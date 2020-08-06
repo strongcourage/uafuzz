@@ -1,0 +1,342 @@
+-------------------
+{0x8048308;.init_proc}
+[0x8048308;(0x8048308,0x8048309,0x804830c);(0x8048311);(0x804830c-0x80483d0-0x8048311)]
+(0x8048308;push    ebx;53;0x8048308;.init_proc)
+(0x8048309;sub     esp, 8;83 EC 08;0x8048308;.init_proc)
+(0x804830c;call    __x86_get_pc_thunk_bx;E8 BF 00 00 00;0x8048308;.init_proc)
+
+[0x8048311;(0x8048311,0x8048317,0x804831d,0x804831f);(0x8048321,0x8048326);(0x804830c-0x80483d0-0x8048311)]
+(0x8048311;add     ebx, 1CEFh;81 C3 EF 1C 00 00;0x8048311;.init_proc)
+(0x8048317;mov     eax, ds:(__gmon_start___ptr - 804A000h)[ebx];8B 83 FC FF FF FF;0x8048311;.init_proc)
+(0x804831d;test    eax, eax;85 C0;0x8048311;.init_proc)
+(0x804831f;jz      short loc_8048326;74 05;0x8048311;.init_proc)
+
+[0x8048321;(0x8048321);(0x8048326);(0x8048321-0x8048390-0x8048326)]
+(0x8048321;call    __gmon_start__;E8 6A 00 00 00;0x8048321;.init_proc)
+
+[0x8048326;(0x8048326,0x8048329,0x804832a);();()]
+(0x8048326;add     esp, 8;83 C4 08;0x8048326;.init_proc)
+(0x8048329;pop     ebx;5B;0x8048326;.init_proc)
+(0x804832a;retn;C3;0x8048326;.init_proc)
+
+-------------------
+{0x8048340;.read}
+[0x8048340;(0x8048340);(0x804a054);()]
+(0x8048340;jmp     ds:off_804A00C;FF 25 0C A0 04 08;0x8048340;.read)
+
+-------------------
+{0x8048350;.free}
+[0x8048350;(0x8048350);(0x804a058);()]
+(0x8048350;jmp     ds:off_804A010;FF 25 10 A0 04 08;0x8048350;.free)
+
+-------------------
+{0x8048360;.malloc}
+[0x8048360;(0x8048360);(0x804a05c);()]
+(0x8048360;jmp     ds:off_804A014;FF 25 14 A0 04 08;0x8048360;.malloc)
+
+-------------------
+{0x8048370;.open}
+[0x8048370;(0x8048370);(0x804a060);()]
+(0x8048370;jmp     ds:off_804A018;FF 25 18 A0 04 08;0x8048370;.open)
+
+-------------------
+{0x8048380;.__libc_start_main}
+[0x8048380;(0x8048380);(0x804a064);()]
+(0x8048380;jmp     ds:off_804A01C;FF 25 1C A0 04 08;0x8048380;.__libc_start_main)
+
+-------------------
+{0x8048390;__gmon_start__}
+[0x8048390;(0x8048390);(0x804a06c);()]
+(0x8048390;jmp     ds:__gmon_start___ptr;FF 25 FC 9F 04 08;0x8048390;__gmon_start__)
+
+-------------------
+{0x80483a0;_start}
+[0x80483a0;(0x80483a0,0x80483a2,0x80483a3,0x80483a5,0x80483a8,0x80483a9,0x80483aa,0x80483ab,0x80483b0,0x80483b5,0x80483b6,0x80483b7,0x80483bc);(0x80483c1);(0x80483bc-0x8048380-0x80483c1)]
+(0x80483a0;xor     ebp, ebp;31 ED;0x80483a0;_start)
+(0x80483a2;pop     esi;5E;0x80483a0;_start)
+(0x80483a3;mov     ecx, esp;89 E1;0x80483a0;_start)
+(0x80483a5;and     esp, 0FFFFFFF0h;83 E4 F0;0x80483a0;_start)
+(0x80483a8;push    eax;50;0x80483a0;_start)
+(0x80483a9;push    esp;54;0x80483a0;_start)
+(0x80483aa;push    edx;52;0x80483a0;_start)
+(0x80483ab;push    offset __libc_csu_fini;68 D0 85 04 08;0x80483a0;_start)
+(0x80483b0;push    offset __libc_csu_init;68 70 85 04 08;0x80483a0;_start)
+(0x80483b5;push    ecx;51;0x80483a0;_start)
+(0x80483b6;push    esi;56;0x80483a0;_start)
+(0x80483b7;push    offset main;68 B5 84 04 08;0x80483a0;_start)
+(0x80483bc;call    ___libc_start_main;E8 BF FF FF FF;0x80483a0;_start)
+
+[0x80483c1;(0x80483c1);();(0x80483bc-0x8048380-0x80483c1)]
+(0x80483c1;hlt;F4;0x80483c1;_start)
+
+-------------------
+{0x80483d0;__x86.get_pc_thunk.bx}
+[0x80483d0;(0x80483d0,0x80483d3);();()]
+(0x80483d0;mov     ebx, [esp+0];8B 1C 24;0x80483d0;__x86.get_pc_thunk.bx)
+(0x80483d3;retn;C3;0x80483d0;__x86.get_pc_thunk.bx)
+
+-------------------
+{0x80483e0;deregister_tm_clones}
+[0x80483e0;(0x80483e0,0x80483e5,0x80483ea,0x80483ed);(0x80483ef,0x8048409);()]
+(0x80483e0;mov     eax, offset unk_804A02B;B8 2B A0 04 08;0x80483e0;deregister_tm_clones)
+(0x80483e5;sub     eax, offset __bss_start;2D 28 A0 04 08;0x80483e0;deregister_tm_clones)
+(0x80483ea;cmp     eax, 6;83 F8 06;0x80483e0;deregister_tm_clones)
+(0x80483ed;jbe     short locret_8048409;76 1A;0x80483e0;deregister_tm_clones)
+
+[0x80483ef;(0x80483ef,0x80483f4,0x80483f6);(0x80483f8,0x8048409);()]
+(0x80483ef;mov     eax, 0;B8 00 00 00 00;0x80483ef;deregister_tm_clones)
+(0x80483f4;test    eax, eax;85 C0;0x80483ef;deregister_tm_clones)
+(0x80483f6;jz      short locret_8048409;74 11;0x80483ef;deregister_tm_clones)
+
+[0x80483f8;(0x80483f8,0x80483f9,0x80483fb,0x80483fe,0x8048403);(0x8048405);()]
+(0x80483f8;push    ebp;55;0x80483f8;deregister_tm_clones)
+(0x80483f9;mov     ebp, esp;89 E5;0x80483f8;deregister_tm_clones)
+(0x80483fb;sub     esp, 14h;83 EC 14;0x80483f8;deregister_tm_clones)
+(0x80483fe;push    offset __bss_start;68 28 A0 04 08;0x80483f8;deregister_tm_clones)
+(0x8048403;call    eax;FF D0;0x80483f8;deregister_tm_clones)
+
+[0x8048405;(0x8048405,0x8048408);(0x8048409);()]
+(0x8048405;add     esp, 10h;83 C4 10;0x8048405;deregister_tm_clones)
+(0x8048408;leave;C9;0x8048405;deregister_tm_clones)
+
+[0x8048409;(0x8048409);();()]
+(0x8048409;rep retn;F3 C3;0x8048409;deregister_tm_clones)
+
+-------------------
+{0x8048410;register_tm_clones}
+[0x8048410;(0x8048410,0x8048415,0x804841a,0x804841d,0x804841f,0x8048422,0x8048424,0x8048426);(0x8048428,0x8048443);()]
+(0x8048410;mov     eax, offset __bss_start;B8 28 A0 04 08;0x8048410;register_tm_clones)
+(0x8048415;sub     eax, offset __bss_start;2D 28 A0 04 08;0x8048410;register_tm_clones)
+(0x804841a;sar     eax, 2;C1 F8 02;0x8048410;register_tm_clones)
+(0x804841d;mov     edx, eax;89 C2;0x8048410;register_tm_clones)
+(0x804841f;shr     edx, 1Fh;C1 EA 1F;0x8048410;register_tm_clones)
+(0x8048422;add     eax, edx;01 D0;0x8048410;register_tm_clones)
+(0x8048424;sar     eax, 1;D1 F8;0x8048410;register_tm_clones)
+(0x8048426;jz      short locret_8048443;74 1B;0x8048410;register_tm_clones)
+
+[0x8048428;(0x8048428,0x804842d,0x804842f);(0x8048431,0x8048443);()]
+(0x8048428;mov     edx, 0;BA 00 00 00 00;0x8048428;register_tm_clones)
+(0x804842d;test    edx, edx;85 D2;0x8048428;register_tm_clones)
+(0x804842f;jz      short locret_8048443;74 12;0x8048428;register_tm_clones)
+
+[0x8048431;(0x8048431,0x8048432,0x8048434,0x8048437,0x8048438,0x804843d);(0x804843f);()]
+(0x8048431;push    ebp;55;0x8048431;register_tm_clones)
+(0x8048432;mov     ebp, esp;89 E5;0x8048431;register_tm_clones)
+(0x8048434;sub     esp, 10h;83 EC 10;0x8048431;register_tm_clones)
+(0x8048437;push    eax;50;0x8048431;register_tm_clones)
+(0x8048438;push    offset __bss_start;68 28 A0 04 08;0x8048431;register_tm_clones)
+(0x804843d;call    edx;FF D2;0x8048431;register_tm_clones)
+
+[0x804843f;(0x804843f,0x8048442);(0x8048443);()]
+(0x804843f;add     esp, 10h;83 C4 10;0x804843f;register_tm_clones)
+(0x8048442;leave;C9;0x804843f;register_tm_clones)
+
+[0x8048443;(0x8048443);();()]
+(0x8048443;rep retn;F3 C3;0x8048443;register_tm_clones)
+
+-------------------
+{0x8048450;__do_global_dtors_aux}
+[0x8048450;(0x8048450,0x8048457);(0x8048459,0x804846c);()]
+(0x8048450;cmp     ds:__bss_start, 0;80 3D 28 A0 04 08 00;0x8048450;__do_global_dtors_aux)
+(0x8048457;jnz     short locret_804846C;75 13;0x8048450;__do_global_dtors_aux)
+
+[0x8048459;(0x8048459,0x804845a,0x804845c,0x804845f);(0x8048464);(0x804845f-0x80483e0-0x8048464)]
+(0x8048459;push    ebp;55;0x8048459;__do_global_dtors_aux)
+(0x804845a;mov     ebp, esp;89 E5;0x8048459;__do_global_dtors_aux)
+(0x804845c;sub     esp, 8;83 EC 08;0x8048459;__do_global_dtors_aux)
+(0x804845f;call    deregister_tm_clones;E8 7C FF FF FF;0x8048459;__do_global_dtors_aux)
+
+[0x8048464;(0x8048464,0x804846b);(0x804846c);(0x804845f-0x80483e0-0x8048464)]
+(0x8048464;mov     ds:__bss_start, 1;C6 05 28 A0 04 08 01;0x8048464;__do_global_dtors_aux)
+(0x804846b;leave;C9;0x8048464;__do_global_dtors_aux)
+
+[0x804846c;(0x804846c);();()]
+(0x804846c;rep retn;F3 C3;0x804846c;__do_global_dtors_aux)
+
+-------------------
+{0x8048470;frame_dummy}
+[0x8048470;(0x8048470,0x8048475,0x8048477,0x8048479);(0x804847b,0x8048480);()]
+(0x8048470;mov     eax, offset __JCR_LIST__;B8 10 9F 04 08;0x8048470;frame_dummy)
+(0x8048475;mov     edx, [eax];8B 10;0x8048470;frame_dummy)
+(0x8048477;test    edx, edx;85 D2;0x8048470;frame_dummy)
+(0x8048479;jnz     short loc_8048480;75 05;0x8048470;frame_dummy)
+
+[0x804847b;(0x804847b);(0x8048410);()]
+(0x804847b;jmp     short register_tm_clones;EB 93;0x804847b;frame_dummy)
+
+[0x8048480;(0x8048480,0x8048485,0x8048487);(0x804847b,0x8048489);()]
+(0x8048480;mov     edx, 0;BA 00 00 00 00;0x8048480;frame_dummy)
+(0x8048485;test    edx, edx;85 D2;0x8048480;frame_dummy)
+(0x8048487;jz      short loc_804847B;74 F2;0x8048480;frame_dummy)
+
+[0x8048489;(0x8048489,0x804848a,0x804848c,0x804848f,0x8048490);(0x8048492);()]
+(0x8048489;push    ebp;55;0x8048489;frame_dummy)
+(0x804848a;mov     ebp, esp;89 E5;0x8048489;frame_dummy)
+(0x804848c;sub     esp, 14h;83 EC 14;0x8048489;frame_dummy)
+(0x804848f;push    eax;50;0x8048489;frame_dummy)
+(0x8048490;call    edx;FF D2;0x8048489;frame_dummy)
+
+[0x8048492;(0x8048492,0x8048495,0x8048496);(0x8048410);()]
+(0x8048492;add     esp, 10h;83 C4 10;0x8048492;frame_dummy)
+(0x8048495;leave;C9;0x8048492;frame_dummy)
+(0x8048496;jmp     register_tm_clones;E9 75 FF FF FF;0x8048492;frame_dummy)
+
+-------------------
+{0x804849b;bad_func}
+[0x804849b;(0x804849b,0x804849c,0x804849e,0x80484a1,0x80484a6,0x80484a9,0x80484aa);(0x80484af);(0x80484aa-0x8048350-0x80484af)]
+(0x804849b;push    ebp;55;0x804849b;bad_func)
+(0x804849c;mov     ebp, esp;89 E5;0x804849b;bad_func)
+(0x804849e;sub     esp, 8;83 EC 08;0x804849b;bad_func)
+(0x80484a1;mov     eax, ds:p;A1 2C A0 04 08;0x804849b;bad_func)
+(0x80484a6;sub     esp, 0Ch;83 EC 0C;0x804849b;bad_func)
+(0x80484a9;push    eax;50;0x804849b;bad_func)
+(0x80484aa;call    _free;E8 A1 FE FF FF;0x804849b;bad_func)
+
+[0x80484af;(0x80484af,0x80484b2,0x80484b3,0x80484b4);();(0x80484aa-0x8048350-0x80484af)]
+(0x80484af;add     esp, 10h;83 C4 10;0x80484af;bad_func)
+(0x80484b2;nop;90;0x80484af;bad_func)
+(0x80484b3;leave;C9;0x80484af;bad_func)
+(0x80484b4;retn;C3;0x80484af;bad_func)
+
+-------------------
+{0x80484b5;main}
+[0x80484b5;(0x80484b5,0x80484b9,0x80484bc,0x80484bf,0x80484c0,0x80484c2,0x80484c3,0x80484c6,0x80484c8,0x80484cb,0x80484ce,0x80484d0,0x80484d3,0x80484d5,0x80484d6);(0x80484db);(0x80484d6-0x8048370-0x80484db)]
+(0x80484b5;lea     ecx, [esp+4];8D 4C 24 04;0x80484b5;main)
+(0x80484b9;and     esp, 0FFFFFFF0h;83 E4 F0;0x80484b5;main)
+(0x80484bc;push    dword ptr [ecx-4];FF 71 FC;0x80484b5;main)
+(0x80484bf;push    ebp;55;0x80484b5;main)
+(0x80484c0;mov     ebp, esp;89 E5;0x80484b5;main)
+(0x80484c2;push    ecx;51;0x80484b5;main)
+(0x80484c3;sub     esp, 14h;83 EC 14;0x80484b5;main)
+(0x80484c6;mov     eax, ecx;89 C8;0x80484b5;main)
+(0x80484c8;mov     eax, [eax+4];8B 40 04;0x80484b5;main)
+(0x80484cb;add     eax, 4;83 C0 04;0x80484b5;main)
+(0x80484ce;mov     eax, [eax];8B 00;0x80484b5;main)
+(0x80484d0;sub     esp, 8;83 EC 08;0x80484b5;main)
+(0x80484d3;push    0;6A 00;0x80484b5;main)
+(0x80484d5;push    eax;50;0x80484b5;main)
+(0x80484d6;call    _open;E8 95 FE FF FF;0x80484b5;main)
+
+[0x80484db;(0x80484db,0x80484de,0x80484e1,0x80484e4,0x80484e6,0x80484eb,0x80484ee);(0x80484f3);(0x80484ee-0x8048340-0x80484f3)]
+(0x80484db;add     esp, 10h;83 C4 10;0x80484db;main)
+(0x80484de;mov     [ebp+f], eax;89 45 F4;0x80484db;main)
+(0x80484e1;sub     esp, 4;83 EC 04;0x80484db;main)
+(0x80484e4;push    0Ah;6A 0A;0x80484db;main)
+(0x80484e6;push    offset buf;68 34 A0 04 08;0x80484db;main)
+(0x80484eb;push    [ebp+f];FF 75 F4;0x80484db;main)
+(0x80484ee;call    _read;E8 4D FE FF FF;0x80484db;main)
+
+[0x80484f3;(0x80484f3,0x80484f6,0x80484f9,0x80484fb);(0x8048500);(0x80484fb-0x8048360-0x8048500)]
+(0x80484f3;add     esp, 10h;83 C4 10;0x80484f3;main)
+(0x80484f6;sub     esp, 0Ch;83 EC 0C;0x80484f3;main)
+(0x80484f9;push    4;6A 04;0x80484f3;main)
+(0x80484fb;call    _malloc;E8 60 FE FF FF;0x80484f3;main)
+
+[0x8048500;(0x8048500,0x8048503,0x8048508,0x804850f,0x8048511);(0x8048513,0x804852f);(0x80484fb-0x8048360-0x8048500)]
+(0x8048500;add     esp, 10h;83 C4 10;0x8048500;main)
+(0x8048503;mov     ds:p, eax;A3 2C A0 04 08;0x8048500;main)
+(0x8048508;movzx   eax, ds:buf;0F B6 05 34 A0 04 08;0x8048500;main)
+(0x804850f;cmp     al, 41h;3C 41;0x8048500;main)
+(0x8048511;jnz     short loc_804852F;75 1C;0x8048500;main)
+
+[0x8048513;(0x8048513,0x8048516,0x8048518);(0x804851d);(0x8048518-0x8048360-0x804851d)]
+(0x8048513;sub     esp, 0Ch;83 EC 0C;0x8048513;main)
+(0x8048516;push    4;6A 04;0x8048513;main)
+(0x8048518;call    _malloc;E8 43 FE FF FF;0x8048513;main)
+
+[0x804851d;(0x804851d,0x8048520,0x8048525,0x804852a);(0x804852f);(0x8048518-0x8048360-0x804851d)]
+(0x804851d;add     esp, 10h;83 C4 10;0x804851d;main)
+(0x8048520;mov     ds:p_alias, eax;A3 30 A0 04 08;0x804851d;main)
+(0x8048525;mov     eax, ds:p_alias;A1 30 A0 04 08;0x804851d;main)
+(0x804852a;mov     ds:p, eax;A3 2C A0 04 08;0x804851d;main)
+
+[0x804852f;(0x804852f,0x8048536,0x8048538);(0x804853a,0x804853f);()]
+(0x804852f;movzx   eax, ds:buf+1;0F B6 05 35 A0 04 08;0x804852f;main)
+(0x8048536;cmp     al, 46h;3C 46;0x804852f;main)
+(0x8048538;jnz     short loc_804853F;75 05;0x804852f;main)
+
+[0x804853a;(0x804853a);(0x804853f);(0x804853a-0x804849b-0x804853f)]
+(0x804853a;call    bad_func;E8 5C FF FF FF;0x804853a;main)
+
+[0x804853f;(0x804853f,0x8048546,0x8048548);(0x804854a,0x8048555);()]
+(0x804853f;movzx   eax, ds:buf+2;0F B6 05 36 A0 04 08;0x804853f;main)
+(0x8048546;cmp     al, 55h;3C 55;0x804853f;main)
+(0x8048548;jnz     short loc_8048555;75 0B;0x804853f;main)
+
+[0x804854a;(0x804854a,0x804854f);(0x8048555);()]
+(0x804854a;mov     eax, ds:p;A1 2C A0 04 08;0x804854a;main)
+(0x804854f;mov     dword ptr [eax], 1;C7 00 01 00 00 00;0x804854a;main)
+
+[0x8048555;(0x8048555,0x804855a,0x804855d,0x804855e,0x8048561);();()]
+(0x8048555;mov     eax, 0;B8 00 00 00 00;0x8048555;main)
+(0x804855a;mov     ecx, [ebp+var_4];8B 4D FC;0x8048555;main)
+(0x804855d;leave;C9;0x8048555;main)
+(0x804855e;lea     esp, [ecx-4];8D 61 FC;0x8048555;main)
+(0x8048561;retn;C3;0x8048555;main)
+
+-------------------
+{0x8048570;__libc_csu_init}
+[0x8048570;(0x8048570,0x8048571,0x8048572,0x8048573,0x8048574);(0x8048579);(0x8048574-0x80483d0-0x8048579)]
+(0x8048570;push    ebp;55;0x8048570;__libc_csu_init)
+(0x8048571;push    edi;57;0x8048570;__libc_csu_init)
+(0x8048572;push    esi;56;0x8048570;__libc_csu_init)
+(0x8048573;push    ebx;53;0x8048570;__libc_csu_init)
+(0x8048574;call    __x86_get_pc_thunk_bx;E8 57 FE FF FF;0x8048570;__libc_csu_init)
+
+[0x8048579;(0x8048579,0x804857f,0x8048582,0x8048586,0x804858c);(0x8048591);(0x804858c-0x8048308-0x8048591)]
+(0x8048579;add     ebx, 1A87h;81 C3 87 1A 00 00;0x8048579;__libc_csu_init)
+(0x804857f;sub     esp, 0Ch;83 EC 0C;0x8048579;__libc_csu_init)
+(0x8048582;mov     ebp, [esp+1Ch+arg_0];8B 6C 24 20;0x8048579;__libc_csu_init)
+(0x8048586;lea     esi, (__do_global_dtors_aux_fini_array_entry - 804A000h)[ebx];8D B3 0C FF FF FF;0x8048579;__libc_csu_init)
+(0x804858c;call    _init_proc;E8 77 FD FF FF;0x8048579;__libc_csu_init)
+
+[0x8048591;(0x8048591,0x8048597,0x8048599,0x804859c,0x804859e);(0x80485a0,0x80485c5);(0x804858c-0x8048308-0x8048591)]
+(0x8048591;lea     eax, (__frame_dummy_init_array_entry - 804A000h)[ebx];8D 83 08 FF FF FF;0x8048591;__libc_csu_init)
+(0x8048597;sub     esi, eax;29 C6;0x8048591;__libc_csu_init)
+(0x8048599;sar     esi, 2;C1 FE 02;0x8048591;__libc_csu_init)
+(0x804859c;test    esi, esi;85 F6;0x8048591;__libc_csu_init)
+(0x804859e;jz      short loc_80485C5;74 25;0x8048591;__libc_csu_init)
+
+[0x80485a0;(0x80485a0,0x80485a2);(0x80485a8);()]
+(0x80485a0;xor     edi, edi;31 FF;0x80485a0;__libc_csu_init)
+(0x80485a2;lea     esi, [esi+0];8D B6 00 00 00 00;0x80485a0;__libc_csu_init)
+
+[0x80485a8;(0x80485a8,0x80485ab,0x80485af,0x80485b3,0x80485b4);(0x80485bb);(0x80485b4-0x8048470-0x80485bb)]
+(0x80485a8;sub     esp, 4;83 EC 04;0x80485a8;__libc_csu_init)
+(0x80485ab;push    [esp+20h+arg_8];FF 74 24 2C;0x80485a8;__libc_csu_init)
+(0x80485af;push    [esp+24h+arg_4];FF 74 24 2C;0x80485a8;__libc_csu_init)
+(0x80485b3;push    ebp;55;0x80485a8;__libc_csu_init)
+(0x80485b4;call    ds:(__frame_dummy_init_array_entry - 804A000h)[ebx+edi*4];FF 94 BB 08 FF FF FF;0x80485a8;__libc_csu_init)
+
+[0x80485bb;(0x80485bb,0x80485be,0x80485c1,0x80485c3);(0x80485c5,0x80485a8);(0x80485b4-0x8048470-0x80485bb)]
+(0x80485bb;add     edi, 1;83 C7 01;0x80485bb;__libc_csu_init)
+(0x80485be;add     esp, 10h;83 C4 10;0x80485bb;__libc_csu_init)
+(0x80485c1;cmp     edi, esi;39 F7;0x80485bb;__libc_csu_init)
+(0x80485c3;jnz     short loc_80485A8;75 E3;0x80485bb;__libc_csu_init)
+
+[0x80485c5;(0x80485c5,0x80485c8,0x80485c9,0x80485ca,0x80485cb,0x80485cc);();()]
+(0x80485c5;add     esp, 0Ch;83 C4 0C;0x80485c5;__libc_csu_init)
+(0x80485c8;pop     ebx;5B;0x80485c5;__libc_csu_init)
+(0x80485c9;pop     esi;5E;0x80485c5;__libc_csu_init)
+(0x80485ca;pop     edi;5F;0x80485c5;__libc_csu_init)
+(0x80485cb;pop     ebp;5D;0x80485c5;__libc_csu_init)
+(0x80485cc;retn;C3;0x80485c5;__libc_csu_init)
+
+-------------------
+{0x80485d0;__libc_csu_fini}
+[0x80485d0;(0x80485d0);();()]
+(0x80485d0;rep retn;F3 C3;0x80485d0;__libc_csu_fini)
+
+-------------------
+{0x80485d4;.term_proc}
+[0x80485d4;(0x80485d4,0x80485d5,0x80485d8);(0x80485dd);(0x80485d8-0x80483d0-0x80485dd)]
+(0x80485d4;push    ebx;53;0x80485d4;.term_proc)
+(0x80485d5;sub     esp, 8;83 EC 08;0x80485d4;.term_proc)
+(0x80485d8;call    __x86_get_pc_thunk_bx;E8 F3 FD FF FF;0x80485d4;.term_proc)
+
+[0x80485dd;(0x80485dd,0x80485e3,0x80485e6,0x80485e7);();(0x80485d8-0x80483d0-0x80485dd)]
+(0x80485dd;add     ebx, 1A23h;81 C3 23 1A 00 00;0x80485dd;.term_proc)
+(0x80485e3;add     esp, 8;83 C4 08;0x80485dd;.term_proc)
+(0x80485e6;pop     ebx;5B;0x80485dd;.term_proc)
+(0x80485e7;retn;C3;0x80485dd;.term_proc)
+

@@ -1,0 +1,80 @@
+# Organization
+
+  BINSEC's development happens in the protected devel branch
+
+  `master` is used to store releases.
+
+# Build
+
+If you just checked out the repository, you need generate the configure script
+with `autoconf`.
+
+Once this is done, the usual invocation should work:
+```
+% ./configure
+```
+
+You have the choice of either building evrything (the default), or if you know
+what you are doing, build either pinsec or binsec. 
+
+To build everything:
+
+```
+% make
+```
+
+
+## Binsec
+
+Now if you are interested in binsec only type at toplevel
+
+```
+% make binsec
+```
+
+or
+
+```
+% cd src && make depend && make -j
+```
+
+### ocamlbuild-based architecture ###
+
+If `ocamlbuild` is installed, it can be used to compile `binsec`.
+
+At toplevel (or in `src`)
+```
+make clean
+OCAMLBUILD=ocamlbuild make
+```
+
+
+## Pinsec
+
+This step is more involved
+
+```
+% make pinsec
+```
+
+
+# Documentation
+
+```
+% make -f Distrib.mk alldoc
+```
+
+## Distribution
+
+The tarball is built by the previous step. In case you only need the tarball,
+type:
+
+```
+% make -f Distrib.mk distrib
+```
+
+To test the tarball build, type in the platform directory
+
+```
+% ./script/test_distrib.sh
+```

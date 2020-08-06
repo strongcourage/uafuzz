@@ -1,0 +1,2232 @@
+ast/ast_builder.cmo : static/types/region_bitvector.cmi base/list_utils.cmi \
+    utils/instruction.cmi dba/dba_types.cmi dba/dba_printer.cmi dba/dba.cmi \
+    ast/cfgraph.cmi ast/ast_builder.cmi
+ast/ast_builder.cmx : static/types/region_bitvector.cmx base/list_utils.cmx \
+    utils/instruction.cmx dba/dba_types.cmx dba/dba_printer.cmx dba/dba.cmx \
+    ast/cfgraph.cmx ast/ast_builder.cmi
+ast/ast_builder.cmi : static/types/region_bitvector.cmi \
+    utils/instruction.cmi dba/dba_types.cmi dba/dba.cmi ast/cfgraph.cmi
+ast/cfgraph.cmo : ast/cfgraph.cmi
+ast/cfgraph.cmx : ast/cfgraph.cmi
+ast/cfgraph.cmi :
+ast/instr_cfg.cmo : base/virtual_address.cmi base/mnemonic.cmi \
+    base/machine.cmi utils/instruction.cmi utils/dhunk.cmi dba/dba_types.cmi \
+    dba/dba.cmi utils/colors.cmi utils/cfg.cmi base/bitvector.cmi \
+    ast/instr_cfg.cmi
+ast/instr_cfg.cmx : base/virtual_address.cmx base/mnemonic.cmx \
+    base/machine.cmx utils/instruction.cmx utils/dhunk.cmx dba/dba_types.cmx \
+    dba/dba.cmx utils/colors.cmx utils/cfg.cmx base/bitvector.cmx \
+    ast/instr_cfg.cmi
+ast/instr_cfg.cmi : base/virtual_address.cmi utils/instruction.cmi \
+    dba/dba_types.cmi dba/dba.cmi utils/cfg.cmi
+backwards/bw_main.cmo : backwards/opaque.cmi base/cli.cmi \
+    backwards/bw_options.cmi backwards/bw_main.cmi
+backwards/bw_main.cmx : backwards/opaque.cmx base/cli.cmx \
+    backwards/bw_options.cmx backwards/bw_main.cmi
+backwards/bw_main.cmi :
+backwards/bw_options.cmo : base/cli.cmi backwards/bw_options.cmi
+backwards/bw_options.cmx : base/cli.cmx backwards/bw_options.cmi
+backwards/bw_options.cmi : base/cli.cmi
+backwards/opaque.cmo : base/virtual_address.cmi sse/sse_utils.cmi \
+    sse/sse_symbolic.cmi sse/sse_smt.cmi sse/sse_options.cmi \
+    formula/solver.cmi parser/parser.cmi parser/parse_utils.cmi \
+    parser/parse_helpers.cmi base/mnemonic.cmi base/logger.cmi \
+    base/list_utils.cmi parser/lexer.cmo kernel/kernel_options.cmi \
+    utils/instruction.cmi ast/instr_cfg.cmi formula/formula_pp.cmi \
+    formula/formula_options.cmi formula/formula.cmi disasm/disasm.cmi \
+    utils/dhunk.cmi dba/dba_types.cmi dba/dba_printer.cmi dba/dba.cmi \
+    backwards/bw_options.cmi base/bitvector.cmi backwards/opaque.cmi
+backwards/opaque.cmx : base/virtual_address.cmx sse/sse_utils.cmx \
+    sse/sse_symbolic.cmx sse/sse_smt.cmx sse/sse_options.cmx \
+    formula/solver.cmx parser/parser.cmx parser/parse_utils.cmx \
+    parser/parse_helpers.cmx base/mnemonic.cmx base/logger.cmx \
+    base/list_utils.cmx parser/lexer.cmx kernel/kernel_options.cmx \
+    utils/instruction.cmx ast/instr_cfg.cmx formula/formula_pp.cmx \
+    formula/formula_options.cmx formula/formula.cmx disasm/disasm.cmx \
+    utils/dhunk.cmx dba/dba_types.cmx dba/dba_printer.cmx dba/dba.cmx \
+    backwards/bw_options.cmx base/bitvector.cmx backwards/opaque.cmi
+backwards/opaque.cmi : base/virtual_address.cmi ast/instr_cfg.cmi
+base/array_utils.cmo : base/array_utils.cmi
+base/array_utils.cmx : base/array_utils.cmi
+base/array_utils.cmi :
+base/base_logger.cmo : base/logger.cmi base/base_logger.cmi
+base/base_logger.cmx : base/logger.cmx base/base_logger.cmi
+base/base_logger.cmi : base/logger.cmi
+base/basic_types.cmo : base/sigs.cmi base/natural.cmi base/hashamt.cmi \
+    base/bigint.cmi base/basic_types.cmi
+base/basic_types.cmx : base/sigs.cmi base/natural.cmx base/hashamt.cmx \
+    base/bigint.cmx base/basic_types.cmi
+base/basic_types.cmi : base/sigs.cmi base/natural.cmi base/bigint.cmi
+base/bigint.cmo : base/bigint.cmi
+base/bigint.cmx : base/bigint.cmi
+base/bigint.cmi :
+base/binstream.cmo : base/sequence.cmi base/base_logger.cmi \
+    base/binstream.cmi
+base/binstream.cmx : base/sequence.cmx base/base_logger.cmx \
+    base/binstream.cmi
+base/binstream.cmi : base/sigs.cmi
+base/bitset.cmo : base/bitvector.cmi base/bitset.cmi
+base/bitset.cmx : base/bitvector.cmx base/bitset.cmi
+base/bitset.cmi :
+base/bitvector.cmo : base/sigs.cmi base/bigint.cmi base/basic_types.cmi \
+    base/bitvector.cmi
+base/bitvector.cmx : base/sigs.cmi base/bigint.cmx base/basic_types.cmx \
+    base/bitvector.cmi
+base/bitvector.cmi : base/sigs.cmi base/bigint.cmi base/basic_types.cmi
+base/cli.cmo : base/string_utils.cmi base/sigs.cmi base/logger.cmi \
+    base/basic_types.cmi base/cli.cmi
+base/cli.cmx : base/string_utils.cmx base/sigs.cmi base/logger.cmx \
+    base/basic_types.cmx base/cli.cmi
+base/cli.cmi : base/sigs.cmi base/logger.cmi base/basic_types.cmi
+base/file_utils.cmo : base/file_utils.cmi
+base/file_utils.cmx : base/file_utils.cmi
+base/file_utils.cmi :
+base/fstack.cmo : base/fstack.cmi
+base/fstack.cmx : base/fstack.cmi
+base/fstack.cmi :
+base/hashamt.cmo : base/hashamt.cmi
+base/hashamt.cmx : base/hashamt.cmi
+base/hashamt.cmi :
+base/interval.cmo : base/sigs.cmi base/bitvector.cmi base/basic_types.cmi \
+    base/interval.cmi
+base/interval.cmx : base/sigs.cmi base/bitvector.cmx base/basic_types.cmx \
+    base/interval.cmi
+base/interval.cmi : base/sigs.cmi base/bitvector.cmi base/basic_types.cmi
+base/list_utils.cmo : base/list_utils.cmi
+base/list_utils.cmx : base/list_utils.cmi
+base/list_utils.cmi :
+base/logger.cmo : base/logger.cmi
+base/logger.cmx : base/logger.cmi
+base/logger.cmi :
+base/machine.cmo : base/machine.cmi
+base/machine.cmx : base/machine.cmi
+base/machine.cmi :
+base/mnemonic.cmo : base/mnemonic.cmi
+base/mnemonic.cmx : base/mnemonic.cmi
+base/mnemonic.cmi :
+base/natural.cmo : base/natural.cmi
+base/natural.cmx : base/natural.cmi
+base/natural.cmi :
+base/print_utils.cmo : base/print_utils.cmi
+base/print_utils.cmx : base/print_utils.cmi
+base/print_utils.cmi :
+base/sequence.cmo : base/sequence.cmi
+base/sequence.cmx : base/sequence.cmi
+base/sequence.cmi :
+base/sigs.cmi : base/hashamt.cmi
+base/size.cmo : base/natural.cmi base/basic_types.cmi base/size.cmi
+base/size.cmx : base/natural.cmx base/basic_types.cmx base/size.cmi
+base/size.cmi : base/natural.cmi
+base/string_utils.cmo : base/string_utils.cmi
+base/string_utils.cmx : base/string_utils.cmi
+base/string_utils.cmi :
+base/utils.cmo : base/utils.cmi
+base/utils.cmx : base/utils.cmi
+base/utils.cmi :
+base/virtual_address.cmo : base/bitvector.cmi base/bigint.cmi \
+    base/basic_types.cmi base/virtual_address.cmi
+base/virtual_address.cmx : base/bitvector.cmx base/bigint.cmx \
+    base/basic_types.cmx base/virtual_address.cmi
+base/virtual_address.cmi : base/sigs.cmi base/bitvector.cmi base/bigint.cmi
+base/worklist.cmo : base/sigs.cmi base/worklist.cmi
+base/worklist.cmx : base/sigs.cmi base/worklist.cmi
+base/worklist.cmi : base/sigs.cmi
+binpatcher/binpatcher.cmo : base/virtual_address.cmi parser/parser.cmi \
+    parser/parse_utils.cmi base/logger.cmi loader/loader_utils.cmi \
+    loader/loader_types.cmi loader/loader.cmi parser/lexer.cmo \
+    kernel/kernel_options.cmi base/cli.cmi base/binstream.cmi \
+    binpatcher/binpatcher_options.cmi base/basic_types.cmi \
+    binpatcher/binpatcher.cmi
+binpatcher/binpatcher.cmx : base/virtual_address.cmx parser/parser.cmx \
+    parser/parse_utils.cmx base/logger.cmx loader/loader_utils.cmx \
+    loader/loader_types.cmx loader/loader.cmx parser/lexer.cmx \
+    kernel/kernel_options.cmx base/cli.cmx base/binstream.cmx \
+    binpatcher/binpatcher_options.cmx base/basic_types.cmx \
+    binpatcher/binpatcher.cmi
+binpatcher/binpatcher.cmi : base/virtual_address.cmi loader/loader_types.cmi \
+    loader/loader.cmi base/binstream.cmi
+binpatcher/binpatcher_options.cmo : base/cli.cmi \
+    binpatcher/binpatcher_options.cmi
+binpatcher/binpatcher_options.cmx : base/cli.cmx \
+    binpatcher/binpatcher_options.cmi
+binpatcher/binpatcher_options.cmi : base/cli.cmi
+config.cmo :
+config.cmx :
+dba/dba.cmo : base/size.cmi base/sigs.cmi base/machine.cmi base/interval.cmi \
+    base/bitvector.cmi base/bigint.cmi dba/dba.cmi
+dba/dba.cmx : base/size.cmx base/sigs.cmi base/machine.cmx base/interval.cmx \
+    base/bitvector.cmx base/bigint.cmx dba/dba.cmi
+dba/dba.cmi : base/size.cmi base/sigs.cmi base/interval.cmi \
+    base/bitvector.cmi base/bigint.cmi
+dba/dba_printer.cmo : base/print_utils.cmi base/interval.cmi dba/dba.cmi \
+    base/bitvector.cmi base/bigint.cmi dba/dba_printer.cmi
+dba/dba_printer.cmx : base/print_utils.cmx base/interval.cmx dba/dba.cmx \
+    base/bitvector.cmx base/bigint.cmx dba/dba_printer.cmi
+dba/dba_printer.cmi : dba/dba.cmi
+dba/dba_to_formula.cmo : formula/formula.cmi dba/dba.cmi \
+    dba/dba_to_formula.cmi
+dba/dba_to_formula.cmx : formula/formula.cmx dba/dba.cmx \
+    dba/dba_to_formula.cmi
+dba/dba_to_formula.cmi : formula/formula.cmi dba/dba.cmi
+dba/dba_types.cmo : base/virtual_address.cmi base/size.cmi base/sigs.cmi \
+    base/machine.cmi base/logger.cmi base/interval.cmi dba/dba_printer.cmi \
+    dba/dba.cmi base/bitvector.cmi base/bigint.cmi base/basic_types.cmi \
+    dba/dba_types.cmi
+dba/dba_types.cmx : base/virtual_address.cmx base/size.cmx base/sigs.cmi \
+    base/machine.cmx base/logger.cmx base/interval.cmx dba/dba_printer.cmx \
+    dba/dba.cmx base/bitvector.cmx base/bigint.cmx base/basic_types.cmx \
+    dba/dba_types.cmi
+dba/dba_types.cmi : base/virtual_address.cmi base/size.cmi base/sigs.cmi \
+    base/logger.cmi dba/dba.cmi base/bitvector.cmi base/bigint.cmi \
+    base/basic_types.cmi
+dba/dba_utils.cmo : base/size.cmi base/machine.cmi base/interval.cmi \
+    dba/errors.cmi dba/dba_types.cmi dba/dba_printer.cmi dba/dba.cmi \
+    base/bitvector.cmi base/bigint.cmi dba/dba_utils.cmi
+dba/dba_utils.cmx : base/size.cmx base/machine.cmx base/interval.cmx \
+    dba/errors.cmx dba/dba_types.cmx dba/dba_printer.cmx dba/dba.cmx \
+    base/bitvector.cmx base/bigint.cmx dba/dba_utils.cmi
+dba/dba_utils.cmi : dba/dba.cmi base/bitvector.cmi
+dba/dba_visitor.cmo : base/interval.cmi dba/dba_types.cmi dba/dba.cmi \
+    base/bitvector.cmi dba/dba_visitor.cmi
+dba/dba_visitor.cmx : base/interval.cmx dba/dba_types.cmx dba/dba.cmx \
+    base/bitvector.cmx dba/dba_visitor.cmi
+dba/dba_visitor.cmi : dba/dba_types.cmi dba/dba.cmi base/bitvector.cmi
+dba/errors.cmo : dba/dba_types.cmi dba/dba.cmi dba/errors.cmi
+dba/errors.cmx : dba/dba_types.cmx dba/dba.cmx dba/errors.cmi
+dba/errors.cmi : dba/dba_types.cmi dba/dba.cmi
+disasm/arm/armToDba.cmo : base/virtual_address.cmi parser/parser.cmi \
+    parser/parse_helpers.cmi base/mnemonic.cmi disasm/x86/lreader.cmi \
+    parser/lexer.cmo kernel/kernel_options.cmi utils/instruction.cmi \
+    dba/errors.cmi disasm/disasm_options.cmi utils/dhunk.cmi \
+    dba/dba_types.cmi dba/dba.cmi base/basic_types.cmi \
+    disasm/arm/armToDba.cmi
+disasm/arm/armToDba.cmx : base/virtual_address.cmx parser/parser.cmx \
+    parser/parse_helpers.cmx base/mnemonic.cmx disasm/x86/lreader.cmx \
+    parser/lexer.cmx kernel/kernel_options.cmx utils/instruction.cmx \
+    dba/errors.cmx disasm/disasm_options.cmx utils/dhunk.cmx \
+    dba/dba_types.cmx dba/dba.cmx base/basic_types.cmx \
+    disasm/arm/armToDba.cmi
+disasm/arm/armToDba.cmi : base/virtual_address.cmi disasm/x86/lreader.cmi \
+    utils/instruction.cmi utils/dhunk.cmi
+disasm/decode_utils.cmo : disasm/x86/x86toDba.cmi \
+    disasm/x86/x86Instruction.cmi base/virtual_address.cmi \
+    base/string_utils.cmi base/logger.cmi disasm/disasm_options.cmi \
+    utils/dhunk.cmi base/binstream.cmi base/bigint.cmi \
+    disasm/decode_utils.cmi
+disasm/decode_utils.cmx : disasm/x86/x86toDba.cmx \
+    disasm/x86/x86Instruction.cmx base/virtual_address.cmx \
+    base/string_utils.cmx base/logger.cmx disasm/disasm_options.cmx \
+    utils/dhunk.cmx base/binstream.cmx base/bigint.cmx \
+    disasm/decode_utils.cmi
+disasm/decode_utils.cmi : utils/dhunk.cmi base/binstream.cmi base/bigint.cmi
+disasm/disasm.cmo : disasm/x86/x86toDba.cmi base/virtual_address.cmi \
+    base/string_utils.cmi disasm/simplify/simplification_dba_block.cmi \
+    base/print_utils.cmi parser/parse_utils.cmi base/mnemonic.cmi \
+    base/logger.cmi loader/loader_utils.cmi loader/loader.cmi \
+    llvm/llvm_decoder.cmi kernel/kernel_options.cmi \
+    kernel/kernel_functions.cmi base/interval.cmi utils/instruction.cmi \
+    ast/instr_cfg.cmi infos.cmi dba/errors.cmi disasm/disasm_options.cmi \
+    disasm/disasm_core.cmi disasm/disasm_cfg.cmi utils/dhunk.cmi \
+    dba/dba_types.cmi dba/dba_printer.cmi dba/dba.cmi base/cli.cmi \
+    base/binstream.cmi base/bigint.cmi base/basic_types.cmi disasm/disasm.cmi
+disasm/disasm.cmx : disasm/x86/x86toDba.cmx base/virtual_address.cmx \
+    base/string_utils.cmx disasm/simplify/simplification_dba_block.cmx \
+    base/print_utils.cmx parser/parse_utils.cmx base/mnemonic.cmx \
+    base/logger.cmx loader/loader_utils.cmx loader/loader.cmx \
+    llvm/llvm_decoder.cmx kernel/kernel_options.cmx \
+    kernel/kernel_functions.cmx base/interval.cmx utils/instruction.cmx \
+    ast/instr_cfg.cmx infos.cmx dba/errors.cmx disasm/disasm_options.cmx \
+    disasm/disasm_core.cmx disasm/disasm_cfg.cmx utils/dhunk.cmx \
+    dba/dba_types.cmx dba/dba_printer.cmx dba/dba.cmx base/cli.cmx \
+    base/binstream.cmx base/bigint.cmx base/basic_types.cmx disasm/disasm.cmi
+disasm/disasm.cmi : base/virtual_address.cmi ast/instr_cfg.cmi infos.cmi \
+    disasm/disasm_core.cmi dba/dba_types.cmi
+disasm/disasm_cfg.cmo : base/virtual_address.cmi loader/loader_utils.cmi \
+    loader/loader.cmi kernel/kernel_functions.cmi utils/instruction.cmi \
+    ast/instr_cfg.cmi disasm/disasm_options.cmi disasm/disasm_core.cmi \
+    utils/dhunk.cmi disasm/disasm_cfg.cmi
+disasm/disasm_cfg.cmx : base/virtual_address.cmx loader/loader_utils.cmx \
+    loader/loader.cmx kernel/kernel_functions.cmx utils/instruction.cmx \
+    ast/instr_cfg.cmx disasm/disasm_options.cmx disasm/disasm_core.cmx \
+    utils/dhunk.cmx disasm/disasm_cfg.cmi
+disasm/disasm_cfg.cmi :
+disasm/disasm_core.cmo : disasm/x86/x86toDba.cmi \
+    disasm/x86/x86Instruction.cmi base/worklist.cmi base/virtual_address.cmi \
+    base/size.cmi base/mnemonic.cmi base/machine.cmi disasm/x86/lreader.cmi \
+    base/logger.cmi kernel/kernel_options.cmi kernel/kernel_functions.cmi \
+    utils/instruction.cmi dba/errors.cmi disasm/disasm_options.cmi \
+    utils/dhunk.cmi dba/dba.cmi disasm/arm/armToDba.cmi \
+    disasm/disasm_core.cmi
+disasm/disasm_core.cmx : disasm/x86/x86toDba.cmx \
+    disasm/x86/x86Instruction.cmx base/worklist.cmx base/virtual_address.cmx \
+    base/size.cmx base/mnemonic.cmx base/machine.cmx disasm/x86/lreader.cmx \
+    base/logger.cmx kernel/kernel_options.cmx kernel/kernel_functions.cmx \
+    utils/instruction.cmx dba/errors.cmx disasm/disasm_options.cmx \
+    utils/dhunk.cmx dba/dba.cmx disasm/arm/armToDba.cmx \
+    disasm/disasm_core.cmi
+disasm/disasm_core.cmi : base/worklist.cmi base/virtual_address.cmi \
+    base/sigs.cmi utils/instruction.cmi base/binstream.cmi
+disasm/disasm_options.cmo : base/virtual_address.cmi parser/parser.cmi \
+    base/logger.cmi parser/lexer.cmo utils/dhunk.cmi base/cli.cmi \
+    disasm/disasm_options.cmi
+disasm/disasm_options.cmx : base/virtual_address.cmx parser/parser.cmx \
+    base/logger.cmx parser/lexer.cmx utils/dhunk.cmx base/cli.cmx \
+    disasm/disasm_options.cmi
+disasm/disasm_options.cmi : base/virtual_address.cmi utils/dhunk.cmi \
+    base/cli.cmi
+disasm/simplify/simplification_dba.cmo : base/utils.cmi \
+    disasm/simplify/simplification_options.cmi \
+    disasm/simplify/simplification_dba_utils.cmi \
+    disasm/simplify/simplification_dba_prog.cmi \
+    disasm/simplify/simplification_dba_block.cmi disasm/disasm_options.cmi \
+    dba/dba_types.cmi static/ai/ai_options.cmi \
+    disasm/simplify/simplification_dba.cmi
+disasm/simplify/simplification_dba.cmx : base/utils.cmx \
+    disasm/simplify/simplification_options.cmx \
+    disasm/simplify/simplification_dba_utils.cmx \
+    disasm/simplify/simplification_dba_prog.cmx \
+    disasm/simplify/simplification_dba_block.cmx disasm/disasm_options.cmx \
+    dba/dba_types.cmx static/ai/ai_options.cmx \
+    disasm/simplify/simplification_dba.cmi
+disasm/simplify/simplification_dba.cmi : \
+    disasm/simplify/simplification_options.cmi
+disasm/simplify/simplification_dba_block.cmo : base/size.cmi \
+    disasm/simplify/simplification_options.cmi \
+    disasm/simplify/simplification_dba_utils.cmi \
+    static/types/region_bitvector.cmi base/logger.cmi base/interval.cmi \
+    utils/dhunk.cmi dba/dba_types.cmi dba/dba.cmi base/basic_types.cmi \
+    disasm/simplify/simplification_dba_block.cmi
+disasm/simplify/simplification_dba_block.cmx : base/size.cmx \
+    disasm/simplify/simplification_options.cmx \
+    disasm/simplify/simplification_dba_utils.cmx \
+    static/types/region_bitvector.cmx base/logger.cmx base/interval.cmx \
+    utils/dhunk.cmx dba/dba_types.cmx dba/dba.cmx base/basic_types.cmx \
+    disasm/simplify/simplification_dba_block.cmi
+disasm/simplify/simplification_dba_block.cmi : \
+    disasm/simplify/simplification_options.cmi utils/dhunk.cmi
+disasm/simplify/simplification_dba_prog.cmo : \
+    disasm/simplify/simplification_dba_utils.cmi base/logger.cmi \
+    utils/instruction.cmi disasm/disasm_options.cmi dba/dba_types.cmi \
+    dba/dba.cmi disasm/simplify/simplification_dba_prog.cmi
+disasm/simplify/simplification_dba_prog.cmx : \
+    disasm/simplify/simplification_dba_utils.cmx base/logger.cmx \
+    utils/instruction.cmx disasm/disasm_options.cmx dba/dba_types.cmx \
+    dba/dba.cmx disasm/simplify/simplification_dba_prog.cmi
+disasm/simplify/simplification_dba_prog.cmi : \
+    disasm/simplify/simplification_options.cmi
+disasm/simplify/simplification_dba_utils.cmo : disasm/x86/x86toDba.cmi \
+    base/interval.cmi disasm/disasm_options.cmi dba/dba_types.cmi dba/dba.cmi \
+    base/bitvector.cmi base/bigint.cmi base/basic_types.cmi \
+    static/ai/ai_options.cmi disasm/simplify/simplification_dba_utils.cmi
+disasm/simplify/simplification_dba_utils.cmx : disasm/x86/x86toDba.cmx \
+    base/interval.cmx disasm/disasm_options.cmx dba/dba_types.cmx dba/dba.cmx \
+    base/bitvector.cmx base/bigint.cmx base/basic_types.cmx \
+    static/ai/ai_options.cmx disasm/simplify/simplification_dba_utils.cmi
+disasm/simplify/simplification_dba_utils.cmi : dba/dba_types.cmi dba/dba.cmi \
+    base/basic_types.cmi
+disasm/simplify/simplification_options.cmo : utils/instruction.cmi \
+    dba/dba_types.cmi dba/dba.cmi base/cli.cmi \
+    disasm/simplify/simplification_options.cmi
+disasm/simplify/simplification_options.cmx : utils/instruction.cmx \
+    dba/dba_types.cmx dba/dba.cmx base/cli.cmx \
+    disasm/simplify/simplification_options.cmi
+disasm/simplify/simplification_options.cmi : utils/instruction.cmi \
+    dba/dba_types.cmi dba/dba.cmi base/cli.cmi
+disasm/x86/lreader.cmo : base/logger.cmi loader/loader.cmi \
+    disasm/disasm_options.cmi base/binstream.cmi disasm/x86/lreader.cmi
+disasm/x86/lreader.cmx : base/logger.cmx loader/loader.cmx \
+    disasm/disasm_options.cmx base/binstream.cmx disasm/x86/lreader.cmi
+disasm/x86/lreader.cmi : loader/loader.cmi base/binstream.cmi
+disasm/x86/predba.cmo : base/logger.cmi disasm/disasm_options.cmi \
+    utils/dhunk.cmi dba/dba_printer.cmi dba/dba.cmi disasm/x86/predba.cmi
+disasm/x86/predba.cmx : base/logger.cmx disasm/disasm_options.cmx \
+    utils/dhunk.cmx dba/dba_printer.cmx dba/dba.cmx disasm/x86/predba.cmi
+disasm/x86/predba.cmi : utils/dhunk.cmi dba/dba.cmi
+disasm/x86/x86Instruction.cmo : disasm/x86/x86pp.cmi disasm/x86/x86Types.cmi \
+    base/size.cmi base/mnemonic.cmi utils/instruction.cmi \
+    disasm/x86/x86Instruction.cmi
+disasm/x86/x86Instruction.cmx : disasm/x86/x86pp.cmx disasm/x86/x86Types.cmi \
+    base/size.cmx base/mnemonic.cmx utils/instruction.cmx \
+    disasm/x86/x86Instruction.cmi
+disasm/x86/x86Instruction.cmi : disasm/x86/x86Types.cmi \
+    utils/instruction.cmi
+disasm/x86/x86Types.cmi :
+disasm/x86/x86Util.cmo : disasm/x86/x86Types.cmi base/size.cmi \
+    disasm/x86/lreader.cmi base/logger.cmi disasm/disasm_options.cmi \
+    disasm/x86/x86Util.cmi
+disasm/x86/x86Util.cmx : disasm/x86/x86Types.cmi base/size.cmx \
+    disasm/x86/lreader.cmx base/logger.cmx disasm/disasm_options.cmx \
+    disasm/x86/x86Util.cmi
+disasm/x86/x86Util.cmi : disasm/x86/x86Types.cmi base/size.cmi \
+    disasm/x86/lreader.cmi
+disasm/x86/x86decoder.cmo : disasm/x86/x86pp.cmi disasm/x86/x86Util.cmi \
+    disasm/x86/x86Types.cmi disasm/x86/x86Instruction.cmi \
+    disasm/x86/lreader.cmi base/logger.cmi disasm/disasm_options.cmi \
+    disasm/x86/x86decoder.cmi
+disasm/x86/x86decoder.cmx : disasm/x86/x86pp.cmx disasm/x86/x86Util.cmx \
+    disasm/x86/x86Types.cmi disasm/x86/x86Instruction.cmx \
+    disasm/x86/lreader.cmx base/logger.cmx disasm/disasm_options.cmx \
+    disasm/x86/x86decoder.cmi
+disasm/x86/x86decoder.cmi : disasm/x86/x86Types.cmi \
+    disasm/x86/x86Instruction.cmi disasm/x86/lreader.cmi
+disasm/x86/x86pp.cmo : disasm/x86/x86Util.cmi disasm/x86/x86Types.cmi \
+    base/bigint.cmi disasm/x86/x86pp.cmi
+disasm/x86/x86pp.cmx : disasm/x86/x86Util.cmx disasm/x86/x86Types.cmi \
+    base/bigint.cmx disasm/x86/x86pp.cmi
+disasm/x86/x86pp.cmi : disasm/x86/x86Types.cmi
+disasm/x86/x86toDba.cmo : disasm/x86/x86pp.cmi disasm/x86/x86decoder.cmi \
+    disasm/x86/x86Util.cmi disasm/x86/x86Types.cmi \
+    disasm/x86/x86Instruction.cmi base/virtual_address.cmi base/utils.cmi \
+    base/size.cmi disasm/x86/predba.cmi disasm/x86/lreader.cmi \
+    base/logger.cmi base/list_utils.cmi base/interval.cmi dba/errors.cmi \
+    disasm/disasm_options.cmi utils/dhunk.cmi dba/dba_utils.cmi \
+    dba/dba_types.cmi dba/dba_printer.cmi dba/dba.cmi base/bitvector.cmi \
+    base/bigint.cmi base/basic_types.cmi disasm/x86/x86toDba.cmi
+disasm/x86/x86toDba.cmx : disasm/x86/x86pp.cmx disasm/x86/x86decoder.cmx \
+    disasm/x86/x86Util.cmx disasm/x86/x86Types.cmi \
+    disasm/x86/x86Instruction.cmx base/virtual_address.cmx base/utils.cmx \
+    base/size.cmx disasm/x86/predba.cmx disasm/x86/lreader.cmx \
+    base/logger.cmx base/list_utils.cmx base/interval.cmx dba/errors.cmx \
+    disasm/disasm_options.cmx utils/dhunk.cmx dba/dba_utils.cmx \
+    dba/dba_types.cmx dba/dba_printer.cmx dba/dba.cmx base/bitvector.cmx \
+    base/bigint.cmx base/basic_types.cmx disasm/x86/x86toDba.cmi
+disasm/x86/x86toDba.cmi : disasm/x86/x86Instruction.cmi \
+    base/virtual_address.cmi disasm/x86/lreader.cmi utils/dhunk.cmi \
+    base/binstream.cmi
+dynamic/drun.cmo : dynamic/dse/path_exploration/uaf_detection.cmi \
+    dynamic/trace/trace_options.cmi dynamic/trace/trace_loader.cmi \
+    dynamic/trace/trace_config.cmi dynamic/examples/switch.cmi \
+    dynamic/examples/summary_analysis.cmi dynamic/examples/stat_analysis.cmi \
+    dynamic/examples/sploit1.cmi server/server_options.cmi \
+    dynamic/dse/examples/opaque_predicate.cmi utils/network_io.cmi \
+    base/logger.cmi dynamic/dse/libcall_stubs/libcall_stubs.cmi \
+    dynamic/dse/path_exploration/invertChild.cmi \
+    dynamic/dse/examples/generic_analyse.cmi formula/formula_options.cmi \
+    dynamic/examples/flareon.cmi base/file_utils.cmi \
+    dynamic/dse/path_exploration/eipRewrite.cmi dynamic/dse/dse_options.cmi \
+    piqi/config_piqi_ext.cmo piqi/config_piqi.cmo base/cli.cmi \
+    dynamic/dse/path_exploration/check_trace.cmi \
+    dynamic/dse/examples/call_ret.cmi \
+    dynamic/dse/libcall_stubs/call_convention.cmi \
+    dynamic/examples/branch_coverage.cmi dynamic/drun.cmi
+dynamic/drun.cmx : dynamic/dse/path_exploration/uaf_detection.cmx \
+    dynamic/trace/trace_options.cmx dynamic/trace/trace_loader.cmx \
+    dynamic/trace/trace_config.cmx dynamic/examples/switch.cmx \
+    dynamic/examples/summary_analysis.cmx dynamic/examples/stat_analysis.cmx \
+    dynamic/examples/sploit1.cmx server/server_options.cmx \
+    dynamic/dse/examples/opaque_predicate.cmx utils/network_io.cmx \
+    base/logger.cmx dynamic/dse/libcall_stubs/libcall_stubs.cmx \
+    dynamic/dse/path_exploration/invertChild.cmx \
+    dynamic/dse/examples/generic_analyse.cmx formula/formula_options.cmx \
+    dynamic/examples/flareon.cmx base/file_utils.cmx \
+    dynamic/dse/path_exploration/eipRewrite.cmx dynamic/dse/dse_options.cmx \
+    piqi/config_piqi_ext.cmx piqi/config_piqi.cmx base/cli.cmx \
+    dynamic/dse/path_exploration/check_trace.cmx \
+    dynamic/dse/examples/call_ret.cmx \
+    dynamic/dse/libcall_stubs/call_convention.cmx \
+    dynamic/examples/branch_coverage.cmx dynamic/drun.cmi
+dynamic/drun.cmi :
+dynamic/dse/dse_options.cmo : base/cli.cmi dynamic/dse/dse_options.cmi
+dynamic/dse/dse_options.cmx : base/cli.cmx dynamic/dse/dse_options.cmi
+dynamic/dse/dse_options.cmi : base/cli.cmi
+dynamic/dse/examples/call_ret.cmo : base/utils.cmi \
+    dynamic/trace/trace_type.cmi dynamic/trace/trace_config.cmi base/size.cmi \
+    dynamic/dse/policy_utils.cmi dynamic/dse/path_predicate_env.cmi \
+    dynamic/dse/path_predicate.cmi base/logger.cmi kernel/kernel_options.cmi \
+    formula/formula_pp.cmi formula/formula.cmi dynamic/dse/dse_options.cmi \
+    disasm/decode_utils.cmi dba/dba_types.cmi dba/dba.cmi \
+    piqi/config_piqi.cmo base/bitvector.cmi base/bigint.cmi \
+    base/basic_types.cmi piqi/analysis_config_piqi.cmo \
+    dynamic/dse/examples/call_ret.cmi
+dynamic/dse/examples/call_ret.cmx : base/utils.cmx \
+    dynamic/trace/trace_type.cmx dynamic/trace/trace_config.cmx base/size.cmx \
+    dynamic/dse/policy_utils.cmx dynamic/dse/path_predicate_env.cmx \
+    dynamic/dse/path_predicate.cmx base/logger.cmx kernel/kernel_options.cmx \
+    formula/formula_pp.cmx formula/formula.cmx dynamic/dse/dse_options.cmx \
+    disasm/decode_utils.cmx dba/dba_types.cmx dba/dba.cmx \
+    piqi/config_piqi.cmx base/bitvector.cmx base/bigint.cmx \
+    base/basic_types.cmx piqi/analysis_config_piqi.cmx \
+    dynamic/dse/examples/call_ret.cmi
+dynamic/dse/examples/call_ret.cmi : dynamic/trace/trace_config.cmi \
+    dynamic/dse/path_predicate.cmi
+dynamic/dse/examples/generic_analyse.cmo : base/utils.cmi \
+    dynamic/trace/trace_type.cmi dynamic/trace/trace_config.cmi \
+    smtlib/smt_model.cmi dynamic/dse/path_predicate_formula.cmi \
+    dynamic/dse/path_predicate_env.cmi dynamic/dse/path_predicate.cmi \
+    parser/parse_utils.cmi base/logger.cmi formula/formula_pp.cmi \
+    formula/formula.cmi base/file_utils.cmi dba/errors.cmi \
+    dynamic/dse/dse_options.cmi dba/dba_utils.cmi dba/dba_printer.cmi \
+    dba/dba.cmi piqi/config_piqi.cmo base/bitvector.cmi base/bigint.cmi \
+    piqi/analysis_config_piqi.cmo dynamic/dse/examples/generic_analyse.cmi
+dynamic/dse/examples/generic_analyse.cmx : base/utils.cmx \
+    dynamic/trace/trace_type.cmx dynamic/trace/trace_config.cmx \
+    smtlib/smt_model.cmx dynamic/dse/path_predicate_formula.cmx \
+    dynamic/dse/path_predicate_env.cmx dynamic/dse/path_predicate.cmx \
+    parser/parse_utils.cmx base/logger.cmx formula/formula_pp.cmx \
+    formula/formula.cmx base/file_utils.cmx dba/errors.cmx \
+    dynamic/dse/dse_options.cmx dba/dba_utils.cmx dba/dba_printer.cmx \
+    dba/dba.cmx piqi/config_piqi.cmx base/bitvector.cmx base/bigint.cmx \
+    piqi/analysis_config_piqi.cmx dynamic/dse/examples/generic_analyse.cmi
+dynamic/dse/examples/generic_analyse.cmi : dynamic/trace/trace_config.cmi \
+    dynamic/dse/path_predicate.cmi
+dynamic/dse/examples/opaque_predicate.cmo : base/utils.cmi \
+    dynamic/trace/trace_type.cmi dynamic/trace/trace_config.cmi \
+    dynamic/dse/path_predicate_env.cmi dynamic/dse/path_predicate.cmi \
+    base/logger.cmi kernel/kernel_options.cmi formula/formula_pp.cmi \
+    formula/formula.cmi base/file_utils.cmi dynamic/dse/dse_options.cmi \
+    dba/dba_types.cmi dba/dba.cmi piqi/config_piqi.cmo base/bitvector.cmi \
+    base/bigint.cmi base/basic_types.cmi piqi/analysis_config_piqi.cmo \
+    dynamic/dse/examples/opaque_predicate.cmi
+dynamic/dse/examples/opaque_predicate.cmx : base/utils.cmx \
+    dynamic/trace/trace_type.cmx dynamic/trace/trace_config.cmx \
+    dynamic/dse/path_predicate_env.cmx dynamic/dse/path_predicate.cmx \
+    base/logger.cmx kernel/kernel_options.cmx formula/formula_pp.cmx \
+    formula/formula.cmx base/file_utils.cmx dynamic/dse/dse_options.cmx \
+    dba/dba_types.cmx dba/dba.cmx piqi/config_piqi.cmx base/bitvector.cmx \
+    base/bigint.cmx base/basic_types.cmx piqi/analysis_config_piqi.cmx \
+    dynamic/dse/examples/opaque_predicate.cmi
+dynamic/dse/examples/opaque_predicate.cmi : dynamic/trace/trace_config.cmi \
+    dynamic/dse/path_predicate.cmi
+dynamic/dse/instruction_stubs/instruction_stubs.cmo : \
+    dynamic/trace/trace_type.cmi piqi/instruction_piqi.cmo \
+    dynamic/dse/dse_options.cmi \
+    dynamic/dse/instruction_stubs/instruction_stubs.cmi
+dynamic/dse/instruction_stubs/instruction_stubs.cmx : \
+    dynamic/trace/trace_type.cmx piqi/instruction_piqi.cmx \
+    dynamic/dse/dse_options.cmx \
+    dynamic/dse/instruction_stubs/instruction_stubs.cmi
+dynamic/dse/instruction_stubs/instruction_stubs.cmi : \
+    dynamic/trace/trace_type.cmi dynamic/dse/path_predicate_env.cmi \
+    piqi/instruction_piqi.cmo
+dynamic/dse/libcall_stubs/call_convention.cmo : dynamic/trace/trace_type.cmi \
+    base/size.cmi dynamic/dse/path_predicate_utils.cmi \
+    dynamic/dse/path_predicate_formula.cmi dynamic/dse/path_predicate_env.cmi \
+    base/machine.cmi formula/formula.cmi disasm/decode_utils.cmi dba/dba.cmi \
+    piqi/common_piqi.cmo base/bitvector.cmi base/bigint.cmi \
+    dynamic/dse/libcall_stubs/call_convention.cmi
+dynamic/dse/libcall_stubs/call_convention.cmx : dynamic/trace/trace_type.cmx \
+    base/size.cmx dynamic/dse/path_predicate_utils.cmx \
+    dynamic/dse/path_predicate_formula.cmx dynamic/dse/path_predicate_env.cmx \
+    base/machine.cmx formula/formula.cmx disasm/decode_utils.cmx dba/dba.cmx \
+    piqi/common_piqi.cmx base/bitvector.cmx base/bigint.cmx \
+    dynamic/dse/libcall_stubs/call_convention.cmi
+dynamic/dse/libcall_stubs/call_convention.cmi : dynamic/trace/trace_type.cmi \
+    dynamic/dse/path_predicate_env.cmi formula/formula.cmi dba/dba.cmi \
+    piqi/common_piqi.cmo
+dynamic/dse/libcall_stubs/libc_stubs.cmo : dynamic/trace/trace_type.cmi \
+    dynamic/dse/path_predicate_utils.cmi \
+    dynamic/dse/path_predicate_formula.cmi dynamic/dse/path_predicate_env.cmi \
+    base/logger.cmi dynamic/dse/libcall_stubs/libcall_utils.cmi \
+    dynamic/dse/libcall_stubs/libcall_types.cmi piqi/libcall_piqi.cmo \
+    base/interval.cmi formula/formula.cmi \
+    dynamic/dse/path_exploration/fdInput.cmi dynamic/dse/dse_options.cmi \
+    disasm/decode_utils.cmi dba/dba.cmi piqi/common_piqi.cmo \
+    dynamic/dse/libcall_stubs/call_convention.cmi base/bitvector.cmi \
+    base/bigint.cmi base/basic_types.cmi \
+    dynamic/dse/libcall_stubs/libc_stubs.cmi
+dynamic/dse/libcall_stubs/libc_stubs.cmx : dynamic/trace/trace_type.cmx \
+    dynamic/dse/path_predicate_utils.cmx \
+    dynamic/dse/path_predicate_formula.cmx dynamic/dse/path_predicate_env.cmx \
+    base/logger.cmx dynamic/dse/libcall_stubs/libcall_utils.cmx \
+    dynamic/dse/libcall_stubs/libcall_types.cmi piqi/libcall_piqi.cmx \
+    base/interval.cmx formula/formula.cmx \
+    dynamic/dse/path_exploration/fdInput.cmx dynamic/dse/dse_options.cmx \
+    disasm/decode_utils.cmx dba/dba.cmx piqi/common_piqi.cmx \
+    dynamic/dse/libcall_stubs/call_convention.cmx base/bitvector.cmx \
+    base/bigint.cmx base/basic_types.cmx \
+    dynamic/dse/libcall_stubs/libc_stubs.cmi
+dynamic/dse/libcall_stubs/libc_stubs.cmi : \
+    dynamic/dse/libcall_stubs/libcall_types.cmi piqi/libcall_piqi.cmo
+dynamic/dse/libcall_stubs/libcall_stubs.cmo : \
+    dynamic/dse/libcall_stubs/windows_stubs.cmi base/utils.cmi \
+    dynamic/trace/trace_type.cmi dynamic/dse/path_predicate_formula.cmi \
+    dynamic/dse/path_predicate_env.cmi base/logger.cmi piqi/libcall_piqi.cmo \
+    dynamic/dse/libcall_stubs/libc_stubs.cmi dynamic/dse/dse_options.cmi \
+    piqi/common_piqi.cmo dynamic/dse/libcall_stubs/call_convention.cmi \
+    dynamic/dse/libcall_stubs/libcall_stubs.cmi
+dynamic/dse/libcall_stubs/libcall_stubs.cmx : \
+    dynamic/dse/libcall_stubs/windows_stubs.cmx base/utils.cmx \
+    dynamic/trace/trace_type.cmx dynamic/dse/path_predicate_formula.cmx \
+    dynamic/dse/path_predicate_env.cmx base/logger.cmx piqi/libcall_piqi.cmx \
+    dynamic/dse/libcall_stubs/libc_stubs.cmx dynamic/dse/dse_options.cmx \
+    piqi/common_piqi.cmx dynamic/dse/libcall_stubs/call_convention.cmx \
+    dynamic/dse/libcall_stubs/libcall_stubs.cmi
+dynamic/dse/libcall_stubs/libcall_stubs.cmi : dynamic/trace/trace_type.cmi \
+    dynamic/dse/path_predicate_env.cmi piqi/libcall_piqi.cmo \
+    piqi/common_piqi.cmo
+dynamic/dse/libcall_stubs/libcall_types.cmi : dynamic/trace/trace_type.cmi \
+    dynamic/dse/path_predicate_env.cmi piqi/common_piqi.cmo \
+    dynamic/dse/libcall_stubs/call_convention.cmi
+dynamic/dse/libcall_stubs/libcall_utils.cmo : base/machine.cmi \
+    base/logger.cmi dynamic/dse/dse_options.cmi disasm/decode_utils.cmi \
+    piqi/common_piqi.cmo dynamic/dse/libcall_stubs/libcall_utils.cmi
+dynamic/dse/libcall_stubs/libcall_utils.cmx : base/machine.cmx \
+    base/logger.cmx dynamic/dse/dse_options.cmx disasm/decode_utils.cmx \
+    piqi/common_piqi.cmx dynamic/dse/libcall_stubs/libcall_utils.cmi
+dynamic/dse/libcall_stubs/libcall_utils.cmi : piqi/common_piqi.cmo
+dynamic/dse/libcall_stubs/windows_stubs.cmo : dynamic/trace/trace_type.cmi \
+    dynamic/dse/path_predicate_env.cmi \
+    dynamic/dse/libcall_stubs/libcall_utils.cmi \
+    dynamic/dse/libcall_stubs/libcall_types.cmi piqi/libcall_piqi.cmo \
+    disasm/decode_utils.cmi piqi/common_piqi.cmo \
+    dynamic/dse/libcall_stubs/call_convention.cmi \
+    dynamic/dse/libcall_stubs/windows_stubs.cmi
+dynamic/dse/libcall_stubs/windows_stubs.cmx : dynamic/trace/trace_type.cmx \
+    dynamic/dse/path_predicate_env.cmx \
+    dynamic/dse/libcall_stubs/libcall_utils.cmx \
+    dynamic/dse/libcall_stubs/libcall_types.cmi piqi/libcall_piqi.cmx \
+    disasm/decode_utils.cmx piqi/common_piqi.cmx \
+    dynamic/dse/libcall_stubs/call_convention.cmx \
+    dynamic/dse/libcall_stubs/windows_stubs.cmi
+dynamic/dse/libcall_stubs/windows_stubs.cmi : \
+    dynamic/dse/libcall_stubs/libcall_types.cmi piqi/libcall_piqi.cmo
+dynamic/dse/path_exploration/Parsing_gueb.cmo : base/logger.cmi \
+    dynamic/dse/dse_options.cmi dynamic/dse/path_exploration/Parsing_gueb.cmi
+dynamic/dse/path_exploration/Parsing_gueb.cmx : base/logger.cmx \
+    dynamic/dse/dse_options.cmx dynamic/dse/path_exploration/Parsing_gueb.cmi
+dynamic/dse/path_exploration/Parsing_gueb.cmi :
+dynamic/dse/path_exploration/check_trace.cmo : dynamic/trace/trace_type.cmi \
+    dynamic/trace/trace_config.cmi formula/solver.cmi \
+    dynamic/dse/path_predicate_formula.cmi dynamic/dse/path_predicate_env.cmi \
+    dynamic/dse/path_predicate.cmi base/logger.cmi \
+    dynamic/dse/path_exploration/invertChild.cmi formula/formula_options.cmi \
+    formula/formula.cmi dynamic/dse/dse_options.cmi dba/dba_types.cmi \
+    dba/dba.cmi piqi/config_piqi.cmo base/bigint.cmi \
+    dynamic/dse/path_exploration/check_trace.cmi
+dynamic/dse/path_exploration/check_trace.cmx : dynamic/trace/trace_type.cmx \
+    dynamic/trace/trace_config.cmx formula/solver.cmx \
+    dynamic/dse/path_predicate_formula.cmx dynamic/dse/path_predicate_env.cmx \
+    dynamic/dse/path_predicate.cmx base/logger.cmx \
+    dynamic/dse/path_exploration/invertChild.cmx formula/formula_options.cmx \
+    formula/formula.cmx dynamic/dse/dse_options.cmx dba/dba_types.cmx \
+    dba/dba.cmx piqi/config_piqi.cmx base/bigint.cmx \
+    dynamic/dse/path_exploration/check_trace.cmi
+dynamic/dse/path_exploration/check_trace.cmi : dynamic/trace/trace_type.cmi \
+    dynamic/trace/trace_config.cmi dynamic/dse/tainting/tainting.cmi \
+    dynamic/dse/path_exploration/symbolicInput.cmi smtlib/smt_model.cmi \
+    dynamic/dse/path_predicate_env.cmi dynamic/dse/path_predicate.cmi \
+    piqi/libcall_piqi.cmo dynamic/dse/path_exploration/invertChild.cmi \
+    dynamic/dse/path_exploration/inputFromFiles.cmi formula/formula.cmi \
+    dynamic/dse/path_exploration/exploration_type.cmi dba/dba_types.cmi \
+    dba/dba.cmi piqi/config_piqi.cmo piqi/common_piqi.cmo base/bitvector.cmi
+dynamic/dse/path_exploration/conf_exploration.cmo : \
+    dynamic/trace/trace_config.cmi base/file_utils.cmi \
+    piqi/config_piqi_ext.cmo \
+    dynamic/dse/path_exploration/conf_exploration.cmi
+dynamic/dse/path_exploration/conf_exploration.cmx : \
+    dynamic/trace/trace_config.cmx base/file_utils.cmx \
+    piqi/config_piqi_ext.cmx \
+    dynamic/dse/path_exploration/conf_exploration.cmi
+dynamic/dse/path_exploration/conf_exploration.cmi : \
+    dynamic/trace/trace_config.cmi
+dynamic/dse/path_exploration/criteriaAsDefault.cmo : \
+    dynamic/dse/path_exploration/typeTraceDSE.cmi \
+    dynamic/dse/path_exploration/typeHistoryDSE.cmi \
+    dynamic/dse/path_exploration/criteriaAsDefault.cmi
+dynamic/dse/path_exploration/criteriaAsDefault.cmx : \
+    dynamic/dse/path_exploration/typeTraceDSE.cmi \
+    dynamic/dse/path_exploration/typeHistoryDSE.cmi \
+    dynamic/dse/path_exploration/criteriaAsDefault.cmi
+dynamic/dse/path_exploration/criteriaAsDefault.cmi : \
+    dynamic/dse/path_exploration/typeCriteriaDSE.cmi
+dynamic/dse/path_exploration/criteriaAsUAF.cmo : \
+    dynamic/dse/path_exploration/uaf_detection.cmi \
+    dynamic/dse/path_exploration/typeTraceDSE.cmi \
+    dynamic/dse/path_exploration/typeHistoryDSE.cmi \
+    dynamic/trace/trace_config.cmi \
+    dynamic/dse/path_exploration/Parsing_gueb.cmi dynamic/dse/dse_options.cmi \
+    piqi/config_piqi.cmo dynamic/dse/path_exploration/criteriaAsUAF.cmi
+dynamic/dse/path_exploration/criteriaAsUAF.cmx : \
+    dynamic/dse/path_exploration/uaf_detection.cmx \
+    dynamic/dse/path_exploration/typeTraceDSE.cmi \
+    dynamic/dse/path_exploration/typeHistoryDSE.cmi \
+    dynamic/trace/trace_config.cmx \
+    dynamic/dse/path_exploration/Parsing_gueb.cmx dynamic/dse/dse_options.cmx \
+    piqi/config_piqi.cmx dynamic/dse/path_exploration/criteriaAsUAF.cmi
+dynamic/dse/path_exploration/criteriaAsUAF.cmi : \
+    dynamic/dse/path_exploration/typeCriteriaDSE.cmi
+dynamic/dse/path_exploration/criteriaEIPRewrite.cmo : \
+    dynamic/dse/path_exploration/typeTraceDSE.cmi \
+    dynamic/dse/path_exploration/typeHistoryDSE.cmi base/logger.cmi \
+    dynamic/dse/path_exploration/eipRewrite.cmi dynamic/dse/dse_options.cmi \
+    dynamic/dse/path_exploration/conf_exploration.cmi \
+    dynamic/dse/path_exploration/criteriaEIPRewrite.cmi
+dynamic/dse/path_exploration/criteriaEIPRewrite.cmx : \
+    dynamic/dse/path_exploration/typeTraceDSE.cmi \
+    dynamic/dse/path_exploration/typeHistoryDSE.cmi base/logger.cmx \
+    dynamic/dse/path_exploration/eipRewrite.cmx dynamic/dse/dse_options.cmx \
+    dynamic/dse/path_exploration/conf_exploration.cmx \
+    dynamic/dse/path_exploration/criteriaEIPRewrite.cmi
+dynamic/dse/path_exploration/criteriaEIPRewrite.cmi : \
+    dynamic/dse/path_exploration/typeTraceDSE.cmi \
+    dynamic/dse/path_exploration/typeHistoryDSE.cmi \
+    dynamic/dse/path_exploration/conf_exploration.cmi
+dynamic/dse/path_exploration/dse.cmo : \
+    dynamic/dse/path_exploration/typeTraceDSE.cmi \
+    dynamic/dse/path_exploration/typeHistoryDSE.cmi \
+    dynamic/dse/path_exploration/typeGuideDSE.cmi \
+    dynamic/dse/path_exploration/typeCriteriaDSE.cmi \
+    dynamic/dse/path_exploration/tracesToTree.cmi \
+    dynamic/dse/path_exploration/traceAsFile.cmi base/logger.cmi \
+    dynamic/dse/path_exploration/invertChild.cmi \
+    dynamic/dse/path_exploration/historyAsTree.cmi \
+    dynamic/dse/path_exploration/guideAsUAF.cmi \
+    dynamic/dse/path_exploration/guideAsStrcmp.cmi \
+    dynamic/dse/path_exploration/guideAsRandom.cmi \
+    dynamic/dse/path_exploration/guideAsDFS.cmi \
+    dynamic/dse/path_exploration/guideAsBFS.cmi \
+    dynamic/dse/path_exploration/exploration_type.cmi \
+    dynamic/dse/dse_options.cmi \
+    dynamic/dse/path_exploration/criteriaAsUAF.cmi \
+    dynamic/dse/path_exploration/criteriaAsDefault.cmi \
+    dynamic/dse/path_exploration/conf_exploration.cmi base/cli.cmi \
+    dynamic/dse/path_exploration/dse.cmi
+dynamic/dse/path_exploration/dse.cmx : \
+    dynamic/dse/path_exploration/typeTraceDSE.cmi \
+    dynamic/dse/path_exploration/typeHistoryDSE.cmi \
+    dynamic/dse/path_exploration/typeGuideDSE.cmi \
+    dynamic/dse/path_exploration/typeCriteriaDSE.cmi \
+    dynamic/dse/path_exploration/tracesToTree.cmx \
+    dynamic/dse/path_exploration/traceAsFile.cmx base/logger.cmx \
+    dynamic/dse/path_exploration/invertChild.cmx \
+    dynamic/dse/path_exploration/historyAsTree.cmx \
+    dynamic/dse/path_exploration/guideAsUAF.cmx \
+    dynamic/dse/path_exploration/guideAsStrcmp.cmx \
+    dynamic/dse/path_exploration/guideAsRandom.cmx \
+    dynamic/dse/path_exploration/guideAsDFS.cmx \
+    dynamic/dse/path_exploration/guideAsBFS.cmx \
+    dynamic/dse/path_exploration/exploration_type.cmx \
+    dynamic/dse/dse_options.cmx \
+    dynamic/dse/path_exploration/criteriaAsUAF.cmx \
+    dynamic/dse/path_exploration/criteriaAsDefault.cmx \
+    dynamic/dse/path_exploration/conf_exploration.cmx base/cli.cmx \
+    dynamic/dse/path_exploration/dse.cmi
+dynamic/dse/path_exploration/dse.cmi :
+dynamic/dse/path_exploration/dseException.cmo : \
+    dynamic/dse/path_exploration/dseException.cmi
+dynamic/dse/path_exploration/dseException.cmx : \
+    dynamic/dse/path_exploration/dseException.cmi
+dynamic/dse/path_exploration/dseException.cmi :
+dynamic/dse/path_exploration/eipRewrite.cmo : dynamic/trace/trace_type.cmi \
+    dynamic/trace/trace_config.cmi \
+    dynamic/dse/path_exploration/symbolicInput.cmi formula/solver.cmi \
+    dynamic/dse/path_predicate_formula.cmi dynamic/dse/path_predicate_env.cmi \
+    dynamic/dse/path_predicate.cmi base/logger.cmi \
+    dynamic/dse/path_exploration/invertChild.cmi formula/formula_options.cmi \
+    formula/formula.cmi dynamic/dse/dse_options.cmi dba/dba_types.cmi \
+    dba/dba.cmi piqi/config_piqi_ext.cmo piqi/config_piqi.cmo \
+    base/bitvector.cmi base/bigint.cmi \
+    dynamic/dse/path_exploration/eipRewrite.cmi
+dynamic/dse/path_exploration/eipRewrite.cmx : dynamic/trace/trace_type.cmx \
+    dynamic/trace/trace_config.cmx \
+    dynamic/dse/path_exploration/symbolicInput.cmx formula/solver.cmx \
+    dynamic/dse/path_predicate_formula.cmx dynamic/dse/path_predicate_env.cmx \
+    dynamic/dse/path_predicate.cmx base/logger.cmx \
+    dynamic/dse/path_exploration/invertChild.cmx formula/formula_options.cmx \
+    formula/formula.cmx dynamic/dse/dse_options.cmx dba/dba_types.cmx \
+    dba/dba.cmx piqi/config_piqi_ext.cmx piqi/config_piqi.cmx \
+    base/bitvector.cmx base/bigint.cmx \
+    dynamic/dse/path_exploration/eipRewrite.cmi
+dynamic/dse/path_exploration/eipRewrite.cmi : dynamic/trace/trace_type.cmi \
+    dynamic/trace/trace_config.cmi dynamic/dse/tainting/tainting.cmi \
+    dynamic/dse/path_exploration/symbolicInput.cmi smtlib/smt_model.cmi \
+    dynamic/dse/path_predicate_env.cmi dynamic/dse/path_predicate.cmi \
+    piqi/libcall_piqi.cmo dynamic/dse/path_exploration/invertChild.cmi \
+    dynamic/dse/path_exploration/inputFromFiles.cmi formula/formula.cmi \
+    dynamic/dse/path_exploration/exploration_type.cmi dba/dba_types.cmi \
+    dba/dba.cmi piqi/config_piqi.cmo piqi/common_piqi.cmo base/bitvector.cmi
+dynamic/dse/path_exploration/exploration_type.cmo : \
+    dynamic/dse/path_exploration/exploration_type.cmi
+dynamic/dse/path_exploration/exploration_type.cmx : \
+    dynamic/dse/path_exploration/exploration_type.cmi
+dynamic/dse/path_exploration/exploration_type.cmi :
+dynamic/dse/path_exploration/fdInput.cmo : base/logger.cmi \
+    static/ai/ai_options.cmi dynamic/dse/path_exploration/fdInput.cmi
+dynamic/dse/path_exploration/fdInput.cmx : base/logger.cmx \
+    static/ai/ai_options.cmx dynamic/dse/path_exploration/fdInput.cmi
+dynamic/dse/path_exploration/fdInput.cmi :
+dynamic/dse/path_exploration/guideAsBFS.cmo : \
+    dynamic/dse/path_exploration/typeTraceDSE.cmi \
+    dynamic/dse/path_exploration/typeHistoryDSE.cmi \
+    dynamic/dse/path_exploration/guideAsBFS.cmi
+dynamic/dse/path_exploration/guideAsBFS.cmx : \
+    dynamic/dse/path_exploration/typeTraceDSE.cmi \
+    dynamic/dse/path_exploration/typeHistoryDSE.cmi \
+    dynamic/dse/path_exploration/guideAsBFS.cmi
+dynamic/dse/path_exploration/guideAsBFS.cmi : \
+    dynamic/dse/path_exploration/typeTraceDSE.cmi \
+    dynamic/dse/path_exploration/typeHistoryDSE.cmi \
+    dynamic/dse/path_exploration/typeGuideDSE.cmi
+dynamic/dse/path_exploration/guideAsDFS.cmo : \
+    dynamic/dse/path_exploration/typeTraceDSE.cmi \
+    dynamic/dse/path_exploration/typeHistoryDSE.cmi \
+    dynamic/dse/path_exploration/guideAsDFS.cmi
+dynamic/dse/path_exploration/guideAsDFS.cmx : \
+    dynamic/dse/path_exploration/typeTraceDSE.cmi \
+    dynamic/dse/path_exploration/typeHistoryDSE.cmi \
+    dynamic/dse/path_exploration/guideAsDFS.cmi
+dynamic/dse/path_exploration/guideAsDFS.cmi : \
+    dynamic/dse/path_exploration/typeTraceDSE.cmi \
+    dynamic/dse/path_exploration/typeHistoryDSE.cmi \
+    dynamic/dse/path_exploration/typeGuideDSE.cmi
+dynamic/dse/path_exploration/guideAsPriority.cmi : \
+    dynamic/dse/path_exploration/typeTraceDSE.cmi \
+    dynamic/dse/path_exploration/typeHistoryDSE.cmi \
+    dynamic/dse/path_exploration/typeGuideDSE.cmi
+dynamic/dse/path_exploration/guideAsRandom.cmo : \
+    dynamic/dse/path_exploration/typeTraceDSE.cmi \
+    dynamic/dse/path_exploration/typeHistoryDSE.cmi \
+    dynamic/dse/path_exploration/guideAsRandom.cmi
+dynamic/dse/path_exploration/guideAsRandom.cmx : \
+    dynamic/dse/path_exploration/typeTraceDSE.cmi \
+    dynamic/dse/path_exploration/typeHistoryDSE.cmi \
+    dynamic/dse/path_exploration/guideAsRandom.cmi
+dynamic/dse/path_exploration/guideAsRandom.cmi : \
+    dynamic/dse/path_exploration/typeTraceDSE.cmi \
+    dynamic/dse/path_exploration/typeHistoryDSE.cmi \
+    dynamic/dse/path_exploration/typeGuideDSE.cmi
+dynamic/dse/path_exploration/guideAsShortestPath.cmi : \
+    dynamic/dse/path_exploration/typeTraceDSE.cmi \
+    dynamic/dse/path_exploration/typeHistoryDSE.cmi \
+    dynamic/dse/path_exploration/typeGuideDSE.cmi
+dynamic/dse/path_exploration/guideAsStrcmp.cmo : \
+    dynamic/dse/path_exploration/typeTraceDSE.cmi \
+    dynamic/dse/path_exploration/typeHistoryDSE.cmi \
+    dynamic/dse/path_exploration/typeGuideDSE.cmi \
+    dynamic/dse/path_exploration/dseException.cmi \
+    dynamic/dse/path_exploration/guideAsStrcmp.cmi
+dynamic/dse/path_exploration/guideAsStrcmp.cmx : \
+    dynamic/dse/path_exploration/typeTraceDSE.cmi \
+    dynamic/dse/path_exploration/typeHistoryDSE.cmi \
+    dynamic/dse/path_exploration/typeGuideDSE.cmi \
+    dynamic/dse/path_exploration/dseException.cmx \
+    dynamic/dse/path_exploration/guideAsStrcmp.cmi
+dynamic/dse/path_exploration/guideAsStrcmp.cmi : \
+    dynamic/dse/path_exploration/typeTraceDSE.cmi \
+    dynamic/dse/path_exploration/typeHistoryDSE.cmi \
+    dynamic/dse/path_exploration/typeGuideDSE.cmi
+dynamic/dse/path_exploration/guideAsUAF.cmo : \
+    dynamic/dse/path_exploration/typeTraceDSE.cmi \
+    dynamic/dse/path_exploration/typeHistoryDSE.cmi \
+    dynamic/dse/path_exploration/Parsing_gueb.cmi \
+    dynamic/dse/path_exploration/exploration_type.cmi \
+    dynamic/dse/path_exploration/dseException.cmi \
+    dynamic/dse/path_exploration/guideAsUAF.cmi
+dynamic/dse/path_exploration/guideAsUAF.cmx : \
+    dynamic/dse/path_exploration/typeTraceDSE.cmi \
+    dynamic/dse/path_exploration/typeHistoryDSE.cmi \
+    dynamic/dse/path_exploration/Parsing_gueb.cmx \
+    dynamic/dse/path_exploration/exploration_type.cmx \
+    dynamic/dse/path_exploration/dseException.cmx \
+    dynamic/dse/path_exploration/guideAsUAF.cmi
+dynamic/dse/path_exploration/guideAsUAF.cmi : \
+    dynamic/dse/path_exploration/typeTraceDSE.cmi \
+    dynamic/dse/path_exploration/typeHistoryDSE.cmi \
+    dynamic/dse/path_exploration/typeGuideDSE.cmi
+dynamic/dse/path_exploration/historyAsTree.cmo : base/utils.cmi \
+    dynamic/dse/path_exploration/typeTraceDSE.cmi \
+    dynamic/dse/path_exploration/tracesToTree.cmi base/logger.cmi \
+    dynamic/dse/dse_options.cmi \
+    dynamic/dse/path_exploration/historyAsTree.cmi
+dynamic/dse/path_exploration/historyAsTree.cmx : base/utils.cmx \
+    dynamic/dse/path_exploration/typeTraceDSE.cmi \
+    dynamic/dse/path_exploration/tracesToTree.cmx base/logger.cmx \
+    dynamic/dse/dse_options.cmx \
+    dynamic/dse/path_exploration/historyAsTree.cmi
+dynamic/dse/path_exploration/historyAsTree.cmi : \
+    dynamic/dse/path_exploration/typeHistoryDSE.cmi
+dynamic/dse/path_exploration/inputFromFiles.cmo : base/logger.cmi \
+    dynamic/dse/dse_options.cmi \
+    dynamic/dse/path_exploration/inputFromFiles.cmi
+dynamic/dse/path_exploration/inputFromFiles.cmx : base/logger.cmx \
+    dynamic/dse/dse_options.cmx \
+    dynamic/dse/path_exploration/inputFromFiles.cmi
+dynamic/dse/path_exploration/inputFromFiles.cmi :
+dynamic/dse/path_exploration/invertChild.cmo : dynamic/trace/trace_type.cmi \
+    dynamic/trace/trace_config.cmi \
+    dynamic/dse/path_exploration/symbolicInput.cmi formula/solver.cmi \
+    smtlib/smt_model.cmi dynamic/dse/path_predicate_utils.cmi \
+    dynamic/dse/path_predicate_formula.cmi dynamic/dse/path_predicate_env.cmi \
+    dynamic/dse/path_predicate.cmi base/logger.cmi piqi/libcall_piqi.cmo \
+    dynamic/dse/path_exploration/inputFromFiles.cmi \
+    formula/formula_options.cmi formula/formula.cmi \
+    dynamic/dse/path_exploration/fdInput.cmi \
+    dynamic/dse/path_exploration/exploration_type.cmi \
+    dynamic/dse/dse_options.cmi dba/dba_types.cmi dba/dba.cmi \
+    piqi/config_piqi_ext.cmo piqi/config_piqi.cmo piqi/common_piqi.cmo \
+    base/bitvector.cmi base/bigint.cmi \
+    dynamic/dse/path_exploration/invertChild.cmi
+dynamic/dse/path_exploration/invertChild.cmx : dynamic/trace/trace_type.cmx \
+    dynamic/trace/trace_config.cmx \
+    dynamic/dse/path_exploration/symbolicInput.cmx formula/solver.cmx \
+    smtlib/smt_model.cmx dynamic/dse/path_predicate_utils.cmx \
+    dynamic/dse/path_predicate_formula.cmx dynamic/dse/path_predicate_env.cmx \
+    dynamic/dse/path_predicate.cmx base/logger.cmx piqi/libcall_piqi.cmx \
+    dynamic/dse/path_exploration/inputFromFiles.cmx \
+    formula/formula_options.cmx formula/formula.cmx \
+    dynamic/dse/path_exploration/fdInput.cmx \
+    dynamic/dse/path_exploration/exploration_type.cmx \
+    dynamic/dse/dse_options.cmx dba/dba_types.cmx dba/dba.cmx \
+    piqi/config_piqi_ext.cmx piqi/config_piqi.cmx piqi/common_piqi.cmx \
+    base/bitvector.cmx base/bigint.cmx \
+    dynamic/dse/path_exploration/invertChild.cmi
+dynamic/dse/path_exploration/invertChild.cmi : dynamic/trace/trace_type.cmi \
+    dynamic/trace/trace_config.cmi dynamic/dse/tainting/tainting.cmi \
+    dynamic/dse/path_exploration/symbolicInput.cmi smtlib/smt_model.cmi \
+    dynamic/dse/path_predicate_env.cmi dynamic/dse/path_predicate.cmi \
+    piqi/libcall_piqi.cmo dynamic/dse/path_exploration/inputFromFiles.cmi \
+    formula/formula.cmi dynamic/dse/path_exploration/exploration_type.cmi \
+    dba/dba_types.cmi dba/dba.cmi piqi/config_piqi.cmo piqi/common_piqi.cmo \
+    base/bitvector.cmi
+dynamic/dse/path_exploration/symbolicInput.cmo : smtlib/smt_model.cmi \
+    piqi/config_piqi_ext.cmo piqi/config_piqi.cmo base/bitvector.cmi \
+    base/bigint.cmi dynamic/dse/path_exploration/symbolicInput.cmi
+dynamic/dse/path_exploration/symbolicInput.cmx : smtlib/smt_model.cmx \
+    piqi/config_piqi_ext.cmx piqi/config_piqi.cmx base/bitvector.cmx \
+    base/bigint.cmx dynamic/dse/path_exploration/symbolicInput.cmi
+dynamic/dse/path_exploration/symbolicInput.cmi : smtlib/smt_model.cmi \
+    piqi/config_piqi.cmo
+dynamic/dse/path_exploration/traceAsFile.cmo : \
+    dynamic/dse/path_exploration/typeTraceDSE.cmi \
+    dynamic/dse/path_exploration/tracesToTree.cmi \
+    dynamic/trace/trace_type.cmi dynamic/trace/trace_loader.cmi \
+    dynamic/trace/trace_config.cmi base/logger.cmi piqi/libcall_piqi.cmo \
+    dynamic/dse/path_exploration/invertChild.cmi utils/instParsing.cmi \
+    dynamic/dse/path_exploration/fdInput.cmi \
+    dynamic/dse/path_exploration/exploration_type.cmi \
+    dynamic/dse/dse_options.cmi dba/dba_types.cmi dba/dba.cmi \
+    piqi/config_piqi.cmo dynamic/dse/path_exploration/conf_exploration.cmi \
+    base/bitvector.cmi base/bigint.cmi \
+    dynamic/dse/path_exploration/traceAsFile.cmi
+dynamic/dse/path_exploration/traceAsFile.cmx : \
+    dynamic/dse/path_exploration/typeTraceDSE.cmi \
+    dynamic/dse/path_exploration/tracesToTree.cmx \
+    dynamic/trace/trace_type.cmx dynamic/trace/trace_loader.cmx \
+    dynamic/trace/trace_config.cmx base/logger.cmx piqi/libcall_piqi.cmx \
+    dynamic/dse/path_exploration/invertChild.cmx utils/instParsing.cmx \
+    dynamic/dse/path_exploration/fdInput.cmx \
+    dynamic/dse/path_exploration/exploration_type.cmx \
+    dynamic/dse/dse_options.cmx dba/dba_types.cmx dba/dba.cmx \
+    piqi/config_piqi.cmx dynamic/dse/path_exploration/conf_exploration.cmx \
+    base/bitvector.cmx base/bigint.cmx \
+    dynamic/dse/path_exploration/traceAsFile.cmi
+dynamic/dse/path_exploration/traceAsFile.cmi : \
+    dynamic/dse/path_exploration/typeTraceDSE.cmi
+dynamic/dse/path_exploration/tracesToTree.cmo : dynamic/trace/trace_type.cmi \
+    dynamic/trace/trace_loader.cmi utils/instParsing.cmi \
+    dynamic/dse/path_exploration/exploration_type.cmi \
+    dynamic/dse/path_exploration/tracesToTree.cmi
+dynamic/dse/path_exploration/tracesToTree.cmx : dynamic/trace/trace_type.cmx \
+    dynamic/trace/trace_loader.cmx utils/instParsing.cmx \
+    dynamic/dse/path_exploration/exploration_type.cmx \
+    dynamic/dse/path_exploration/tracesToTree.cmi
+dynamic/dse/path_exploration/tracesToTree.cmi : \
+    dynamic/dse/path_exploration/exploration_type.cmi
+dynamic/dse/path_exploration/typeCriteriaDSE.cmi : \
+    dynamic/dse/path_exploration/typeTraceDSE.cmi \
+    dynamic/dse/path_exploration/typeHistoryDSE.cmi
+dynamic/dse/path_exploration/typeGuideDSE.cmi : \
+    dynamic/dse/path_exploration/typeTraceDSE.cmi \
+    dynamic/dse/path_exploration/typeHistoryDSE.cmi
+dynamic/dse/path_exploration/typeHistoryDSE.cmi : \
+    dynamic/dse/path_exploration/typeTraceDSE.cmi
+dynamic/dse/path_exploration/typeTraceDSE.cmi : \
+    dynamic/dse/path_exploration/tracesToTree.cmi \
+    dynamic/trace/trace_config.cmi \
+    dynamic/dse/path_exploration/exploration_type.cmi \
+    dynamic/dse/path_exploration/conf_exploration.cmi
+dynamic/dse/path_exploration/uaf_detection.cmo : \
+    dynamic/trace/trace_type.cmi dynamic/trace/trace_config.cmi \
+    formula/solver.cmi dynamic/dse/path_predicate_utils.cmi \
+    dynamic/dse/path_predicate_formula.cmi dynamic/dse/path_predicate_env.cmi \
+    dynamic/dse/path_predicate.cmi base/logger.cmi piqi/libcall_piqi.cmo \
+    dynamic/dse/path_exploration/invertChild.cmi formula/formula_utils.cmi \
+    formula/formula_options.cmi formula/formula.cmi \
+    dynamic/dse/dse_options.cmi dba/dba_types.cmi dba/dba.cmi \
+    piqi/config_piqi.cmo base/bitvector.cmi base/bigint.cmi \
+    base/basic_types.cmi dynamic/dse/path_exploration/uaf_detection.cmi
+dynamic/dse/path_exploration/uaf_detection.cmx : \
+    dynamic/trace/trace_type.cmx dynamic/trace/trace_config.cmx \
+    formula/solver.cmx dynamic/dse/path_predicate_utils.cmx \
+    dynamic/dse/path_predicate_formula.cmx dynamic/dse/path_predicate_env.cmx \
+    dynamic/dse/path_predicate.cmx base/logger.cmx piqi/libcall_piqi.cmx \
+    dynamic/dse/path_exploration/invertChild.cmx formula/formula_utils.cmx \
+    formula/formula_options.cmx formula/formula.cmx \
+    dynamic/dse/dse_options.cmx dba/dba_types.cmx dba/dba.cmx \
+    piqi/config_piqi.cmx base/bitvector.cmx base/bigint.cmx \
+    base/basic_types.cmx dynamic/dse/path_exploration/uaf_detection.cmi
+dynamic/dse/path_exploration/uaf_detection.cmi : \
+    dynamic/trace/trace_type.cmi dynamic/trace/trace_config.cmi \
+    dynamic/dse/path_exploration/symbolicInput.cmi \
+    dynamic/dse/path_predicate_env.cmi dynamic/dse/path_predicate.cmi \
+    piqi/libcall_piqi.cmo formula/formula.cmi dba/dba.cmi \
+    piqi/common_piqi.cmo
+dynamic/dse/path_predicate.cmo : disasm/x86/x86Util.cmi \
+    dynamic/trace/trace_type.cmi piqi/trace_piqi.cmo \
+    dynamic/trace/trace_loader.cmi dynamic/trace/trace_config.cmi \
+    dynamic/dse/tainting/tainting.cmi dynamic/dse/tainting/taint_types.cmi \
+    dynamic/dse/syscall_stubs/syscall_stubs.cmi formula/solver.cmi \
+    smtlib/smt_model.cmi base/size.cmi dynamic/dse/policy_type.cmi \
+    dynamic/dse/policy_engine.cmi dynamic/dse/path_predicate_formula.cmi \
+    dynamic/dse/path_predicate_env.cmi utils/network_io.cmi base/machine.cmi \
+    base/logger.cmi base/list_utils.cmi \
+    dynamic/dse/libcall_stubs/libcall_stubs.cmi base/interval.cmi \
+    dynamic/dse/instruction_stubs/instruction_stubs.cmi \
+    formula/formula_utils.cmi formula/formula_pp.cmi \
+    formula/formula_options.cmi formula/formula.cmi \
+    dynamic/dse/dse_options.cmi disasm/decode_utils.cmi dba/dba_utils.cmi \
+    dba/dba_types.cmi dba/dba_to_formula.cmi dba/dba_printer.cmi dba/dba.cmi \
+    piqi/config_piqi.cmo piqi/common_piqi.cmo base/bitvector.cmi \
+    base/bigint.cmi base/basic_types.cmi dynamic/dse/path_predicate.cmi
+dynamic/dse/path_predicate.cmx : disasm/x86/x86Util.cmx \
+    dynamic/trace/trace_type.cmx piqi/trace_piqi.cmx \
+    dynamic/trace/trace_loader.cmx dynamic/trace/trace_config.cmx \
+    dynamic/dse/tainting/tainting.cmx dynamic/dse/tainting/taint_types.cmx \
+    dynamic/dse/syscall_stubs/syscall_stubs.cmx formula/solver.cmx \
+    smtlib/smt_model.cmx base/size.cmx dynamic/dse/policy_type.cmi \
+    dynamic/dse/policy_engine.cmx dynamic/dse/path_predicate_formula.cmx \
+    dynamic/dse/path_predicate_env.cmx utils/network_io.cmx base/machine.cmx \
+    base/logger.cmx base/list_utils.cmx \
+    dynamic/dse/libcall_stubs/libcall_stubs.cmx base/interval.cmx \
+    dynamic/dse/instruction_stubs/instruction_stubs.cmx \
+    formula/formula_utils.cmx formula/formula_pp.cmx \
+    formula/formula_options.cmx formula/formula.cmx \
+    dynamic/dse/dse_options.cmx disasm/decode_utils.cmx dba/dba_utils.cmx \
+    dba/dba_types.cmx dba/dba_to_formula.cmx dba/dba_printer.cmx dba/dba.cmx \
+    piqi/config_piqi.cmx piqi/common_piqi.cmx base/bitvector.cmx \
+    base/bigint.cmx base/basic_types.cmx dynamic/dse/path_predicate.cmi
+dynamic/dse/path_predicate.cmi : dynamic/trace/trace_type.cmi \
+    dynamic/trace/trace_config.cmi dynamic/dse/tainting/tainting.cmi \
+    smtlib/smt_model.cmi dynamic/dse/path_predicate_env.cmi \
+    formula/formula.cmi dba/dba_types.cmi dba/dba.cmi piqi/config_piqi.cmo \
+    base/bitvector.cmi
+dynamic/dse/path_predicate_env.cmo : dynamic/trace/trace_type.cmi \
+    dynamic/dse/tainting/tainting.cmi smtlib/smt_model.cmi \
+    formula/formula.cmi dba/dba_types.cmi dba/dba.cmi piqi/config_piqi.cmo \
+    base/bitvector.cmi base/basic_types.cmi \
+    dynamic/dse/path_predicate_env.cmi
+dynamic/dse/path_predicate_env.cmx : dynamic/trace/trace_type.cmx \
+    dynamic/dse/tainting/tainting.cmx smtlib/smt_model.cmx \
+    formula/formula.cmx dba/dba_types.cmx dba/dba.cmx piqi/config_piqi.cmx \
+    base/bitvector.cmx base/basic_types.cmx \
+    dynamic/dse/path_predicate_env.cmi
+dynamic/dse/path_predicate_env.cmi : dynamic/trace/trace_type.cmi \
+    dynamic/dse/tainting/tainting.cmi smtlib/smt_model.cmi \
+    formula/formula.cmi dba/dba_types.cmi dba/dba.cmi piqi/config_piqi.cmo \
+    base/bitvector.cmi base/basic_types.cmi
+dynamic/dse/path_predicate_formula.cmo : disasm/x86/x86Util.cmi \
+    base/string_utils.cmi formula/solver.cmi \
+    dynamic/dse/path_predicate_optim.cmi dynamic/dse/path_predicate_env.cmi \
+    base/logger.cmi base/interval.cmi formula/formula_utils.cmi \
+    formula/formula_pp.cmi formula/formula_options.cmi formula/formula.cmi \
+    dba/errors.cmi dynamic/dse/dse_options.cmi base/bitvector.cmi \
+    base/bigint.cmi base/basic_types.cmi \
+    dynamic/dse/path_predicate_formula.cmi
+dynamic/dse/path_predicate_formula.cmx : disasm/x86/x86Util.cmx \
+    base/string_utils.cmx formula/solver.cmx \
+    dynamic/dse/path_predicate_optim.cmx dynamic/dse/path_predicate_env.cmx \
+    base/logger.cmx base/interval.cmx formula/formula_utils.cmx \
+    formula/formula_pp.cmx formula/formula_options.cmx formula/formula.cmx \
+    dba/errors.cmx dynamic/dse/dse_options.cmx base/bitvector.cmx \
+    base/bigint.cmx base/basic_types.cmx \
+    dynamic/dse/path_predicate_formula.cmi
+dynamic/dse/path_predicate_formula.cmi : formula/solver.cmi \
+    dynamic/dse/path_predicate_env.cmi formula/formula.cmi \
+    base/basic_types.cmi
+dynamic/dse/path_predicate_optim.cmo : dba/errors.cmi \
+    dynamic/dse/path_predicate_optim.cmi
+dynamic/dse/path_predicate_optim.cmx : dba/errors.cmx \
+    dynamic/dse/path_predicate_optim.cmi
+dynamic/dse/path_predicate_optim.cmi : dynamic/dse/path_predicate_env.cmi \
+    formula/formula.cmi
+dynamic/dse/path_predicate_utils.cmo : disasm/x86/x86Util.cmi \
+    base/string_utils.cmi base/size.cmi \
+    dynamic/dse/path_predicate_formula.cmi dynamic/dse/path_predicate_env.cmi \
+    base/logger.cmi formula/formula_utils.cmi \
+    formula/formula_transformation.cmi formula/formula_pp.cmi \
+    formula/formula.cmi dynamic/dse/dse_options.cmi disasm/decode_utils.cmi \
+    dba/dba_utils.cmi dba/dba_types.cmi dba/dba_printer.cmi dba/dba.cmi \
+    base/bitvector.cmi base/bigint.cmi dynamic/dse/path_predicate_utils.cmi
+dynamic/dse/path_predicate_utils.cmx : disasm/x86/x86Util.cmx \
+    base/string_utils.cmx base/size.cmx \
+    dynamic/dse/path_predicate_formula.cmx dynamic/dse/path_predicate_env.cmx \
+    base/logger.cmx formula/formula_utils.cmx \
+    formula/formula_transformation.cmx formula/formula_pp.cmx \
+    formula/formula.cmx dynamic/dse/dse_options.cmx disasm/decode_utils.cmx \
+    dba/dba_utils.cmx dba/dba_types.cmx dba/dba_printer.cmx dba/dba.cmx \
+    base/bitvector.cmx base/bigint.cmx dynamic/dse/path_predicate_utils.cmi
+dynamic/dse/path_predicate_utils.cmi : dynamic/dse/path_predicate_env.cmi \
+    formula/formula.cmi dba/dba.cmi
+dynamic/dse/policy_engine.cmo : dynamic/dse/tainting/taint_types.cmi \
+    base/size.cmi base/print_utils.cmi dynamic/dse/policy_type.cmi \
+    parser/policy_token.cmo parser/policy_parser.cmi base/logger.cmi \
+    base/interval.cmi dynamic/dse/dse_options.cmi dba/dba_types.cmi \
+    dba/dba_printer.cmi dba/dba.cmi base/bitvector.cmi base/bigint.cmi \
+    base/basic_types.cmi dynamic/dse/policy_engine.cmi
+dynamic/dse/policy_engine.cmx : dynamic/dse/tainting/taint_types.cmx \
+    base/size.cmx base/print_utils.cmx dynamic/dse/policy_type.cmi \
+    parser/policy_token.cmx parser/policy_parser.cmx base/logger.cmx \
+    base/interval.cmx dynamic/dse/dse_options.cmx dba/dba_types.cmx \
+    dba/dba_printer.cmx dba/dba.cmx base/bitvector.cmx base/bigint.cmx \
+    base/basic_types.cmx dynamic/dse/policy_engine.cmi
+dynamic/dse/policy_engine.cmi : dynamic/dse/policy_type.cmi \
+    dynamic/dse/path_predicate_env.cmi dba/dba_types.cmi dba/dba.cmi
+dynamic/dse/policy_type.cmi : dynamic/dse/tainting/taint_types.cmi \
+    dba/dba.cmi
+dynamic/dse/policy_utils.cmo : dynamic/trace/trace_options.cmi \
+    dynamic/dse/policy_utils.cmi
+dynamic/dse/policy_utils.cmx : dynamic/trace/trace_options.cmx \
+    dynamic/dse/policy_utils.cmi
+dynamic/dse/policy_utils.cmi :
+dynamic/dse/syscall_stubs/syscall_stubs.cmo : dynamic/trace/trace_type.cmi \
+    piqi/syscall_piqi.cmo dynamic/dse/path_predicate_env.cmi \
+    dynamic/dse/syscall_stubs/syscall_stubs.cmi
+dynamic/dse/syscall_stubs/syscall_stubs.cmx : dynamic/trace/trace_type.cmx \
+    piqi/syscall_piqi.cmx dynamic/dse/path_predicate_env.cmx \
+    dynamic/dse/syscall_stubs/syscall_stubs.cmi
+dynamic/dse/syscall_stubs/syscall_stubs.cmi : dynamic/trace/trace_type.cmi \
+    piqi/syscall_piqi.cmo dynamic/dse/path_predicate_env.cmi
+dynamic/dse/tainting/taint_types.cmo : dynamic/dse/tainting/taint_types.cmi
+dynamic/dse/tainting/taint_types.cmx : dynamic/dse/tainting/taint_types.cmi
+dynamic/dse/tainting/taint_types.cmi :
+dynamic/dse/tainting/tainting.cmo : dynamic/trace/trace_type.cmi \
+    dynamic/trace/trace_options.cmi dynamic/dse/tainting/taint_types.cmi \
+    base/logger.cmi base/interval.cmi dba/dba_types.cmi dba/dba.cmi \
+    base/basic_types.cmi dynamic/dse/tainting/tainting.cmi
+dynamic/dse/tainting/tainting.cmx : dynamic/trace/trace_type.cmx \
+    dynamic/trace/trace_options.cmx dynamic/dse/tainting/taint_types.cmx \
+    base/logger.cmx base/interval.cmx dba/dba_types.cmx dba/dba.cmx \
+    base/basic_types.cmx dynamic/dse/tainting/tainting.cmi
+dynamic/dse/tainting/tainting.cmi : dynamic/trace/trace_type.cmi \
+    dynamic/dse/tainting/taint_types.cmi dba/dba.cmi
+dynamic/examples/branch_coverage.cmo : dynamic/trace/trace_type.cmi \
+    dynamic/trace/trace_config.cmi dynamic/dse/path_predicate_env.cmi \
+    dynamic/dse/path_predicate.cmi base/logger.cmi formula/formula_pp.cmi \
+    formula/formula.cmi dynamic/dse/dse_options.cmi dba/dba_types.cmi \
+    dba/dba.cmi piqi/config_piqi.cmo base/bitvector.cmi base/bigint.cmi \
+    dynamic/examples/branch_coverage.cmi
+dynamic/examples/branch_coverage.cmx : dynamic/trace/trace_type.cmx \
+    dynamic/trace/trace_config.cmx dynamic/dse/path_predicate_env.cmx \
+    dynamic/dse/path_predicate.cmx base/logger.cmx formula/formula_pp.cmx \
+    formula/formula.cmx dynamic/dse/dse_options.cmx dba/dba_types.cmx \
+    dba/dba.cmx piqi/config_piqi.cmx base/bitvector.cmx base/bigint.cmx \
+    dynamic/examples/branch_coverage.cmi
+dynamic/examples/branch_coverage.cmi : dynamic/trace/trace_config.cmi \
+    dynamic/dse/path_predicate.cmi
+dynamic/examples/flareon.cmo : dynamic/trace/trace_type.cmi \
+    dynamic/trace/trace_config.cmi formula/solver.cmi smtlib/smt_model.cmi \
+    dynamic/dse/path_predicate_formula.cmi dynamic/dse/path_predicate_env.cmi \
+    dynamic/dse/path_predicate.cmi base/machine.cmi base/logger.cmi \
+    dynamic/dse/libcall_stubs/libcall_stubs.cmi formula/formula_pp.cmi \
+    formula/formula_options.cmi formula/formula.cmi \
+    dynamic/dse/dse_options.cmi dba/dba_types.cmi dba/dba.cmi \
+    piqi/config_piqi_ext.cmo piqi/config_piqi.cmo piqi/common_piqi.cmo \
+    base/bitvector.cmi base/bigint.cmi dynamic/examples/flareon.cmi
+dynamic/examples/flareon.cmx : dynamic/trace/trace_type.cmx \
+    dynamic/trace/trace_config.cmx formula/solver.cmx smtlib/smt_model.cmx \
+    dynamic/dse/path_predicate_formula.cmx dynamic/dse/path_predicate_env.cmx \
+    dynamic/dse/path_predicate.cmx base/machine.cmx base/logger.cmx \
+    dynamic/dse/libcall_stubs/libcall_stubs.cmx formula/formula_pp.cmx \
+    formula/formula_options.cmx formula/formula.cmx \
+    dynamic/dse/dse_options.cmx dba/dba_types.cmx dba/dba.cmx \
+    piqi/config_piqi_ext.cmx piqi/config_piqi.cmx piqi/common_piqi.cmx \
+    base/bitvector.cmx base/bigint.cmx dynamic/examples/flareon.cmi
+dynamic/examples/flareon.cmi : dynamic/trace/trace_config.cmi \
+    smtlib/smt_model.cmi dynamic/dse/path_predicate.cmi
+dynamic/examples/sploit1.cmo : dynamic/trace/trace_type.cmi \
+    formula/solver.cmi smtlib/smt_model.cmi \
+    dynamic/dse/path_predicate_formula.cmi dynamic/dse/path_predicate_env.cmi \
+    dynamic/dse/path_predicate.cmi base/machine.cmi base/logger.cmi \
+    formula/formula_pp.cmi formula/formula_options.cmi formula/formula.cmi \
+    dynamic/dse/dse_options.cmi dba/dba.cmi piqi/config_piqi.cmo \
+    base/bitvector.cmi base/bigint.cmi dynamic/examples/sploit1.cmi
+dynamic/examples/sploit1.cmx : dynamic/trace/trace_type.cmx \
+    formula/solver.cmx smtlib/smt_model.cmx \
+    dynamic/dse/path_predicate_formula.cmx dynamic/dse/path_predicate_env.cmx \
+    dynamic/dse/path_predicate.cmx base/machine.cmx base/logger.cmx \
+    formula/formula_pp.cmx formula/formula_options.cmx formula/formula.cmx \
+    dynamic/dse/dse_options.cmx dba/dba.cmx piqi/config_piqi.cmx \
+    base/bitvector.cmx base/bigint.cmx dynamic/examples/sploit1.cmi
+dynamic/examples/sploit1.cmi : dynamic/trace/trace_config.cmi \
+    smtlib/smt_model.cmi dynamic/dse/path_predicate.cmi
+dynamic/examples/stat_analysis.cmo : dynamic/trace/trace_type.cmi \
+    dynamic/trace/trace_postprocessing.cmi dynamic/trace/trace_options.cmi \
+    dynamic/trace/trace_config.cmi dynamic/dse/policy_utils.cmi \
+    dynamic/dse/path_predicate_optim.cmi \
+    dynamic/dse/path_predicate_formula.cmi dynamic/dse/path_predicate_env.cmi \
+    dynamic/dse/path_predicate.cmi base/logger.cmi formula/formula_pp.cmi \
+    formula/formula.cmi dynamic/dse/dse_options.cmi dba/dba_types.cmi \
+    dba/dba.cmi piqi/config_piqi.cmo base/basic_types.cmi \
+    dynamic/examples/stat_analysis.cmi
+dynamic/examples/stat_analysis.cmx : dynamic/trace/trace_type.cmx \
+    dynamic/trace/trace_postprocessing.cmx dynamic/trace/trace_options.cmx \
+    dynamic/trace/trace_config.cmx dynamic/dse/policy_utils.cmx \
+    dynamic/dse/path_predicate_optim.cmx \
+    dynamic/dse/path_predicate_formula.cmx dynamic/dse/path_predicate_env.cmx \
+    dynamic/dse/path_predicate.cmx base/logger.cmx formula/formula_pp.cmx \
+    formula/formula.cmx dynamic/dse/dse_options.cmx dba/dba_types.cmx \
+    dba/dba.cmx piqi/config_piqi.cmx base/basic_types.cmx \
+    dynamic/examples/stat_analysis.cmi
+dynamic/examples/stat_analysis.cmi : dynamic/trace/trace_config.cmi \
+    dynamic/dse/path_predicate_env.cmi dynamic/dse/path_predicate.cmi
+dynamic/examples/summary_analysis.cmo : dynamic/trace/trace_type.cmi \
+    dynamic/trace/trace_config.cmi dynamic/dse/path_predicate_env.cmi \
+    dynamic/dse/path_predicate.cmi base/logger.cmi \
+    dynamic/dse/dse_options.cmi dba/dba_types.cmi dba/dba.cmi \
+    base/basic_types.cmi dynamic/examples/summary_analysis.cmi
+dynamic/examples/summary_analysis.cmx : dynamic/trace/trace_type.cmx \
+    dynamic/trace/trace_config.cmx dynamic/dse/path_predicate_env.cmx \
+    dynamic/dse/path_predicate.cmx base/logger.cmx \
+    dynamic/dse/dse_options.cmx dba/dba_types.cmx dba/dba.cmx \
+    base/basic_types.cmx dynamic/examples/summary_analysis.cmi
+dynamic/examples/summary_analysis.cmi : dynamic/trace/trace_config.cmi \
+    dynamic/dse/path_predicate.cmi
+dynamic/examples/switch.cmo : dynamic/trace/trace_type.cmi \
+    dynamic/trace/trace_config.cmi formula/solver.cmi smtlib/smt_model.cmi \
+    dynamic/dse/path_predicate_formula.cmi dynamic/dse/path_predicate_env.cmi \
+    dynamic/dse/path_predicate.cmi base/logger.cmi \
+    formula/formula_options.cmi formula/formula.cmi \
+    dynamic/dse/dse_options.cmi dba/dba_types.cmi dba/dba.cmi \
+    piqi/config_piqi.cmo base/bitvector.cmi dynamic/examples/switch.cmi
+dynamic/examples/switch.cmx : dynamic/trace/trace_type.cmx \
+    dynamic/trace/trace_config.cmx formula/solver.cmx smtlib/smt_model.cmx \
+    dynamic/dse/path_predicate_formula.cmx dynamic/dse/path_predicate_env.cmx \
+    dynamic/dse/path_predicate.cmx base/logger.cmx \
+    formula/formula_options.cmx formula/formula.cmx \
+    dynamic/dse/dse_options.cmx dba/dba_types.cmx dba/dba.cmx \
+    piqi/config_piqi.cmx base/bitvector.cmx dynamic/examples/switch.cmi
+dynamic/examples/switch.cmi : dynamic/trace/trace_config.cmi \
+    dynamic/dse/path_predicate.cmi
+dynamic/trace/trace_config.cmo : piqi/config_piqi.cmo \
+    dynamic/trace/trace_config.cmi
+dynamic/trace/trace_config.cmx : piqi/config_piqi.cmx \
+    dynamic/trace/trace_config.cmi
+dynamic/trace/trace_config.cmi : piqi/config_piqi.cmo
+dynamic/trace/trace_loader.cmo : disasm/x86/x86toDba.cmi \
+    disasm/x86/x86Util.cmi disasm/x86/x86Types.cmi \
+    disasm/x86/x86Instruction.cmi base/virtual_address.cmi base/utils.cmi \
+    dynamic/trace/trace_type.cmi dynamic/trace/trace_postprocessing.cmi \
+    piqi/trace_piqi.cmo dynamic/trace/trace_options.cmi \
+    dynamic/trace/trace_config.cmi base/string_utils.cmi base/size.cmi \
+    base/mnemonic.cmi base/logger.cmi \
+    dynamic/dse/libcall_stubs/libcall_stubs.cmi utils/instruction.cmi \
+    ast/instr_cfg.cmi utils/dhunk.cmi disasm/decode_utils.cmi \
+    dba/dba_visitor.cmi dba/dba_types.cmi piqi/common_piqi.cmo \
+    base/binstream.cmi base/bigint.cmi base/basic_types.cmi \
+    dynamic/trace/trace_loader.cmi
+dynamic/trace/trace_loader.cmx : disasm/x86/x86toDba.cmx \
+    disasm/x86/x86Util.cmx disasm/x86/x86Types.cmi \
+    disasm/x86/x86Instruction.cmx base/virtual_address.cmx base/utils.cmx \
+    dynamic/trace/trace_type.cmx dynamic/trace/trace_postprocessing.cmx \
+    piqi/trace_piqi.cmx dynamic/trace/trace_options.cmx \
+    dynamic/trace/trace_config.cmx base/string_utils.cmx base/size.cmx \
+    base/mnemonic.cmx base/logger.cmx \
+    dynamic/dse/libcall_stubs/libcall_stubs.cmx utils/instruction.cmx \
+    ast/instr_cfg.cmx utils/dhunk.cmx disasm/decode_utils.cmx \
+    dba/dba_visitor.cmx dba/dba_types.cmx piqi/common_piqi.cmx \
+    base/binstream.cmx base/bigint.cmx base/basic_types.cmx \
+    dynamic/trace/trace_loader.cmi
+dynamic/trace/trace_loader.cmi : dynamic/trace/trace_type.cmi \
+    piqi/trace_piqi.cmo dynamic/trace/trace_config.cmi ast/instr_cfg.cmi
+dynamic/trace/trace_options.cmo : dynamic/trace/trace_config.cmi \
+    piqi/common_piqi.cmo base/cli.cmi dynamic/trace/trace_options.cmi
+dynamic/trace/trace_options.cmx : dynamic/trace/trace_config.cmx \
+    piqi/common_piqi.cmx base/cli.cmx dynamic/trace/trace_options.cmi
+dynamic/trace/trace_options.cmi : dynamic/trace/trace_config.cmi \
+    piqi/common_piqi.cmo base/cli.cmi
+dynamic/trace/trace_postprocessing.cmo : dynamic/trace/trace_type.cmi \
+    dynamic/trace/trace_options.cmi base/logger.cmi dba/dba_utils.cmi \
+    dba/dba_types.cmi dba/dba.cmi base/basic_types.cmi \
+    dynamic/trace/trace_postprocessing.cmi
+dynamic/trace/trace_postprocessing.cmx : dynamic/trace/trace_type.cmx \
+    dynamic/trace/trace_options.cmx base/logger.cmx dba/dba_utils.cmx \
+    dba/dba_types.cmx dba/dba.cmx base/basic_types.cmx \
+    dynamic/trace/trace_postprocessing.cmi
+dynamic/trace/trace_postprocessing.cmi : dynamic/trace/trace_type.cmi \
+    base/basic_types.cmi
+dynamic/trace/trace_type.cmo : disasm/x86/x86Util.cmi piqi/syscall_piqi.cmo \
+    piqi/libcall_piqi.cmo dba/dba_types.cmi base/bitvector.cmi \
+    base/bigint.cmi base/basic_types.cmi dynamic/trace/trace_type.cmi
+dynamic/trace/trace_type.cmx : disasm/x86/x86Util.cmx piqi/syscall_piqi.cmx \
+    piqi/libcall_piqi.cmx dba/dba_types.cmx base/bitvector.cmx \
+    base/bigint.cmx base/basic_types.cmx dynamic/trace/trace_type.cmi
+dynamic/trace/trace_type.cmi : piqi/syscall_piqi.cmo piqi/libcall_piqi.cmo \
+    dba/dba_types.cmi base/bitvector.cmi base/basic_types.cmi
+formula/formula.cmo : base/sequence.cmi base/list_utils.cmi \
+    base/interval.cmi base/bitvector.cmi base/bigint.cmi formula/formula.cmi
+formula/formula.cmx : base/sequence.cmx base/list_utils.cmx \
+    base/interval.cmx base/bitvector.cmx base/bigint.cmx formula/formula.cmi
+formula/formula.cmi : base/sequence.cmi base/interval.cmi base/bitvector.cmi
+formula/formula_main.cmo : formula/smtlib_to_formula.cmi \
+    smtlib/smtlib_pp.cmi smtlib/smtlib_parser.cmi smtlib/smtlib_lexer.cmo \
+    parser/parse_utils.cmi base/logger.cmi kernel/kernel_options.cmi \
+    formula/formula_transformation.cmi formula/formula_to_smtlib.cmi \
+    formula/formula_options.cmi formula/formula.cmi base/file_utils.cmi \
+    base/cli.cmi formula/formula_main.cmi
+formula/formula_main.cmx : formula/smtlib_to_formula.cmx \
+    smtlib/smtlib_pp.cmx smtlib/smtlib_parser.cmx smtlib/smtlib_lexer.cmx \
+    parser/parse_utils.cmx base/logger.cmx kernel/kernel_options.cmx \
+    formula/formula_transformation.cmx formula/formula_to_smtlib.cmx \
+    formula/formula_options.cmx formula/formula.cmx base/file_utils.cmx \
+    base/cli.cmx formula/formula_main.cmi
+formula/formula_main.cmi : smtlib/smtlib.cmi
+formula/formula_options.cmo : base/cli.cmi formula/formula_options.cmi
+formula/formula_options.cmx : base/cli.cmx formula/formula_options.cmi
+formula/formula_options.cmi : piqi/common_piqi.cmo base/cli.cmi
+formula/formula_pp.cmo : smtlib/smtlib_pp.cmi base/sequence.cmi \
+    base/print_utils.cmi base/interval.cmi formula/formula_to_smtlib.cmi \
+    formula/formula_options.cmi formula/formula.cmi formula/formula_pp.cmi
+formula/formula_pp.cmx : smtlib/smtlib_pp.cmx base/sequence.cmx \
+    base/print_utils.cmx base/interval.cmx formula/formula_to_smtlib.cmx \
+    formula/formula_options.cmx formula/formula.cmx formula/formula_pp.cmi
+formula/formula_pp.cmi : formula/formula.cmi
+formula/formula_to_smtlib.cmo : smtlib/smtlib_utils.cmi smtlib/smtlib.cmi \
+    base/sequence.cmi smtlib/locations.cmi base/interval.cmi \
+    formula/formula_utils.cmi formula/formula.cmi base/bitvector.cmi \
+    base/bigint.cmi formula/formula_to_smtlib.cmi
+formula/formula_to_smtlib.cmx : smtlib/smtlib_utils.cmx smtlib/smtlib.cmi \
+    base/sequence.cmx smtlib/locations.cmx base/interval.cmx \
+    formula/formula_utils.cmx formula/formula.cmx base/bitvector.cmx \
+    base/bigint.cmx formula/formula_to_smtlib.cmi
+formula/formula_to_smtlib.cmi : smtlib/smtlib.cmi formula/formula.cmi
+formula/formula_transformation.cmo : base/interval.cmi \
+    formula/formula_utils.cmi formula/formula_pp.cmi \
+    formula/formula_options.cmi formula/formula.cmi base/bitvector.cmi \
+    base/bigint.cmi base/basic_types.cmi formula/formula_transformation.cmi
+formula/formula_transformation.cmx : base/interval.cmx \
+    formula/formula_utils.cmx formula/formula_pp.cmx \
+    formula/formula_options.cmx formula/formula.cmx base/bitvector.cmx \
+    base/bigint.cmx base/basic_types.cmx formula/formula_transformation.cmi
+formula/formula_transformation.cmi : formula/formula.cmi
+formula/formula_utils.cmo : base/interval.cmi formula/formula.cmi \
+    base/bitvector.cmi formula/formula_utils.cmi
+formula/formula_utils.cmx : base/interval.cmx formula/formula.cmx \
+    base/bitvector.cmx formula/formula_utils.cmi
+formula/formula_utils.cmi : formula/formula.cmi base/bitvector.cmi
+formula/prover.cmo : formula/formula_options.cmi formula/prover.cmi
+formula/prover.cmx : formula/formula_options.cmx formula/prover.cmi
+formula/prover.cmi : formula/formula_options.cmi
+formula/smtlib_to_formula.cmo : smtlib/smtlib_pp.cmi smtlib/smtlib.cmi \
+    base/logger.cmi smtlib/locations.cmi base/interval.cmi \
+    formula/formula_options.cmi formula/formula.cmi base/bitvector.cmi \
+    base/bigint.cmi formula/smtlib_to_formula.cmi
+formula/smtlib_to_formula.cmx : smtlib/smtlib_pp.cmx smtlib/smtlib.cmi \
+    base/logger.cmx smtlib/locations.cmx base/interval.cmx \
+    formula/formula_options.cmx formula/formula.cmx base/bitvector.cmx \
+    base/bigint.cmx formula/smtlib_to_formula.cmi
+formula/smtlib_to_formula.cmi : smtlib/smtlib.cmi formula/formula.cmi
+formula/solver.cmo : base/utils.cmi base/string_utils.cmi \
+    smtlib/smtlib_parser.cmi smtlib/smtlib_lexer.cmo smtlib/smt_model.cmi \
+    formula/prover.cmi base/logger.cmi formula/formula_pp.cmi \
+    formula/formula_options.cmi formula/formula.cmi base/bitvector.cmi \
+    formula/solver.cmi
+formula/solver.cmx : base/utils.cmx base/string_utils.cmx \
+    smtlib/smtlib_parser.cmx smtlib/smtlib_lexer.cmx smtlib/smt_model.cmx \
+    formula/prover.cmx base/logger.cmx formula/formula_pp.cmx \
+    formula/formula_options.cmx formula/formula.cmx base/bitvector.cmx \
+    formula/solver.cmi
+formula/solver.cmi : smtlib/smt_model.cmi formula/prover.cmi \
+    formula/formula.cmi base/bitvector.cmi
+ida/ida_cfg.cmo : base/virtual_address.cmi base/string_utils.cmi \
+    base/size.cmi base/print_utils.cmi base/mnemonic.cmi base/logger.cmi \
+    base/list_utils.cmi utils/instruction.cmi ida/ida_utils.cmi \
+    ida/ida_options.cmi disasm/disasm_core.cmi utils/dhunk.cmi utils/cfg.cmi \
+    base/binstream.cmi ida/ida_cfg.cmi
+ida/ida_cfg.cmx : base/virtual_address.cmx base/string_utils.cmx \
+    base/size.cmx base/print_utils.cmx base/mnemonic.cmx base/logger.cmx \
+    base/list_utils.cmx utils/instruction.cmx ida/ida_utils.cmx \
+    ida/ida_options.cmx disasm/disasm_core.cmx utils/dhunk.cmx utils/cfg.cmx \
+    base/binstream.cmx ida/ida_cfg.cmi
+ida/ida_cfg.cmi : base/virtual_address.cmi utils/instruction.cmi \
+    utils/cfg.cmi
+ida/ida_cg.cmo : base/print_utils.cmi base/logger.cmi ida/ida_utils.cmi \
+    ida/ida_options.cmi ida/ida_cfg.cmi utils/cfg.cmi ida/ida_cg.cmi
+ida/ida_cg.cmx : base/print_utils.cmx base/logger.cmx ida/ida_utils.cmx \
+    ida/ida_options.cmx ida/ida_cfg.cmx utils/cfg.cmx ida/ida_cg.cmi
+ida/ida_cg.cmi : ida/ida_cfg.cmi utils/cfg.cmi
+ida/ida_main.cmo : base/logger.cmi ida/ida_options.cmi ida/ida_cg.cmi \
+    ida/ida_cfg.cmi base/cli.cmi ida/ida_main.cmi
+ida/ida_main.cmx : base/logger.cmx ida/ida_options.cmx ida/ida_cg.cmx \
+    ida/ida_cfg.cmx base/cli.cmx ida/ida_main.cmi
+ida/ida_main.cmi : ida/ida_cg.cmi ida/ida_cfg.cmi
+ida/ida_options.cmo : base/cli.cmi ida/ida_options.cmi
+ida/ida_options.cmx : base/cli.cmx ida/ida_options.cmi
+ida/ida_options.cmi : base/cli.cmi
+ida/ida_utils.cmo : base/virtual_address.cmi base/mnemonic.cmi \
+    base/logger.cmi ida/ida_options.cmi ida/ida_utils.cmi
+ida/ida_utils.cmx : base/virtual_address.cmx base/mnemonic.cmx \
+    base/logger.cmx ida/ida_options.cmx ida/ida_utils.cmi
+ida/ida_utils.cmi : base/virtual_address.cmi base/mnemonic.cmi
+infos.cmo : base/virtual_address.cmi base/list_utils.cmi \
+    kernel/kernel_options.cmi dba/dba_types.cmi dba/dba.cmi infos.cmi
+infos.cmx : base/virtual_address.cmx base/list_utils.cmx \
+    kernel/kernel_options.cmx dba/dba_types.cmx dba/dba.cmx infos.cmi
+infos.cmi : base/virtual_address.cmi dba/dba_types.cmi dba/dba.cmi
+kernel/kernel_core.cmo : base/logger.cmi kernel/kernel_options.cmi \
+    kernel/kernel_functions.cmi base/cli.cmi kernel/kernel_core.cmi
+kernel/kernel_core.cmx : base/logger.cmx kernel/kernel_options.cmx \
+    kernel/kernel_functions.cmx base/cli.cmx kernel/kernel_core.cmi
+kernel/kernel_core.cmi :
+kernel/kernel_functions.cmo : base/machine.cmi loader/loader_types.cmi \
+    loader/loader.cmi kernel/kernel_options.cmi utils/binary_loc.cmi \
+    kernel/kernel_functions.cmi
+kernel/kernel_functions.cmx : base/machine.cmx loader/loader_types.cmx \
+    loader/loader.cmx kernel/kernel_options.cmx utils/binary_loc.cmx \
+    kernel/kernel_functions.cmi
+kernel/kernel_functions.cmi : base/virtual_address.cmi base/machine.cmi \
+    loader/loader.cmi
+kernel/kernel_options.cmo : base/machine.cmi base/logger.cmi config.cmo \
+    base/cli.cmi kernel/kernel_options.cmi
+kernel/kernel_options.cmx : base/machine.cmx base/logger.cmx config.cmx \
+    base/cli.cmx kernel/kernel_options.cmi
+kernel/kernel_options.cmi : base/machine.cmi base/cli.cmi
+llvm/generic_decoder.cmo : base/interval.cmi llvm/generic_decoder_sig.cmi \
+    dba/dba_types.cmi dba/dba.cmi base/bitvector.cmi base/bigint.cmi \
+    llvm/generic_decoder.cmi
+llvm/generic_decoder.cmx : base/interval.cmx llvm/generic_decoder_sig.cmx \
+    dba/dba_types.cmx dba/dba.cmx base/bitvector.cmx base/bigint.cmx \
+    llvm/generic_decoder.cmi
+llvm/generic_decoder.cmi : llvm/generic_decoder_sig.cmi dba/dba.cmi
+llvm/generic_decoder_sig.cmo : llvm/transfer_functions.cmi dba/dba.cmi \
+    llvm/generic_decoder_sig.cmi
+llvm/generic_decoder_sig.cmx : llvm/transfer_functions.cmx dba/dba.cmx \
+    llvm/generic_decoder_sig.cmi
+llvm/generic_decoder_sig.cmi : llvm/transfer_functions.cmi dba/dba.cmi
+llvm/llvm_decoder.cmo : llvm/transfer_functions.cmi \
+    llvm/generic_decoder_sig.cmi llvm/generic_decoder.cmi utils/dhunk.cmi \
+    dba/dba_types.cmi dba/dba.cmi llvm/llvm_decoder.cmi
+llvm/llvm_decoder.cmx : llvm/transfer_functions.cmx \
+    llvm/generic_decoder_sig.cmx llvm/generic_decoder.cmx utils/dhunk.cmx \
+    dba/dba_types.cmx dba/dba.cmx llvm/llvm_decoder.cmi
+llvm/llvm_decoder.cmi : llvm/generic_decoder_sig.cmi utils/dhunk.cmi
+llvm/transfer_functions.cmo : base/bigint.cmi llvm/transfer_functions.cmi
+llvm/transfer_functions.cmx : base/bigint.cmx llvm/transfer_functions.cmi
+llvm/transfer_functions.cmi : base/bigint.cmi
+loader/loader.cmo : loader/loader_pe.cmi loader/loader_elf.cmi \
+    loader/loader_dump.cmi loader/loader_buf.cmi loader/loader.cmi
+loader/loader.cmx : loader/loader_pe.cmx loader/loader_elf.cmx \
+    loader/loader_dump.cmx loader/loader_buf.cmx loader/loader.cmi
+loader/loader.cmi : loader/loader_sigs.cmi loader/loader_pe.cmi \
+    loader/loader_elf.cmi loader/loader_dump.cmi
+loader/loader_buf.cmo : loader/loader_types.cmi loader/loader_buf.cmi
+loader/loader_buf.cmx : loader/loader_types.cmx loader/loader_buf.cmi
+loader/loader_buf.cmi : loader/loader_types.cmi
+loader/loader_dump.cmo : loader/loader_types.cmi loader/loader_buf.cmi \
+    base/binstream.cmi loader/loader_dump.cmi
+loader/loader_dump.cmx : loader/loader_types.cmx loader/loader_buf.cmx \
+    base/binstream.cmx loader/loader_dump.cmi
+loader/loader_dump.cmi : loader/loader_types.cmi loader/loader_sigs.cmi \
+    base/binstream.cmi
+loader/loader_elf.cmo : loader/loader_types.cmi loader/loader_buf.cmi \
+    loader/loader_elf.cmi
+loader/loader_elf.cmx : loader/loader_types.cmx loader/loader_buf.cmx \
+    loader/loader_elf.cmi
+loader/loader_elf.cmi : loader/loader_types.cmi loader/loader_sigs.cmi
+loader/loader_pe.cmo : loader/loader_types.cmi loader/loader_buf.cmi \
+    loader/loader_pe.cmi
+loader/loader_pe.cmx : loader/loader_types.cmx loader/loader_buf.cmx \
+    loader/loader_pe.cmi
+loader/loader_pe.cmi : loader/loader_types.cmi loader/loader_sigs.cmi
+loader/loader_sigs.cmi : loader/loader_types.cmi loader/loader_buf.cmi
+loader/loader_types.cmo : loader/loader_types.cmi
+loader/loader_types.cmx : loader/loader_types.cmi
+loader/loader_types.cmi :
+loader/loader_utils.cmo : base/virtual_address.cmi loader/loader_types.cmi \
+    loader/loader.cmi base/bitvector.cmi base/bigint.cmi base/array_utils.cmi \
+    loader/loader_utils.cmi
+loader/loader_utils.cmx : base/virtual_address.cmx loader/loader_types.cmx \
+    loader/loader.cmx base/bitvector.cmx base/bigint.cmx base/array_utils.cmx \
+    loader/loader_utils.cmi
+loader/loader_utils.cmi : base/virtual_address.cmi loader/loader.cmi \
+    base/bitvector.cmi
+main.cmo : xtrasec/xtrasec.cmi test.cmi sse/sse.cmi \
+    static/simulation/simulate.cmi server/server.cmi base/machine.cmi \
+    kernel/kernel_options.cmi kernel/kernel_functions.cmi \
+    kernel/kernel_core.cmi formula/formula_main.cmi base/file_utils.cmi \
+    dynamic/dse/path_exploration/dse.cmi dynamic/drun.cmi disasm/disasm.cmi \
+    base/cli.cmi backwards/bw_main.cmi binpatcher/binpatcher.cmi \
+    static/ai/ai.cmi
+main.cmx : xtrasec/xtrasec.cmx test.cmx sse/sse.cmx \
+    static/simulation/simulate.cmx server/server.cmx base/machine.cmx \
+    kernel/kernel_options.cmx kernel/kernel_functions.cmx \
+    kernel/kernel_core.cmx formula/formula_main.cmx base/file_utils.cmx \
+    dynamic/dse/path_exploration/dse.cmx dynamic/drun.cmx disasm/disasm.cmx \
+    base/cli.cmx backwards/bw_main.cmx binpatcher/binpatcher.cmx \
+    static/ai/ai.cmx
+parser/SMTLexerWp.cmo : parser/SMTParserWp.cmi
+parser/SMTLexerWp.cmx : parser/SMTParserWp.cmx
+parser/SMTParserWp.cmo : kernel/kernel_options.cmi formula/formula.cmi \
+    parser/SMTParserWp.cmi
+parser/SMTParserWp.cmx : kernel/kernel_options.cmx formula/formula.cmx \
+    parser/SMTParserWp.cmi
+parser/SMTParserWp.cmi : formula/formula.cmi
+parser/dbacsl_parser.cmo : base/size.cmi parser/parse_helpers.cmi \
+    dba/dba.cmi base/bitvector.cmi base/bigint.cmi parser/dbacsl_parser.cmi
+parser/dbacsl_parser.cmx : base/size.cmx parser/parse_helpers.cmx \
+    dba/dba.cmx base/bitvector.cmx base/bigint.cmx parser/dbacsl_parser.cmi
+parser/dbacsl_parser.cmi : dba/dba.cmi
+parser/dbacsl_token.cmo : parser/dbacsl_parser.cmi
+parser/dbacsl_token.cmx : parser/dbacsl_parser.cmx
+parser/lexer.cmo : parser/parser.cmi
+parser/lexer.cmx : parser/parser.cmx
+parser/lexer_infos.cmo : parser/parser_infos.cmi
+parser/lexer_infos.cmx : parser/parser_infos.cmx
+parser/parse_helpers.cmo : base/virtual_address.cmi base/utils.cmi \
+    base/size.cmi base/machine.cmi kernel/kernel_options.cmi dba/errors.cmi \
+    dba/dba_utils.cmi dba/dba_types.cmi dba/dba_printer.cmi dba/dba.cmi \
+    base/bitvector.cmi base/basic_types.cmi parser/parse_helpers.cmi
+parser/parse_helpers.cmx : base/virtual_address.cmx base/utils.cmx \
+    base/size.cmx base/machine.cmx kernel/kernel_options.cmx dba/errors.cmx \
+    dba/dba_utils.cmx dba/dba_types.cmx dba/dba_printer.cmx dba/dba.cmx \
+    base/bitvector.cmx base/basic_types.cmx parser/parse_helpers.cmi
+parser/parse_helpers.cmi : base/virtual_address.cmi dba/dba_types.cmi \
+    dba/dba.cmi base/bitvector.cmi
+parser/parse_utils.cmo : base/virtual_address.cmi parser/parser_infos.cmi \
+    parser/parser.cmi parser/lexer_infos.cmo parser/lexer.cmo \
+    kernel/kernel_options.cmi kernel/kernel_functions.cmi infos.cmi \
+    parser/dbacsl_token.cmo parser/dbacsl_parser.cmi dba/dba_types.cmi \
+    parser/parse_utils.cmi
+parser/parse_utils.cmx : base/virtual_address.cmx parser/parser_infos.cmx \
+    parser/parser.cmx parser/lexer_infos.cmx parser/lexer.cmx \
+    kernel/kernel_options.cmx kernel/kernel_functions.cmx infos.cmx \
+    parser/dbacsl_token.cmx parser/dbacsl_parser.cmx dba/dba_types.cmx \
+    parser/parse_utils.cmi
+parser/parse_utils.cmi : base/machine.cmi infos.cmi dba/dba_types.cmi \
+    dba/dba.cmi
+parser/parser.cmo : base/virtual_address.cmi base/utils.cmi base/size.cmi \
+    parser/parse_helpers.cmi base/machine.cmi utils/directive.cmi \
+    utils/dhunk.cmi dba/dba_types.cmi dba/dba.cmi base/bitvector.cmi \
+    base/binstream.cmi utils/binary_loc.cmi base/bigint.cmi parser/parser.cmi
+parser/parser.cmx : base/virtual_address.cmx base/utils.cmx base/size.cmx \
+    parser/parse_helpers.cmx base/machine.cmx utils/directive.cmx \
+    utils/dhunk.cmx dba/dba_types.cmx dba/dba.cmx base/bitvector.cmx \
+    base/binstream.cmx utils/binary_loc.cmx base/bigint.cmx parser/parser.cmi
+parser/parser.cmi : base/virtual_address.cmi parser/parse_helpers.cmi \
+    utils/directive.cmi utils/dhunk.cmi dba/dba_types.cmi dba/dba.cmi \
+    base/binstream.cmi
+parser/parser_infos.cmo : base/virtual_address.cmi base/size.cmi \
+    base/machine.cmi infos.cmi dba/errors.cmi dba/dba_utils.cmi \
+    dba/dba_types.cmi dba/dba.cmi base/bitvector.cmi base/bigint.cmi \
+    base/basic_types.cmi parser/parser_infos.cmi
+parser/parser_infos.cmx : base/virtual_address.cmx base/size.cmx \
+    base/machine.cmx infos.cmx dba/errors.cmx dba/dba_utils.cmx \
+    dba/dba_types.cmx dba/dba.cmx base/bitvector.cmx base/bigint.cmx \
+    base/basic_types.cmx parser/parser_infos.cmi
+parser/parser_infos.cmi : infos.cmi
+parser/policy_parser.cmo : dynamic/dse/tainting/taint_types.cmi \
+    base/size.cmi dynamic/dse/policy_type.cmi parser/parse_helpers.cmi \
+    base/logger.cmi kernel/kernel_options.cmi base/interval.cmi \
+    dba/dba_types.cmi dba/dba.cmi base/bitvector.cmi base/bigint.cmi \
+    parser/policy_parser.cmi
+parser/policy_parser.cmx : dynamic/dse/tainting/taint_types.cmx \
+    base/size.cmx dynamic/dse/policy_type.cmi parser/parse_helpers.cmx \
+    base/logger.cmx kernel/kernel_options.cmx base/interval.cmx \
+    dba/dba_types.cmx dba/dba.cmx base/bitvector.cmx base/bigint.cmx \
+    parser/policy_parser.cmi
+parser/policy_parser.cmi : dynamic/dse/policy_type.cmi
+parser/policy_token.cmo : parser/policy_parser.cmi
+parser/policy_token.cmx : parser/policy_parser.cmx
+piqi/analysis_config_piqi.cmo : piqi/common_piqi.cmo
+piqi/analysis_config_piqi.cmx : piqi/common_piqi.cmx
+piqi/analysis_config_piqi_ext.cmo : piqi/common_piqi_ext.cmo \
+    piqi/analysis_config_piqi.cmo
+piqi/analysis_config_piqi_ext.cmx : piqi/common_piqi_ext.cmx \
+    piqi/analysis_config_piqi.cmx
+piqi/common_piqi.cmo :
+piqi/common_piqi.cmx :
+piqi/common_piqi_ext.cmo : piqi/common_piqi.cmo
+piqi/common_piqi_ext.cmx : piqi/common_piqi.cmx
+piqi/config_piqi.cmo : piqi/syscall_piqi.cmo piqi/libcall_piqi.cmo \
+    piqi/instruction_piqi.cmo piqi/common_piqi.cmo \
+    piqi/analysis_config_piqi.cmo
+piqi/config_piqi.cmx : piqi/syscall_piqi.cmx piqi/libcall_piqi.cmx \
+    piqi/instruction_piqi.cmx piqi/common_piqi.cmx \
+    piqi/analysis_config_piqi.cmx
+piqi/config_piqi_ext.cmo : piqi/syscall_piqi_ext.cmo \
+    piqi/libcall_piqi_ext.cmo piqi/instruction_piqi_ext.cmo \
+    piqi/config_piqi.cmo piqi/common_piqi_ext.cmo \
+    piqi/analysis_config_piqi_ext.cmo
+piqi/config_piqi_ext.cmx : piqi/syscall_piqi_ext.cmx \
+    piqi/libcall_piqi_ext.cmx piqi/instruction_piqi_ext.cmx \
+    piqi/config_piqi.cmx piqi/common_piqi_ext.cmx \
+    piqi/analysis_config_piqi_ext.cmx
+piqi/dba_piqi.cmo :
+piqi/dba_piqi.cmx :
+piqi/dba_piqi_ext.cmo : piqi/dba_piqi.cmo
+piqi/dba_piqi_ext.cmx : piqi/dba_piqi.cmx
+piqi/instruction_piqi.cmo : piqi/common_piqi.cmo
+piqi/instruction_piqi.cmx : piqi/common_piqi.cmx
+piqi/instruction_piqi_ext.cmo : piqi/instruction_piqi.cmo \
+    piqi/common_piqi_ext.cmo
+piqi/instruction_piqi_ext.cmx : piqi/instruction_piqi.cmx \
+    piqi/common_piqi_ext.cmx
+piqi/libcall_piqi.cmo : piqi/common_piqi.cmo
+piqi/libcall_piqi.cmx : piqi/common_piqi.cmx
+piqi/libcall_piqi_ext.cmo : piqi/libcall_piqi.cmo piqi/common_piqi_ext.cmo
+piqi/libcall_piqi_ext.cmx : piqi/libcall_piqi.cmx piqi/common_piqi_ext.cmx
+piqi/message_piqi.cmo : piqi/dba_piqi.cmo piqi/config_piqi.cmo \
+    piqi/common_piqi.cmo
+piqi/message_piqi.cmx : piqi/dba_piqi.cmx piqi/config_piqi.cmx \
+    piqi/common_piqi.cmx
+piqi/message_piqi_ext.cmo : piqi/message_piqi.cmo piqi/dba_piqi_ext.cmo \
+    piqi/config_piqi_ext.cmo piqi/common_piqi_ext.cmo
+piqi/message_piqi_ext.cmx : piqi/message_piqi.cmx piqi/dba_piqi_ext.cmx \
+    piqi/config_piqi_ext.cmx piqi/common_piqi_ext.cmx
+piqi/syscall_piqi.cmo : piqi/common_piqi.cmo
+piqi/syscall_piqi.cmx : piqi/common_piqi.cmx
+piqi/syscall_piqi_ext.cmo : piqi/syscall_piqi.cmo piqi/common_piqi_ext.cmo
+piqi/syscall_piqi_ext.cmx : piqi/syscall_piqi.cmx piqi/common_piqi_ext.cmx
+piqi/trace_piqi.cmo : piqi/syscall_piqi.cmo piqi/libcall_piqi.cmo \
+    piqi/dba_piqi.cmo piqi/common_piqi.cmo
+piqi/trace_piqi.cmx : piqi/syscall_piqi.cmx piqi/libcall_piqi.cmx \
+    piqi/dba_piqi.cmx piqi/common_piqi.cmx
+piqi/trace_piqi_ext.cmo : piqi/trace_piqi.cmo piqi/syscall_piqi_ext.cmo \
+    piqi/libcall_piqi_ext.cmo piqi/dba_piqi_ext.cmo piqi/common_piqi_ext.cmo
+piqi/trace_piqi_ext.cmx : piqi/trace_piqi.cmx piqi/syscall_piqi_ext.cmx \
+    piqi/libcall_piqi_ext.cmx piqi/dba_piqi_ext.cmx piqi/common_piqi_ext.cmx
+server/dba_io.cmo : base/utils.cmi base/size.cmi base/interval.cmi \
+    dba/dba_types.cmi piqi/dba_piqi.cmo dba/dba.cmi base/bitvector.cmi \
+    base/bigint.cmi server/dba_io.cmi
+server/dba_io.cmx : base/utils.cmx base/size.cmx base/interval.cmx \
+    dba/dba_types.cmx piqi/dba_piqi.cmx dba/dba.cmx base/bitvector.cmx \
+    base/bigint.cmx server/dba_io.cmi
+server/dba_io.cmi : dba/dba_types.cmi piqi/dba_piqi.cmo
+server/server.cmo : server/server_options.cmi server/server_callback.cmi \
+    utils/network_io.cmi base/logger.cmi base/cli.cmi server/server.cmi
+server/server.cmx : server/server_options.cmx server/server_callback.cmx \
+    utils/network_io.cmx base/logger.cmx base/cli.cmx server/server.cmi
+server/server.cmi :
+server/server_callback.cmo : base/virtual_address.cmi \
+    dynamic/trace/trace_config.cmi server/server_options.cmi \
+    dynamic/dse/examples/opaque_predicate.cmi utils/network_io.cmi \
+    piqi/message_piqi.cmo base/logger.cmi \
+    dynamic/dse/libcall_stubs/libcall_stubs.cmi \
+    dynamic/dse/examples/generic_analyse.cmi utils/dhunk.cmi \
+    disasm/decode_utils.cmi server/dba_io.cmi piqi/config_piqi.cmo \
+    dynamic/dse/examples/call_ret.cmi server/server_callback.cmi
+server/server_callback.cmx : base/virtual_address.cmx \
+    dynamic/trace/trace_config.cmx server/server_options.cmx \
+    dynamic/dse/examples/opaque_predicate.cmx utils/network_io.cmx \
+    piqi/message_piqi.cmx base/logger.cmx \
+    dynamic/dse/libcall_stubs/libcall_stubs.cmx \
+    dynamic/dse/examples/generic_analyse.cmx utils/dhunk.cmx \
+    disasm/decode_utils.cmx server/dba_io.cmx piqi/config_piqi.cmx \
+    dynamic/dse/examples/call_ret.cmx server/server_callback.cmi
+server/server_callback.cmi :
+server/server_options.cmo : base/cli.cmi server/server_options.cmi
+server/server_options.cmx : base/cli.cmx server/server_options.cmi
+server/server_options.cmi : base/cli.cmi
+smtlib/locations.cmo : smtlib/locations.cmi
+smtlib/locations.cmx : smtlib/locations.cmi
+smtlib/locations.cmi :
+smtlib/smt_model.cmo : base/utils.cmi base/string_utils.cmi \
+    smtlib/smtlib_pp.cmi smtlib/smtlib.cmi base/print_utils.cmi \
+    loader/loader_utils.cmi loader/loader.cmi kernel/kernel_options.cmi \
+    kernel/kernel_functions.cmi base/bitvector.cmi base/bigint.cmi \
+    base/basic_types.cmi smtlib/smt_model.cmi
+smtlib/smt_model.cmx : base/utils.cmx base/string_utils.cmx \
+    smtlib/smtlib_pp.cmx smtlib/smtlib.cmi base/print_utils.cmx \
+    loader/loader_utils.cmx loader/loader.cmx kernel/kernel_options.cmx \
+    kernel/kernel_functions.cmx base/bitvector.cmx base/bigint.cmx \
+    base/basic_types.cmx smtlib/smt_model.cmi
+smtlib/smt_model.cmi : smtlib/smtlib.cmi base/size.cmi dba/dba.cmi \
+    base/bitvector.cmi
+smtlib/smtlib.cmi : smtlib/locations.cmi
+smtlib/smtlib_lexer.cmo : smtlib/smtlib_parser.cmi smtlib/locations.cmi
+smtlib/smtlib_lexer.cmx : smtlib/smtlib_parser.cmx smtlib/locations.cmx
+smtlib/smtlib_parser.cmo : smtlib/smtlib.cmi smtlib/locations.cmi \
+    smtlib/smtlib_parser.cmi
+smtlib/smtlib_parser.cmx : smtlib/smtlib.cmi smtlib/locations.cmx \
+    smtlib/smtlib_parser.cmi
+smtlib/smtlib_parser.cmi : smtlib/smtlib.cmi
+smtlib/smtlib_pp.cmo : smtlib/smtlib.cmi smtlib/locations.cmi \
+    smtlib/smtlib_pp.cmi
+smtlib/smtlib_pp.cmx : smtlib/smtlib.cmi smtlib/locations.cmx \
+    smtlib/smtlib_pp.cmi
+smtlib/smtlib_pp.cmi : smtlib/smtlib.cmi smtlib/locations.cmi
+smtlib/smtlib_utils.cmo : smtlib/smtlib.cmi smtlib/locations.cmi \
+    smtlib/smtlib_utils.cmi
+smtlib/smtlib_utils.cmx : smtlib/smtlib.cmi smtlib/locations.cmx \
+    smtlib/smtlib_utils.cmi
+smtlib/smtlib_utils.cmi : smtlib/smtlib.cmi smtlib/locations.cmi
+sse/sse.cmo : base/virtual_address.cmi base/utils.cmi sse/sse_types.cmi \
+    sse/sse_symbolic.cmi sse/sse_smt.cmi sse/sse_options.cmi \
+    smtlib/smt_model.cmi base/print_utils.cmi parser/parser.cmi \
+    parser/parse_utils.cmi parser/parse_helpers.cmi base/mnemonic.cmi \
+    base/logger.cmi loader/loader_utils.cmi loader/loader_types.cmi \
+    loader/loader.cmi parser/lexer.cmo kernel/kernel_options.cmi \
+    kernel/kernel_functions.cmi utils/instruction.cmi formula/formula_pp.cmi \
+    formula/formula.cmi dba/errors.cmi utils/directive.cmi dba/dba_types.cmi \
+    dba/dba_printer.cmi dba/dba.cmi base/cli.cmi base/bitvector.cmi \
+    utils/binary_loc.cmi sse/sse.cmi
+sse/sse.cmx : base/virtual_address.cmx base/utils.cmx sse/sse_types.cmx \
+    sse/sse_symbolic.cmx sse/sse_smt.cmx sse/sse_options.cmx \
+    smtlib/smt_model.cmx base/print_utils.cmx parser/parser.cmx \
+    parser/parse_utils.cmx parser/parse_helpers.cmx base/mnemonic.cmx \
+    base/logger.cmx loader/loader_utils.cmx loader/loader_types.cmx \
+    loader/loader.cmx parser/lexer.cmx kernel/kernel_options.cmx \
+    kernel/kernel_functions.cmx utils/instruction.cmx formula/formula_pp.cmx \
+    formula/formula.cmx dba/errors.cmx utils/directive.cmx dba/dba_types.cmx \
+    dba/dba_printer.cmx dba/dba.cmx base/cli.cmx base/bitvector.cmx \
+    utils/binary_loc.cmx sse/sse.cmi
+sse/sse.cmi :
+sse/sse_graph.cmo : base/virtual_address.cmi sse/sse_options.cmi \
+    base/logger.cmi utils/instruction.cmi disasm/disasm_core.cmi \
+    utils/dhunk.cmi dba/dba_types.cmi dba/dba.cmi utils/cfg.cmi \
+    base/basic_types.cmi sse/sse_graph.cmi
+sse/sse_graph.cmx : base/virtual_address.cmx sse/sse_options.cmx \
+    base/logger.cmx utils/instruction.cmx disasm/disasm_core.cmx \
+    utils/dhunk.cmx dba/dba_types.cmx dba/dba.cmx utils/cfg.cmx \
+    base/basic_types.cmx sse/sse_graph.cmi
+sse/sse_graph.cmi : base/virtual_address.cmi dba/dba_types.cmi utils/cfg.cmi
+sse/sse_options.cmo : base/virtual_address.cmi parser/parser.cmi \
+    parser/lexer.cmo utils/directive.cmi base/cli.cmi sse/sse_options.cmi
+sse/sse_options.cmx : base/virtual_address.cmx parser/parser.cmx \
+    parser/lexer.cmx utils/directive.cmx base/cli.cmx sse/sse_options.cmi
+sse/sse_options.cmi : base/virtual_address.cmi utils/directive.cmi \
+    base/cli.cmi
+sse/sse_prune.cmo : sse/sse_options.cmi sse/sse_graph.cmi dba/dba.cmi \
+    utils/cfg.cmi base/bitvector.cmi base/bigint.cmi base/basic_types.cmi \
+    sse/sse_prune.cmi
+sse/sse_prune.cmx : sse/sse_options.cmx sse/sse_graph.cmx dba/dba.cmx \
+    utils/cfg.cmx base/bitvector.cmx base/bigint.cmx base/basic_types.cmx \
+    sse/sse_prune.cmi
+sse/sse_prune.cmi : base/virtual_address.cmi sse/sse_graph.cmi \
+    dba/dba_types.cmi
+sse/sse_smt.cmo : base/virtual_address.cmi base/utils.cmi sse/sse_utils.cmi \
+    sse/sse_types.cmi sse/sse_symbolic.cmi sse/sse_options.cmi \
+    formula/solver.cmi smtlib/smt_model.cmi base/size.cmi formula/prover.cmi \
+    base/print_utils.cmi base/logger.cmi loader/loader_utils.cmi \
+    loader/loader_types.cmi loader/loader.cmi kernel/kernel_functions.cmi \
+    base/interval.cmi formula/formula_utils.cmi formula/formula_pp.cmi \
+    formula/formula_options.cmi formula/formula.cmi dba/dba_printer.cmi \
+    dba/dba.cmi base/bitvector.cmi base/bigint.cmi base/basic_types.cmi \
+    sse/sse_smt.cmi
+sse/sse_smt.cmx : base/virtual_address.cmx base/utils.cmx sse/sse_utils.cmx \
+    sse/sse_types.cmx sse/sse_symbolic.cmx sse/sse_options.cmx \
+    formula/solver.cmx smtlib/smt_model.cmx base/size.cmx formula/prover.cmx \
+    base/print_utils.cmx base/logger.cmx loader/loader_utils.cmx \
+    loader/loader_types.cmx loader/loader.cmx kernel/kernel_functions.cmx \
+    base/interval.cmx formula/formula_utils.cmx formula/formula_pp.cmx \
+    formula/formula_options.cmx formula/formula.cmx dba/dba_printer.cmx \
+    dba/dba.cmx base/bitvector.cmx base/bigint.cmx base/basic_types.cmx \
+    sse/sse_smt.cmi
+sse/sse_smt.cmi : sse/sse_types.cmi sse/sse_symbolic.cmi formula/solver.cmi \
+    smtlib/smt_model.cmi formula/formula.cmi dba/dba.cmi base/bitvector.cmi
+sse/sse_symbolic.cmo : sse/sse_options.cmi base/size.cmi base/natural.cmi \
+    base/machine.cmi base/logger.cmi loader/loader_utils.cmi \
+    kernel/kernel_functions.cmi formula/formula.cmi base/bitvector.cmi \
+    base/bigint.cmi base/basic_types.cmi sse/sse_symbolic.cmi
+sse/sse_symbolic.cmx : sse/sse_options.cmx base/size.cmx base/natural.cmx \
+    base/machine.cmx base/logger.cmx loader/loader_utils.cmx \
+    kernel/kernel_functions.cmx formula/formula.cmx base/bitvector.cmx \
+    base/bigint.cmx base/basic_types.cmx sse/sse_symbolic.cmi
+sse/sse_symbolic.cmi : base/size.cmi formula/formula.cmi base/bitvector.cmi
+sse/sse_types.cmo : base/worklist.cmi base/virtual_address.cmi \
+    base/utils.cmi sse/sse_symbolic.cmi sse/sse_options.cmi \
+    formula/solver.cmi base/sequence.cmi base/print_utils.cmi \
+    base/machine.cmi base/logger.cmi kernel/kernel_functions.cmi \
+    utils/instruction.cmi ast/instr_cfg.cmi base/fstack.cmi \
+    formula/formula_transformation.cmi formula/formula_pp.cmi \
+    formula/formula.cmi disasm/disasm_core.cmi utils/directive.cmi \
+    utils/dhunk.cmi dba/dba_types.cmi dba/dba_printer.cmi dba/dba.cmi \
+    base/bitvector.cmi utils/binary_loc.cmi base/basic_types.cmi \
+    sse/sse_types.cmi
+sse/sse_types.cmx : base/worklist.cmx base/virtual_address.cmx \
+    base/utils.cmx sse/sse_symbolic.cmx sse/sse_options.cmx \
+    formula/solver.cmx base/sequence.cmx base/print_utils.cmx \
+    base/machine.cmx base/logger.cmx kernel/kernel_functions.cmx \
+    utils/instruction.cmx ast/instr_cfg.cmx base/fstack.cmx \
+    formula/formula_transformation.cmx formula/formula_pp.cmx \
+    formula/formula.cmx disasm/disasm_core.cmx utils/directive.cmx \
+    utils/dhunk.cmx dba/dba_types.cmx dba/dba_printer.cmx dba/dba.cmx \
+    base/bitvector.cmx utils/binary_loc.cmx base/basic_types.cmx \
+    sse/sse_types.cmi
+sse/sse_types.cmi : base/virtual_address.cmi sse/sse_symbolic.cmi \
+    sse/sse_options.cmi formula/solver.cmi utils/instruction.cmi \
+    ast/instr_cfg.cmi formula/formula.cmi utils/directive.cmi \
+    dba/dba_types.cmi dba/dba.cmi base/bitvector.cmi
+sse/sse_utils.cmo : sse/sse_options.cmi base/logger.cmi sse/sse_utils.cmi
+sse/sse_utils.cmx : sse/sse_options.cmx base/logger.cmx sse/sse_utils.cmi
+sse/sse_utils.cmi :
+static/ai/ai.cmo : base/utils.cmi static/ai/domains/taint.cmi \
+    static/static_utils.cmi static/types/smt_bitvectors.cmi \
+    static/ai/reduced_product.cmi static/ai/domains/range.cmi static/pmap.cmi \
+    parser/parse_utils.cmi static/ai/nonrelational.cmi base/logger.cmi \
+    static/ai/domains/kset.cmi kernel/kernel_options.cmi infos.cmi \
+    static/ai/high_level_predicate.cmi dba/errors.cmi static/ai/display.cmi \
+    dba/dba_types.cmi dba/dba_printer.cmi dba/dba.cmi \
+    static/simulation/concrete_eval.cmi base/cli.cmi ast/cfgraph.cmi \
+    static/ai/backward_analysis.cmi ast/ast_builder.cmi static/ai/ai_sigs.cmi \
+    static/ai/ai_results.cmi static/ai/ai_options.cmi static/ai/ai.cmi
+static/ai/ai.cmx : base/utils.cmx static/ai/domains/taint.cmx \
+    static/static_utils.cmx static/types/smt_bitvectors.cmx \
+    static/ai/reduced_product.cmx static/ai/domains/range.cmx static/pmap.cmx \
+    parser/parse_utils.cmx static/ai/nonrelational.cmx base/logger.cmx \
+    static/ai/domains/kset.cmx kernel/kernel_options.cmx infos.cmx \
+    static/ai/high_level_predicate.cmx dba/errors.cmx static/ai/display.cmx \
+    dba/dba_types.cmx dba/dba_printer.cmx dba/dba.cmx \
+    static/simulation/concrete_eval.cmx base/cli.cmx ast/cfgraph.cmx \
+    static/ai/backward_analysis.cmx ast/ast_builder.cmx static/ai/ai_sigs.cmi \
+    static/ai/ai_results.cmx static/ai/ai_options.cmx static/ai/ai.cmi
+static/ai/ai.cmi : static/types/smt_bitvectors.cmi static/pmap.cmi \
+    static/ai/high_level_predicate.cmi dba/dba_types.cmi dba/dba.cmi \
+    static/ai/ai_sigs.cmi
+static/ai/ai_options.cmo : base/cli.cmi static/ai/ai_options.cmi
+static/ai/ai_options.cmx : base/cli.cmx static/ai/ai_options.cmi
+static/ai/ai_options.cmi : base/cli.cmi
+static/ai/ai_results.cmo : base/logger.cmi utils/instruction.cmi \
+    dba/dba_types.cmi dba/dba_printer.cmi dba/dba.cmi \
+    static/ai/ai_options.cmi static/ai/ai_results.cmi
+static/ai/ai_results.cmx : base/logger.cmx utils/instruction.cmx \
+    dba/dba_types.cmx dba/dba_printer.cmx dba/dba.cmx \
+    static/ai/ai_options.cmx static/ai/ai_results.cmi
+static/ai/ai_results.cmi : static/pmap.cmi dba/dba_types.cmi dba/dba.cmi
+static/ai/ai_sigs.cmi : static/types/smt_bitvectors.cmi \
+    static/types/region_bitvector.cmi static/ai/high_level_predicate.cmi \
+    formula/formula.cmi dba/dba_types.cmi dba/dba.cmi base/basic_types.cmi
+static/ai/ai_utils.cmo : dba/dba_types.cmi static/ai/ai_utils.cmi
+static/ai/ai_utils.cmx : dba/dba_types.cmx static/ai/ai_utils.cmi
+static/ai/ai_utils.cmi : dba/dba_types.cmi
+static/ai/backward_analysis.cmo : static/ai/normalize_instructions.cmi \
+    base/logger.cmi formula/formula_pp.cmi formula/formula.cmi \
+    dba/dba_types.cmi dba/dba_printer.cmi dba/dba.cmi base/basic_types.cmi \
+    static/ai/ai_options.cmi static/ai/backward_analysis.cmi
+static/ai/backward_analysis.cmx : static/ai/normalize_instructions.cmx \
+    base/logger.cmx formula/formula_pp.cmx formula/formula.cmx \
+    dba/dba_types.cmx dba/dba_printer.cmx dba/dba.cmx base/basic_types.cmx \
+    static/ai/ai_options.cmx static/ai/backward_analysis.cmi
+static/ai/backward_analysis.cmi : static/types/region_bitvector.cmi \
+    formula/formula.cmi dba/dba_types.cmi dba/dba.cmi base/basic_types.cmi
+static/ai/display.cmo : static/types/region_bitvector.cmi \
+    base/print_utils.cmi base/logger.cmi dba/dba_types.cmi \
+    dba/dba_printer.cmi dba/dba.cmi base/bigint.cmi static/ai/ai_options.cmi \
+    static/ai/display.cmi
+static/ai/display.cmx : static/types/region_bitvector.cmx \
+    base/print_utils.cmx base/logger.cmx dba/dba_types.cmx \
+    dba/dba_printer.cmx dba/dba.cmx base/bigint.cmx static/ai/ai_options.cmx \
+    static/ai/display.cmi
+static/ai/display.cmi : static/types/region_bitvector.cmi dba/dba_types.cmi \
+    dba/dba.cmi base/bigint.cmi
+static/ai/domains/domain_common.cmo : static/simulation/simulate.cmi \
+    dba/errors.cmi dba/dba_types.cmi dba/dba.cmi base/bitvector.cmi \
+    static/ai/domains/domain_common.cmi
+static/ai/domains/domain_common.cmx : static/simulation/simulate.cmx \
+    dba/errors.cmx dba/dba_types.cmx dba/dba.cmx base/bitvector.cmx \
+    static/ai/domains/domain_common.cmi
+static/ai/domains/domain_common.cmi : static/types/region_bitvector.cmi
+static/ai/domains/domain_interval.cmo : base/sigs.cmi base/logger.cmi \
+    base/interval.cmi dba/errors.cmi base/bitvector.cmi base/bigint.cmi \
+    static/ai/ai_options.cmi static/ai/domains/domain_interval.cmi
+static/ai/domains/domain_interval.cmx : base/sigs.cmi base/logger.cmx \
+    base/interval.cmx dba/errors.cmx base/bitvector.cmx base/bigint.cmx \
+    static/ai/ai_options.cmx static/ai/domains/domain_interval.cmi
+static/ai/domains/domain_interval.cmi : base/sigs.cmi base/interval.cmi \
+    base/bitvector.cmi
+static/ai/domains/kset.cmo : static/types/smt_bitvectors.cmi \
+    static/types/region_bitvector.cmi static/ai/normalize_instructions.cmi \
+    base/logger.cmi formula/formula_pp.cmi formula/formula.cmi dba/errors.cmi \
+    dba/dba.cmi base/bitvector.cmi base/bigint.cmi base/basic_types.cmi \
+    static/ai/ai_options.cmi static/ai/domains/kset.cmi
+static/ai/domains/kset.cmx : static/types/smt_bitvectors.cmx \
+    static/types/region_bitvector.cmx static/ai/normalize_instructions.cmx \
+    base/logger.cmx formula/formula_pp.cmx formula/formula.cmx dba/errors.cmx \
+    dba/dba.cmx base/bitvector.cmx base/bigint.cmx base/basic_types.cmx \
+    static/ai/ai_options.cmx static/ai/domains/kset.cmi
+static/ai/domains/kset.cmi : static/types/region_bitvector.cmi \
+    static/ai/ai_sigs.cmi
+static/ai/domains/range.cmo : static/types/region_bitvector.cmi \
+    static/ai/normalize_instructions.cmi base/logger.cmi base/interval.cmi \
+    formula/formula.cmi dba/errors.cmi static/ai/domains/domain_interval.cmi \
+    dba/dba_printer.cmi dba/dba.cmi base/bitvector.cmi base/bigint.cmi \
+    base/basic_types.cmi static/ai/ai_options.cmi static/ai/domains/range.cmi
+static/ai/domains/range.cmx : static/types/region_bitvector.cmx \
+    static/ai/normalize_instructions.cmx base/logger.cmx base/interval.cmx \
+    formula/formula.cmx dba/errors.cmx static/ai/domains/domain_interval.cmx \
+    dba/dba_printer.cmx dba/dba.cmx base/bitvector.cmx base/bigint.cmx \
+    base/basic_types.cmx static/ai/ai_options.cmx static/ai/domains/range.cmi
+static/ai/domains/range.cmi : static/ai/ai_sigs.cmi
+static/ai/domains/taint.cmo : base/basic_types.cmi \
+    static/ai/domains/taint.cmi
+static/ai/domains/taint.cmx : base/basic_types.cmx \
+    static/ai/domains/taint.cmi
+static/ai/domains/taint.cmi : static/ai/ai_sigs.cmi
+static/ai/domains/union_find.cmo : base/logger.cmi dba/dba_utils.cmi \
+    dba/dba_types.cmi dba/dba_printer.cmi dba/dba.cmi base/basic_types.cmi \
+    static/ai/ai_sigs.cmi static/ai/ai_options.cmi \
+    static/ai/domains/union_find.cmi
+static/ai/domains/union_find.cmx : base/logger.cmx dba/dba_utils.cmx \
+    dba/dba_types.cmx dba/dba_printer.cmx dba/dba.cmx base/basic_types.cmx \
+    static/ai/ai_sigs.cmi static/ai/ai_options.cmx \
+    static/ai/domains/union_find.cmi
+static/ai/domains/union_find.cmi : dba/dba.cmi static/ai/ai_sigs.cmi
+static/ai/high_level_predicate.cmo : base/size.cmi \
+    static/types/region_bitvector.cmi static/ai/normalize_predicate.cmi \
+    base/logger.cmi base/interval.cmi static/ai/display.cmi dba/dba_utils.cmi \
+    dba/dba_types.cmi dba/dba_printer.cmi dba/dba.cmi base/bitvector.cmi \
+    base/bigint.cmi base/basic_types.cmi static/ai/ai_options.cmi \
+    static/ai/high_level_predicate.cmi
+static/ai/high_level_predicate.cmx : base/size.cmx \
+    static/types/region_bitvector.cmx static/ai/normalize_predicate.cmx \
+    base/logger.cmx base/interval.cmx static/ai/display.cmx dba/dba_utils.cmx \
+    dba/dba_types.cmx dba/dba_printer.cmx dba/dba.cmx base/bitvector.cmx \
+    base/bigint.cmx base/basic_types.cmx static/ai/ai_options.cmx \
+    static/ai/high_level_predicate.cmi
+static/ai/high_level_predicate.cmi : dba/dba_types.cmi dba/dba.cmi
+static/ai/nonrelational.cmo : base/utils.cmi \
+    static/ai/domains/union_find.cmi static/static_types.cmi \
+    static/types/smt_bitvectors.cmi base/size.cmi \
+    static/simulation/simulate.cmi static/types/region_bitvector.cmi \
+    static/ai/normalize_instructions.cmi base/machine.cmi base/logger.cmi \
+    base/interval.cmi static/ai/high_level_predicate.cmi \
+    formula/formula_pp.cmi formula/formula.cmi dba/errors.cmi \
+    static/ai/display.cmi dba/dba_utils.cmi dba/dba_types.cmi \
+    dba/dba_printer.cmi dba/dba.cmi static/simulation/concrete_eval.cmi \
+    base/bitvector.cmi base/bigint.cmi base/basic_types.cmi \
+    static/ai/ai_sigs.cmi static/ai/ai_options.cmi \
+    static/ai/nonrelational.cmi
+static/ai/nonrelational.cmx : base/utils.cmx \
+    static/ai/domains/union_find.cmx static/static_types.cmx \
+    static/types/smt_bitvectors.cmx base/size.cmx \
+    static/simulation/simulate.cmx static/types/region_bitvector.cmx \
+    static/ai/normalize_instructions.cmx base/machine.cmx base/logger.cmx \
+    base/interval.cmx static/ai/high_level_predicate.cmx \
+    formula/formula_pp.cmx formula/formula.cmx dba/errors.cmx \
+    static/ai/display.cmx dba/dba_utils.cmx dba/dba_types.cmx \
+    dba/dba_printer.cmx dba/dba.cmx static/simulation/concrete_eval.cmx \
+    base/bitvector.cmx base/bigint.cmx base/basic_types.cmx \
+    static/ai/ai_sigs.cmi static/ai/ai_options.cmx \
+    static/ai/nonrelational.cmi
+static/ai/nonrelational.cmi : dba/dba.cmi static/ai/ai_sigs.cmi
+static/ai/normalize_instructions.cmo : base/utils.cmi smtlib/smtlib_pp.cmi \
+    parser/SMTParserWp.cmi parser/SMTLexerWp.cmo base/machine.cmi \
+    base/logger.cmi base/interval.cmi formula/formula_utils.cmi \
+    formula/formula_to_smtlib.cmi formula/formula_pp.cmi formula/formula.cmi \
+    dba/dba_to_formula.cmi dba/dba_printer.cmi dba/dba.cmi base/bitvector.cmi \
+    base/bigint.cmi base/basic_types.cmi static/ai/ai_options.cmi \
+    static/ai/normalize_instructions.cmi
+static/ai/normalize_instructions.cmx : base/utils.cmx smtlib/smtlib_pp.cmx \
+    parser/SMTParserWp.cmx parser/SMTLexerWp.cmx base/machine.cmx \
+    base/logger.cmx base/interval.cmx formula/formula_utils.cmx \
+    formula/formula_to_smtlib.cmx formula/formula_pp.cmx formula/formula.cmx \
+    dba/dba_to_formula.cmx dba/dba_printer.cmx dba/dba.cmx base/bitvector.cmx \
+    base/bigint.cmx base/basic_types.cmx static/ai/ai_options.cmx \
+    static/ai/normalize_instructions.cmi
+static/ai/normalize_instructions.cmi : static/types/region_bitvector.cmi \
+    formula/formula.cmi dba/dba.cmi base/bitvector.cmi base/basic_types.cmi
+static/ai/normalize_predicate.cmo : parser/SMTParserWp.cmi \
+    parser/SMTLexerWp.cmo base/machine.cmi formula/formula_utils.cmi \
+    formula/formula_pp.cmi formula/formula.cmi dba/dba_to_formula.cmi \
+    dba/dba_printer.cmi dba/dba.cmi base/bitvector.cmi base/bigint.cmi \
+    static/ai/ai_options.cmi static/ai/normalize_predicate.cmi
+static/ai/normalize_predicate.cmx : parser/SMTParserWp.cmx \
+    parser/SMTLexerWp.cmx base/machine.cmx formula/formula_utils.cmx \
+    formula/formula_pp.cmx formula/formula.cmx dba/dba_to_formula.cmx \
+    dba/dba_printer.cmx dba/dba.cmx base/bitvector.cmx base/bigint.cmx \
+    static/ai/ai_options.cmx static/ai/normalize_predicate.cmi
+static/ai/normalize_predicate.cmi : dba/dba.cmi
+static/ai/reduced_product.cmo : base/utils.cmi \
+    static/ai/domains/union_find.cmi static/static_types.cmi \
+    static/types/smt_bitvectors.cmi static/simulation/simulate.cmi \
+    static/types/region_bitvector.cmi base/machine.cmi base/logger.cmi \
+    static/ai/domains/kset.cmi base/interval.cmi \
+    static/ai/high_level_predicate.cmi dba/errors.cmi dba/dba_utils.cmi \
+    dba/dba_types.cmi dba/dba.cmi static/simulation/concrete_eval.cmi \
+    base/bitvector.cmi base/bigint.cmi base/basic_types.cmi \
+    static/ai/ai_utils.cmi static/ai/ai_sigs.cmi static/ai/ai_options.cmi \
+    static/ai/reduced_product.cmi
+static/ai/reduced_product.cmx : base/utils.cmx \
+    static/ai/domains/union_find.cmx static/static_types.cmx \
+    static/types/smt_bitvectors.cmx static/simulation/simulate.cmx \
+    static/types/region_bitvector.cmx base/machine.cmx base/logger.cmx \
+    static/ai/domains/kset.cmx base/interval.cmx \
+    static/ai/high_level_predicate.cmx dba/errors.cmx dba/dba_utils.cmx \
+    dba/dba_types.cmx dba/dba.cmx static/simulation/concrete_eval.cmx \
+    base/bitvector.cmx base/bigint.cmx base/basic_types.cmx \
+    static/ai/ai_utils.cmx static/ai/ai_sigs.cmi static/ai/ai_options.cmx \
+    static/ai/reduced_product.cmi
+static/ai/reduced_product.cmi : static/ai/ai_sigs.cmi
+static/interpreter/concrete.cmo : base/virtual_address.cmi base/size.cmi \
+    static/interpreter/simulation.cmi parser/parser.cmi \
+    parser/parse_utils.cmi parser/parse_helpers.cmi base/machine.cmi \
+    base/logger.cmi loader/loader_utils.cmi parser/lexer.cmo \
+    kernel/kernel_options.cmi kernel/kernel_functions.cmi base/interval.cmi \
+    utils/instruction.cmi dba/errors.cmi disasm/disasm_core.cmi \
+    utils/directive.cmi utils/dhunk.cmi dba/dba_types.cmi dba/dba_printer.cmi \
+    dba/dba.cmi base/cli.cmi base/bitvector.cmi base/binstream.cmi \
+    utils/binary_loc.cmi base/bigint.cmi base/basic_types.cmi \
+    static/interpreter/concrete.cmi
+static/interpreter/concrete.cmx : base/virtual_address.cmx base/size.cmx \
+    static/interpreter/simulation.cmx parser/parser.cmx \
+    parser/parse_utils.cmx parser/parse_helpers.cmx base/machine.cmx \
+    base/logger.cmx loader/loader_utils.cmx parser/lexer.cmx \
+    kernel/kernel_options.cmx kernel/kernel_functions.cmx base/interval.cmx \
+    utils/instruction.cmx dba/errors.cmx disasm/disasm_core.cmx \
+    utils/directive.cmx utils/dhunk.cmx dba/dba_types.cmx dba/dba_printer.cmx \
+    dba/dba.cmx base/cli.cmx base/bitvector.cmx base/binstream.cmx \
+    utils/binary_loc.cmx base/bigint.cmx base/basic_types.cmx \
+    static/interpreter/concrete.cmi
+static/interpreter/concrete.cmi : dba/dba_types.cmi dba/dba.cmi \
+    base/bitvector.cmi
+static/interpreter/simulation.cmo : parser/parser.cmi parser/lexer.cmo \
+    utils/directive.cmi base/cli.cmi static/interpreter/simulation.cmi
+static/interpreter/simulation.cmx : parser/parser.cmx parser/lexer.cmx \
+    utils/directive.cmx base/cli.cmx static/interpreter/simulation.cmi
+static/interpreter/simulation.cmi : base/logger.cmi utils/directive.cmi \
+    base/cli.cmi
+static/pmap.cmo : base/machine.cmi utils/instruction.cmi ast/instr_cfg.cmi \
+    disasm/disasm.cmi utils/dhunk.cmi dba/dba_types.cmi dba/dba.cmi \
+    base/bitvector.cmi base/bigint.cmi static/pmap.cmi
+static/pmap.cmx : base/machine.cmx utils/instruction.cmx ast/instr_cfg.cmx \
+    disasm/disasm.cmx utils/dhunk.cmx dba/dba_types.cmx dba/dba.cmx \
+    base/bitvector.cmx base/bigint.cmx static/pmap.cmi
+static/pmap.cmi : utils/instruction.cmi disasm/disasm.cmi dba/dba_types.cmi \
+    dba/dba.cmi
+static/simulation/concrete_eval.cmo : static/static_types.cmi \
+    static/types/smt_bitvectors.cmi static/simulation/simulate_utils.cmi \
+    static/simulation/simulate_options.cmi static/types/region_bitvector.cmi \
+    base/machine.cmi base/logger.cmi base/interval.cmi formula/formula.cmi \
+    dba/errors.cmi dba/dba_types.cmi dba/dba_printer.cmi dba/dba.cmi \
+    static/simulation/concrete_state.cmi base/bitvector.cmi base/bigint.cmi \
+    static/simulation/concrete_eval.cmi
+static/simulation/concrete_eval.cmx : static/static_types.cmx \
+    static/types/smt_bitvectors.cmx static/simulation/simulate_utils.cmx \
+    static/simulation/simulate_options.cmx static/types/region_bitvector.cmx \
+    base/machine.cmx base/logger.cmx base/interval.cmx formula/formula.cmx \
+    dba/errors.cmx dba/dba_types.cmx dba/dba_printer.cmx dba/dba.cmx \
+    static/simulation/concrete_state.cmx base/bitvector.cmx base/bigint.cmx \
+    static/simulation/concrete_eval.cmi
+static/simulation/concrete_eval.cmi : static/static_types.cmi \
+    static/types/smt_bitvectors.cmi static/types/region_bitvector.cmi \
+    dba/dba_types.cmi dba/dba.cmi static/simulation/concrete_state.cmi \
+    base/bigint.cmi
+static/simulation/concrete_state.cmo : static/static_types.cmi \
+    static/types/region_bitvector.cmi base/bigint.cmi base/basic_types.cmi \
+    static/simulation/concrete_state.cmi
+static/simulation/concrete_state.cmx : static/static_types.cmx \
+    static/types/region_bitvector.cmx base/bigint.cmx base/basic_types.cmx \
+    static/simulation/concrete_state.cmi
+static/simulation/concrete_state.cmi : static/static_types.cmi \
+    static/types/region_bitvector.cmi base/basic_types.cmi
+static/simulation/simulate.cmo : base/virtual_address.cmi \
+    static/static_utils.cmi static/static_types.cmi \
+    static/types/smt_bitvectors.cmi static/simulation/simulate_utils.cmi \
+    static/simulation/simulate_options.cmi \
+    disasm/simplify/simplification_options.cmi \
+    static/types/region_bitvector.cmi static/pmap.cmi parser/parse_utils.cmi \
+    base/machine.cmi base/logger.cmi kernel/kernel_options.cmi \
+    kernel/kernel_functions.cmi base/interval.cmi infos.cmi \
+    formula/formula.cmi dba/errors.cmi dba/dba_utils.cmi dba/dba_types.cmi \
+    dba/dba_printer.cmi dba/dba.cmi static/simulation/concrete_state.cmi \
+    static/simulation/concrete_eval.cmi base/cli.cmi ast/cfgraph.cmi \
+    base/bitvector.cmi base/bigint.cmi ast/ast_builder.cmi \
+    static/simulation/simulate.cmi
+static/simulation/simulate.cmx : base/virtual_address.cmx \
+    static/static_utils.cmx static/static_types.cmx \
+    static/types/smt_bitvectors.cmx static/simulation/simulate_utils.cmx \
+    static/simulation/simulate_options.cmx \
+    disasm/simplify/simplification_options.cmx \
+    static/types/region_bitvector.cmx static/pmap.cmx parser/parse_utils.cmx \
+    base/machine.cmx base/logger.cmx kernel/kernel_options.cmx \
+    kernel/kernel_functions.cmx base/interval.cmx infos.cmx \
+    formula/formula.cmx dba/errors.cmx dba/dba_utils.cmx dba/dba_types.cmx \
+    dba/dba_printer.cmx dba/dba.cmx static/simulation/concrete_state.cmx \
+    static/simulation/concrete_eval.cmx base/cli.cmx ast/cfgraph.cmx \
+    base/bitvector.cmx base/bigint.cmx ast/ast_builder.cmx \
+    static/simulation/simulate.cmi
+static/simulation/simulate.cmi : dba/dba_types.cmi dba/dba.cmi
+static/simulation/simulate_options.cmo : base/cli.cmi \
+    static/simulation/simulate_options.cmi
+static/simulation/simulate_options.cmx : base/cli.cmx \
+    static/simulation/simulate_options.cmi
+static/simulation/simulate_options.cmi : base/cli.cmi
+static/simulation/simulate_utils.cmo : base/bigint.cmi \
+    static/simulation/simulate_utils.cmi
+static/simulation/simulate_utils.cmx : base/bigint.cmx \
+    static/simulation/simulate_utils.cmi
+static/simulation/simulate_utils.cmi : static/types/region_bitvector.cmi \
+    base/bigint.cmi
+static/static_options.cmo : base/cli.cmi static/static_options.cmi
+static/static_options.cmx : base/cli.cmx static/static_options.cmi
+static/static_options.cmi : base/cli.cmi
+static/static_types.cmo : dba/dba_types.cmi dba/dba.cmi \
+    static/static_types.cmi
+static/static_types.cmx : dba/dba_types.cmx dba/dba.cmx \
+    static/static_types.cmi
+static/static_types.cmi : dba/dba.cmi
+static/static_utils.cmo : base/virtual_address.cmi static/static_options.cmi \
+    disasm/simplify/simplification_dba.cmi static/pmap.cmi \
+    disasm/disasm_core.cmi disasm/disasm.cmi dba/dba_types.cmi dba/dba.cmi \
+    static/static_utils.cmi
+static/static_utils.cmx : base/virtual_address.cmx static/static_options.cmx \
+    disasm/simplify/simplification_dba.cmx static/pmap.cmx \
+    disasm/disasm_core.cmx disasm/disasm.cmx dba/dba_types.cmx dba/dba.cmx \
+    static/static_utils.cmi
+static/static_utils.cmi : static/pmap.cmi utils/instruction.cmi \
+    dba/dba_types.cmi dba/dba.cmi
+static/types/region_bitvector.cmo : static/static_options.cmi \
+    static/types/smt_bitvectors.cmi static/simulation/simulate_options.cmi \
+    parser/SMTParserWp.cmi parser/SMTLexerWp.cmo base/print_utils.cmi \
+    base/machine.cmi base/logger.cmi loader/loader_utils.cmi \
+    kernel/kernel_functions.cmi base/interval.cmi formula/formula_utils.cmi \
+    formula/formula_pp.cmi formula/formula.cmi dba/errors.cmi \
+    dba/dba_types.cmi dba/dba_printer.cmi dba/dba.cmi base/bitvector.cmi \
+    base/bigint.cmi base/basic_types.cmi static/types/region_bitvector.cmi
+static/types/region_bitvector.cmx : static/static_options.cmx \
+    static/types/smt_bitvectors.cmx static/simulation/simulate_options.cmx \
+    parser/SMTParserWp.cmx parser/SMTLexerWp.cmx base/print_utils.cmx \
+    base/machine.cmx base/logger.cmx loader/loader_utils.cmx \
+    kernel/kernel_functions.cmx base/interval.cmx formula/formula_utils.cmx \
+    formula/formula_pp.cmx formula/formula.cmx dba/errors.cmx \
+    dba/dba_types.cmx dba/dba_printer.cmx dba/dba.cmx base/bitvector.cmx \
+    base/bigint.cmx base/basic_types.cmx static/types/region_bitvector.cmi
+static/types/region_bitvector.cmi : static/types/smt_bitvectors.cmi \
+    base/sigs.cmi dba/dba_types.cmi dba/dba.cmi base/bitvector.cmi \
+    base/bigint.cmi
+static/types/smt_bitvectors.cmo : base/interval.cmi formula/formula_pp.cmi \
+    formula/formula.cmi dba/dba.cmi base/bitvector.cmi base/bigint.cmi \
+    static/types/smt_bitvectors.cmi
+static/types/smt_bitvectors.cmx : base/interval.cmx formula/formula_pp.cmx \
+    formula/formula.cmx dba/dba.cmx base/bitvector.cmx base/bigint.cmx \
+    static/types/smt_bitvectors.cmi
+static/types/smt_bitvectors.cmi : formula/formula.cmi dba/dba.cmi \
+    base/bitvector.cmi
+test.cmo : dynamic/trace/trace_config.cmi dynamic/dse/policy_engine.cmi \
+    base/logger.cmi kernel/kernel_options.cmi base/file_utils.cmi \
+    dynamic/dse/dse_options.cmi parser/dbacsl_token.cmo \
+    parser/dbacsl_parser.cmi dba/dba_printer.cmi piqi/config_piqi.cmo \
+    base/cli.cmi test.cmi
+test.cmx : dynamic/trace/trace_config.cmx dynamic/dse/policy_engine.cmx \
+    base/logger.cmx kernel/kernel_options.cmx base/file_utils.cmx \
+    dynamic/dse/dse_options.cmx parser/dbacsl_token.cmx \
+    parser/dbacsl_parser.cmx dba/dba_printer.cmx piqi/config_piqi.cmx \
+    base/cli.cmx test.cmi
+test.cmi :
+uafuzz/uafuzz_main.cmo : base/virtual_address.cmi uafuzz/uafuzz_utils.cmi \
+    uafuzz/uafuzz_targets.cmi uafuzz/uafuzz_preprocess.cmi \
+    uafuzz/uafuzz_params.cmi uafuzz/uafuzz_options.cmi \
+    uafuzz/uafuzz_metrics.cmi base/logger.cmi ida/ida_options.cmi \
+    ida/ida_main.cmi ida/ida_cfg.cmi base/cli.cmi uafuzz/uafuzz_main.cmi
+uafuzz/uafuzz_main.cmx : base/virtual_address.cmx uafuzz/uafuzz_utils.cmx \
+    uafuzz/uafuzz_targets.cmx uafuzz/uafuzz_preprocess.cmx \
+    uafuzz/uafuzz_params.cmx uafuzz/uafuzz_options.cmx \
+    uafuzz/uafuzz_metrics.cmx base/logger.cmx ida/ida_options.cmx \
+    ida/ida_main.cmx ida/ida_cfg.cmx base/cli.cmx uafuzz/uafuzz_main.cmi
+uafuzz/uafuzz_main.cmi : base/virtual_address.cmi uafuzz/uafuzz_utils.cmi \
+    uafuzz/uafuzz_targets.cmi uafuzz/uafuzz_preprocess.cmi \
+    uafuzz/uafuzz_params.cmi uafuzz/uafuzz_options.cmi \
+    uafuzz/uafuzz_metrics.cmi ida/ida_cfg.cmi
+uafuzz/uafuzz_metrics.cmo : base/virtual_address.cmi uafuzz/uafuzz_utils.cmi \
+    uafuzz/uafuzz_targets.cmi uafuzz/uafuzz_options.cmi base/print_utils.cmi \
+    base/logger.cmi ida/ida_utils.cmi ida/ida_cg.cmi ida/ida_cfg.cmi \
+    uafuzz/uafuzz_metrics.cmi
+uafuzz/uafuzz_metrics.cmx : base/virtual_address.cmx uafuzz/uafuzz_utils.cmx \
+    uafuzz/uafuzz_targets.cmx uafuzz/uafuzz_options.cmx base/print_utils.cmx \
+    base/logger.cmx ida/ida_utils.cmx ida/ida_cg.cmx ida/ida_cfg.cmx \
+    uafuzz/uafuzz_metrics.cmi
+uafuzz/uafuzz_metrics.cmi : base/virtual_address.cmi \
+    uafuzz/uafuzz_targets.cmi uafuzz/uafuzz_options.cmi ida/ida_cg.cmi \
+    ida/ida_cfg.cmi
+uafuzz/uafuzz_options.cmo : base/cli.cmi uafuzz/uafuzz_options.cmi
+uafuzz/uafuzz_options.cmx : base/cli.cmx uafuzz/uafuzz_options.cmi
+uafuzz/uafuzz_options.cmi : base/cli.cmi
+uafuzz/uafuzz_params.cmo : uafuzz/uafuzz_options.cmi \
+    uafuzz/uafuzz_params.cmi
+uafuzz/uafuzz_params.cmx : uafuzz/uafuzz_options.cmx \
+    uafuzz/uafuzz_params.cmi
+uafuzz/uafuzz_params.cmi : uafuzz/uafuzz_options.cmi
+uafuzz/uafuzz_preprocess.cmo : base/virtual_address.cmi \
+    uafuzz/uafuzz_utils.cmi uafuzz/uafuzz_options.cmi base/print_utils.cmi \
+    base/logger.cmi ida/ida_utils.cmi ida/ida_cfg.cmi utils/cfg.cmi \
+    uafuzz/uafuzz_preprocess.cmi
+uafuzz/uafuzz_preprocess.cmx : base/virtual_address.cmx \
+    uafuzz/uafuzz_utils.cmx uafuzz/uafuzz_options.cmx base/print_utils.cmx \
+    base/logger.cmx ida/ida_utils.cmx ida/ida_cfg.cmx utils/cfg.cmx \
+    uafuzz/uafuzz_preprocess.cmi
+uafuzz/uafuzz_preprocess.cmi : base/virtual_address.cmi \
+    uafuzz/uafuzz_utils.cmi ida/ida_cfg.cmi utils/cfg.cmi
+uafuzz/uafuzz_selector.cmo : uafuzz/uafuzz_preprocess.cmi \
+    uafuzz/uafuzz_options.cmi base/logger.cmi uafuzz/uafuzz_selector.cmi
+uafuzz/uafuzz_selector.cmx : uafuzz/uafuzz_preprocess.cmx \
+    uafuzz/uafuzz_options.cmx base/logger.cmx uafuzz/uafuzz_selector.cmi
+uafuzz/uafuzz_selector.cmi : uafuzz/uafuzz_preprocess.cmi
+uafuzz/uafuzz_targets.cmo : base/virtual_address.cmi \
+    uafuzz/uafuzz_preprocess.cmi uafuzz/uafuzz_options.cmi \
+    base/print_utils.cmi base/logger.cmi ida/ida_utils.cmi ida/ida_cfg.cmi \
+    uafuzz/uafuzz_targets.cmi
+uafuzz/uafuzz_targets.cmx : base/virtual_address.cmx \
+    uafuzz/uafuzz_preprocess.cmx uafuzz/uafuzz_options.cmx \
+    base/print_utils.cmx base/logger.cmx ida/ida_utils.cmx ida/ida_cfg.cmx \
+    uafuzz/uafuzz_targets.cmi
+uafuzz/uafuzz_targets.cmi : base/virtual_address.cmi \
+    uafuzz/uafuzz_preprocess.cmi ida/ida_cfg.cmi
+uafuzz/uafuzz_utils.cmo : base/string_utils.cmi ida/ida_cg.cmi \
+    ida/ida_cfg.cmi uafuzz/uafuzz_utils.cmi
+uafuzz/uafuzz_utils.cmx : base/string_utils.cmx ida/ida_cg.cmx \
+    ida/ida_cfg.cmx uafuzz/uafuzz_utils.cmi
+uafuzz/uafuzz_utils.cmi : ida/ida_cg.cmi ida/ida_cfg.cmi
+utils/binary_loc.cmo : base/virtual_address.cmi loader/loader_utils.cmi \
+    loader/loader.cmi utils/binary_loc.cmi
+utils/binary_loc.cmx : base/virtual_address.cmx loader/loader_utils.cmx \
+    loader/loader.cmx utils/binary_loc.cmi
+utils/binary_loc.cmi : base/virtual_address.cmi loader/loader.cmi
+utils/cfg.cmo : base/sequence.cmi utils/cfg.cmi
+utils/cfg.cmx : base/sequence.cmx utils/cfg.cmi
+utils/cfg.cmi : base/sigs.cmi base/sequence.cmi
+utils/colors.cmo : utils/colors.cmi
+utils/colors.cmx : utils/colors.cmi
+utils/colors.cmi :
+utils/dhunk.cmo : base/virtual_address.cmi base/utils.cmi \
+    base/print_utils.cmi base/logger.cmi base/list_utils.cmi \
+    dba/dba_types.cmi dba/dba_printer.cmi dba/dba.cmi utils/cfg.cmi \
+    base/basic_types.cmi utils/dhunk.cmi
+utils/dhunk.cmx : base/virtual_address.cmx base/utils.cmx \
+    base/print_utils.cmx base/logger.cmx base/list_utils.cmx \
+    dba/dba_types.cmx dba/dba_printer.cmx dba/dba.cmx utils/cfg.cmx \
+    base/basic_types.cmx utils/dhunk.cmi
+utils/dhunk.cmi : base/virtual_address.cmi base/sigs.cmi dba/dba_types.cmi \
+    dba/dba.cmi
+utils/directive.cmo : dba/dba.cmi utils/binary_loc.cmi utils/directive.cmi
+utils/directive.cmx : dba/dba.cmx utils/binary_loc.cmx utils/directive.cmi
+utils/directive.cmi : dba/dba.cmi utils/binary_loc.cmi
+utils/instParsing.cmo : dynamic/trace/trace_type.cmi dba/dba_types.cmi \
+    dba/dba.cmi utils/instParsing.cmi
+utils/instParsing.cmx : dynamic/trace/trace_type.cmx dba/dba_types.cmx \
+    dba/dba.cmx utils/instParsing.cmi
+utils/instParsing.cmi : dynamic/trace/trace_type.cmi
+utils/instruction.cmo : base/virtual_address.cmi base/size.cmi base/sigs.cmi \
+    base/mnemonic.cmi utils/dhunk.cmi dba/dba_types.cmi dba/dba.cmi \
+    base/binstream.cmi base/bigint.cmi utils/instruction.cmi
+utils/instruction.cmx : base/virtual_address.cmx base/size.cmx base/sigs.cmi \
+    base/mnemonic.cmx utils/dhunk.cmx dba/dba_types.cmx dba/dba.cmx \
+    base/binstream.cmx base/bigint.cmx utils/instruction.cmi
+utils/instruction.cmi : base/virtual_address.cmi base/size.cmi base/sigs.cmi \
+    base/mnemonic.cmi utils/dhunk.cmi dba/dba_types.cmi base/binstream.cmi
+utils/network_io.cmo : base/logger.cmi utils/network_io.cmi
+utils/network_io.cmx : base/logger.cmx utils/network_io.cmi
+utils/network_io.cmi : base/logger.cmi
+xtrasec/formula_decoder.cmo : xtrasec/xtrasec_options.cmi base/interval.cmi \
+    formula/formula.cmi base/bitvector.cmi xtrasec/formula_decoder.cmi
+xtrasec/formula_decoder.cmx : xtrasec/xtrasec_options.cmx base/interval.cmx \
+    formula/formula.cmx base/bitvector.cmx xtrasec/formula_decoder.cmi
+xtrasec/formula_decoder.cmi : llvm/generic_decoder_sig.cmi \
+    formula/formula.cmi
+xtrasec/parsepin.cmo : base/virtual_address.cmi xtrasec/parsepin.cmi
+xtrasec/parsepin.cmx : base/virtual_address.cmx xtrasec/parsepin.cmi
+xtrasec/parsepin.cmi : base/virtual_address.cmi
+xtrasec/xtrasec.cmo : xtrasec/xtrasec_options.cmi disasm/x86/x86toDba.cmi \
+    disasm/x86/x86Instruction.cmi base/virtual_address.cmi base/size.cmi \
+    xtrasec/parsepin.cmi llvm/llvm_decoder.cmi llvm/generic_decoder_sig.cmi \
+    llvm/generic_decoder.cmi formula/formula_pp.cmi \
+    xtrasec/formula_decoder.cmi utils/dhunk.cmi dba/dba.cmi base/cli.cmi \
+    base/bitvector.cmi base/binstream.cmi base/bigint.cmi xtrasec/xtrasec.cmi
+xtrasec/xtrasec.cmx : xtrasec/xtrasec_options.cmx disasm/x86/x86toDba.cmx \
+    disasm/x86/x86Instruction.cmx base/virtual_address.cmx base/size.cmx \
+    xtrasec/parsepin.cmx llvm/llvm_decoder.cmx llvm/generic_decoder_sig.cmx \
+    llvm/generic_decoder.cmx formula/formula_pp.cmx \
+    xtrasec/formula_decoder.cmx utils/dhunk.cmx dba/dba.cmx base/cli.cmx \
+    base/bitvector.cmx base/binstream.cmx base/bigint.cmx xtrasec/xtrasec.cmi
+xtrasec/xtrasec.cmi :
+xtrasec/xtrasec_options.cmo : base/cli.cmi xtrasec/xtrasec_options.cmi
+xtrasec/xtrasec_options.cmx : base/cli.cmx xtrasec/xtrasec_options.cmi
+xtrasec/xtrasec_options.cmi : base/cli.cmi

@@ -1,0 +1,181 @@
+@table @option
+@item info @var{subcommand}
+@findex info
+Show various information about the system state.
+@table @option
+@item info version
+@findex version
+Show the version of QEMU.
+@item info network
+@findex network
+Show the network state.
+@item info chardev
+@findex chardev
+Show the character devices.
+@item info block
+@findex block
+Show info of one block device or all block devices.
+@item info blockstats
+@findex blockstats
+Show block device statistics.
+@item info block-jobs
+@findex block-jobs
+Show progress of ongoing block device operations.
+@item info registers
+@findex registers
+Show the cpu registers.
+@item info lapic
+@findex lapic
+Show local APIC state
+@item info ioapic
+@findex ioapic
+Show io APIC state
+@item info cpus
+@findex cpus
+Show infos for each CPU.
+@item info history
+@findex history
+Show the command line history.
+@item info irq
+@findex irq
+Show the interrupts statistics (if available).
+@item info pic
+@findex pic
+Show i8259 (PIC) state.
+@item info pci
+@findex pci
+Show PCI information.
+@item info tlb
+@findex tlb
+Show virtual to physical memory mappings.
+@item info mem
+@findex mem
+Show the active virtual memory mappings.
+@item info mtree
+@findex mtree
+Show memory tree.
+@item info jit
+@findex jit
+Show dynamic compiler info.
+@item info opcount
+@findex opcount
+Show dynamic compiler opcode counters
+@item info kvm
+@findex kvm
+Show KVM information.
+@item info numa
+@findex numa
+Show NUMA information.
+@item info usb
+@findex usb
+Show guest USB devices.
+@item info usbhost
+@findex usbhost
+Show host USB devices.
+@item info profile
+@findex profile
+Show profiling information.
+@item info capture
+@findex capture
+Show capture information.
+@item info snapshots
+@findex snapshots
+Show the currently saved VM snapshots.
+@item info status
+@findex status
+Show the current VM status (running|paused).
+@item info mice
+@findex mice
+Show which guest mouse is receiving events.
+@item info vnc
+@findex vnc
+Show the vnc server status.
+@item info spice
+@findex spice
+Show the spice server status.
+@item info name
+@findex name
+Show the current VM name.
+@item info uuid
+@findex uuid
+Show the current VM UUID.
+@item info cpustats
+@findex cpustats
+Show CPU statistics.
+@item info usernet
+@findex usernet
+Show user network stack connection states.
+@item info migrate
+@findex migrate
+Show migration status.
+@item info migrate_capabilities
+@findex migrate_capabilities
+Show current migration capabilities.
+@item info migrate_parameters
+@findex migrate_parameters
+Show current migration parameters.
+@item info migrate_cache_size
+@findex migrate_cache_size
+Show current migration xbzrle cache size.
+@item info balloon
+@findex balloon
+Show balloon information.
+@item info qtree
+@findex qtree
+Show device tree.
+@item info qdm
+@findex qdm
+Show qdev device model list.
+@item info qom-tree
+@findex qom-tree
+Show QOM composition tree.
+@item info roms
+@findex roms
+Show roms.
+@item info trace-events
+@findex trace-events
+Show available trace-events & their state.
+@item info tpm
+@findex tpm
+Show the TPM device.
+@item info memdev
+@findex memdev
+Show memory backends
+@item info memory-devices
+@findex memory-devices
+Show memory devices.
+@item info iothreads
+@findex iothreads
+Show iothread's identifiers.
+@item info rocker @var{name}
+@findex rocker
+Show rocker switch.
+@item info rocker_ports @var{name}-ports
+@findex ocker-ports
+Show rocker ports.
+@item info rocker_of_dpa_flows @var{name} [@var{tbl_id}]
+@findex rocker-of-dpa-flows
+Show rocker OF-DPA flow tables.
+@item info rocker-of-dpa-groups @var{name} [@var{type}]
+@findex rocker-of-dpa-groups
+Show rocker OF-DPA groups.
+@item info skeys @var{address}
+@findex skeys
+Display the value of a storage key (s390 only)
+@item info cmma @var{address}
+@findex cmma
+Display the values of the CMMA storage attributes for a range of pages (s390 only)
+@item info dump
+@findex dump
+Display the latest dump status.
+@item info ramblock
+@findex ramblock
+Dump all the ramblocks of the system.
+@item info hotpluggable-cpus
+@findex hotpluggable-cpus
+Show information about hotpluggable CPUs
+@item info vm-generation-id
+@findex vm-generation-id
+Show Virtual Machine Generation ID
+@end table
+@end table

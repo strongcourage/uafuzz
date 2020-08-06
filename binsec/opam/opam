@@ -1,0 +1,69 @@
+opam-version: "2.0"
+name: "binsec"
+version: "0.3"
+maintainer: "richard.bonichon@cea.fr"
+authors: [
+"Adel Djoudi"
+"Benjamin Farinier"
+"Frédéric Recoules"
+"Josselin Feist"
+"Lesly-Ann Daniel"
+"Manh-Dung Nguyen"
+"Mathilde Ollivier"
+"Matthieu Lemerre"
+"Olivier Nicole"
+"Richard Bonichon"
+"Robin David"
+"Ta Thanh Dinh"
+"Yaëlle Vinçont"
+]
+homepage: "https://binsec.github.io"
+license: "GNU Lesser General Public License version 2.1"
+doc: ["http://binsec.github.io/apiref/index.html"]
+bug-reports: "mailto:binsec _at_ saxifrage.saclay.cea.fr"
+tags: [
+  "binary code analysis"
+  "symbolic execution"
+  "deductive"
+  "program verification"
+  "formal specification"
+  "automated theorem prover"
+  "plugins"
+  "abstract interpretation"
+  "dataflow analysis"
+  "linking"
+  "disassembly"
+]
+
+build: [
+  ["sh" "-eux" "./run_autoconf_if_needed.sh"] # when used in pinned mode,
+                                              # the configure *cannot* yet be
+                                              # generated
+  ["sh" "-eux" "./run_configure.sh" "--prefix" prefix]
+  [make "-C" "src" "depend"]
+  [make "-C" "src"  "-j%{jobs}%"]
+]
+
+install: [
+  [make "-C" "src" "install"]
+]
+
+remove: [
+  ["sh" "-eux" "./run_autoconf_if_needed.sh"] # when used in pinned mode,
+                                              # the configure *cannot* yet be
+                                              # generated
+  ["sh" "-eux" "./run_configure.sh" "--prefix" prefix ]
+  [make "-C" "src" "uninstall"]
+]
+
+depends: [
+  "ocaml" { >= "4.04.2" & < "4.06.0" }
+  "ocamlgraph" { >= "1.8.5" & < "1.9~" }
+  "ocamlfind"
+  "piqi"
+  "zarith"
+  "zmq"
+  "menhir"
+  "llvm"
+]
+

@@ -1,0 +1,1653 @@
+(**************************************************************************)
+(*  This file is part of BINSEC.                                          *)
+(*                                                                        *)
+(*  Copyright (C) 2016-2018                                               *)
+(*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
+(*         alternatives)                                                  *)
+(*                                                                        *)
+(*  you can redistribute it and/or modify it under the terms of the GNU   *)
+(*  Lesser General Public License as published by the Free Software       *)
+(*  Foundation, version 2.1.                                              *)
+(*                                                                        *)
+(*  It is distributed in the hope that it will be useful,                 *)
+(*  but WITHOUT ANY WARRANTY; without even the implied warranty of        *)
+(*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *)
+(*  GNU Lesser General Public License for more details.                   *)
+(*                                                                        *)
+(*  See the GNU Lesser General Public License version 2.1                 *)
+(*  for more details (enclosed in the file licenses/LGPLv2.1).            *)
+(*                                                                        *)
+(**************************************************************************)
+
+(* Copyright (c) 2005, Regents of the University of California
+ * All rights reserved.
+ *
+ * Author: Adam Chlipala
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * - Redistributions of source code must retain the above copyright notice,
+ *   this list of conditions and the following disclaimer.
+ * - Redistributions in binary form must reproduce the above copyright notice,
+ *   this list of conditions and the following disclaimer in the documentation
+ *   and/or other materials provided with the distribution.
+ * - Neither the name of the University of California, Berkeley nor the names of
+ *   its contributors may be used to endorse or promote products derived from
+ *   this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *
+ *
+ * Modified for BINSEC
+*)
+
+(* Parsing opcodes *)
+
+open X86Types
+open X86Util
+open Disasm_options
+
+exception Decode_abort
+
+let abort () = raise Decode_abort
+
+
+let imode = function
+  | `M32 -> 32
+  | `M16 -> 16
+
+let of_mode = function
+  | `M32 -> `M32
+  | `M16 -> `M16
+
+
+let nCcs = 16
+(* Number of distinct condition codes
+ * Lookup http://x86.renejeschke.de/html/file_module_x86_id_146.html
+*)
+
+
+let nRegs32 = 8
+(** Number of 32-bit registers *)
+
+
+let sign_extend n =
+  if n >= 0x80 && n <= 0xff then n - 0xff - 1
+  else if n >= 0x8000 && n <= 0xffff then n - 0xffff - 1
+  else if n >= 0x80000000 && n <= 0xffffffff then n - 0xffffffff - 1
+  else n
+
+
+let with_xmm_simd mode f =
+  let mm, simd_size =
+    match mode with
+    | `M32 -> MM, S64
+    | `M16 -> XMM, S128
+  in f mm simd_size
+
+
+let read_byte_as_int64 lr =
+  Lreader.Read.u8 lr |> sign_extend |> Int64.of_int
+
+
+let select_reader = function
+  | 8 -> Lreader.Read.u8
+  | 16 -> Lreader.Read.u16
+  | 32 -> Lreader.Read.u32
+  | _ -> assert false
+
+
+(* A 32 bits displacement.
+   We must be careful to stay inside bounds. *)
+let displacement lr rel =
+  let vcursor = Lreader.get_virtual_cursor lr in
+  Logger.debug ~level:4 "displacement from %x of %x" vcursor rel;
+  (vcursor + rel) land 0xffffffff
+
+
+let signed_displacement lr rel =
+  displacement lr (sign_extend rel)
+
+let bytes_to_opcode_string bytes =
+  let b = Buffer.create (3 * List.length bytes) in
+  let rec loop = function
+    | [] -> assert false
+    | [by] ->
+      Buffer.add_string b (Format.sprintf "%02x" by);
+      Buffer.contents b
+    | by :: bytes ->
+      Buffer.add_string b (Format.sprintf "%02x " by);
+      loop bytes
+  in loop bytes
+
+
+let shift_or_rotate_from_spare ~shift ~rotate spare =
+  match spare with
+  | 0 -> rotate Rol
+  | 1 -> rotate Ror
+  | 2 -> rotate Rcl
+  | 3 -> rotate Rcr
+  | 4
+  | 6 -> shift Shl
+  (* According to http://ref.x86asm.net/geek.html#xC0_6
+                 C0 /6 is an alias for C0 /4.
+     This is the same for the other cases.
+     Simple guess that explains this fact:
+     - 6 stands for Sal which is actually the same as Shl (i.e. 4).
+  *)
+  | 5 -> shift Shr
+  | 7 -> shift Sar
+  | _ -> assert false (* All cases have been treated *)
+
+
+(* Functions to deal with unsupported opcodes *)
+let unsupported descr =
+  Unsupported descr
+
+let unsupported_modrm descr address_mode lr =
+  ignore (read_modrm address_mode lr);
+  Unsupported descr
+
+let unsupported_modrm_xmm descr address_mode lr =
+  ignore (read_modrm_xmm address_mode lr);
+  Unsupported descr
+
+let unsupported_imm descr size lr =
+  Lreader.advance lr size;
+  Unsupported descr
+
+let unsupported_modrm_imm descr address_mode size lr =
+  ignore (read_modrm address_mode lr);
+  Lreader.advance lr size;
+  Unsupported descr
+
+let unsupported_m16 unsupported mode =
+  match mode with
+  | `M16 -> unsupported
+  | `M32 -> abort ()
+
+
+let read_0f_38 mode address_mode lr =
+  let b3 = Lreader.Read.u8 lr in
+  let un_ssse3 () = unsupported_modrm "op from ssse3" address_mode lr in
+  let un_m16 descr = unsupported_m16 (unsupported_modrm descr address_mode lr) mode in
+  let sse41 = "op from sse41" in
+  begin match b3 with
+    | n when 0x00 <= n && n <= 0x0b -> un_ssse3 ()
+    | 0x10 | 0x14 | 0x15 -> un_m16 sse41
+    | 0x17 ->
+      let src, spare = read_modrm_xmm address_mode lr in
+      Ptest (XMM, S128, Reg (int_to_xmm_reg spare), src)
+    | 0x1c | 0x1d | 0x1e -> un_ssse3 ()
+    | n when 0x20 <= n && n <= 0x3d -> un_m16 sse41
+    | 0x3e ->
+      begin match mode with
+        | `M16 ->
+          let src, spare = read_modrm_xmm address_mode lr in
+          Pmaxuw (XMM, S128, Reg (int_to_xmm_reg spare), src)
+        | `M32 -> abort ()
+      end
+    | 0x3f ->
+      begin match mode with
+        | `M16 ->
+          let src, spare = read_modrm_xmm address_mode lr in
+          Pmaxud (XMM, S128, Reg (int_to_xmm_reg spare), src)
+        | `M32 -> abort ()
+      end
+    | 0x40 | 0x41 -> un_m16 sse41
+    | 0x80 | 0x81 -> un_m16 "op from vmx"
+    | 0xf0 -> unsupported_modrm "crc32 or movbe" address_mode lr
+    | 0xf1 -> unsupported_modrm "crc32 or movbe" address_mode lr
+    | _ -> abort ()
+  end
+
+let read_0f_3a mode address_mode lr =
+  let b3 = Lreader.Read.u8 lr in
+  let un_imm_m16 descr =
+    unsupported_m16 (unsupported_modrm_imm descr address_mode 1 lr) mode
+  in
+  match b3 with
+  | 0x08 -> un_imm_m16 "roundps"
+  | 0x09 -> un_imm_m16 "roundpd"
+  | 0x0a -> un_imm_m16 "roundss"
+  | 0x0b -> un_imm_m16 "roundsd"
+  | 0x0c -> un_imm_m16 "blendps"
+  | 0x0d -> un_imm_m16 "blendpd"
+  | 0x0e -> un_imm_m16 "pblendw"
+  | 0x0f ->
+    let src, spare = read_modrm_xmm address_mode lr in
+    let imm = Lreader.Read.u8 lr in
+    with_xmm_simd mode
+      (fun mm simd -> Palignr (mm, simd, Reg (int_to_xmm_reg spare), src, imm)
+      )
+  | 0x14 -> un_imm_m16 "pextrb"
+  | 0x15 -> un_imm_m16 "pextrw"
+  | 0x16 -> un_imm_m16 "pextrd/q"
+  | 0x17 -> un_imm_m16 "extractps"
+  | 0x20 -> (* 66 0f 3a 20 /r imm8 : PINSRB xmm, m8/r32, imm8*)
+    un_imm_m16 "pinsrb"
+  | 0x21 -> un_imm_m16 "insertps"
+  | 0x22 -> un_imm_m16 "pinsrd/q"
+  | 0x40 -> un_imm_m16 "dpps"
+  | 0x41 -> un_imm_m16 "dppd"
+  | 0x42 -> un_imm_m16 "mpsadbw"
+  | 0x60 -> un_imm_m16 "pcmpestrm"
+  | 0x61 -> un_imm_m16 "pcmpestri"
+  | 0x62 -> un_imm_m16 "pcmpistrm"
+  | 0x63 -> (* 66 0f 3a 63 /r imm8 : PCMPISTRI xmm1, xmm2/m128, imm8 *)
+    un_imm_m16 "pcmpistri"
+  | _ -> abort ()
+
+
+let read_d8 address_mode lr =
+  match Lreader.Peek.u8 lr with
+  | 0xd1 -> unsupported_imm "fcom" 1 lr
+  | 0xd9 -> unsupported_imm "fcomp" 1 lr
+  | _ -> unsupported_modrm "float op" address_mode lr
+
+
+let read_d9 address_mode lr =
+  match Lreader.Peek.u8 lr with
+  | 0xd0 -> (* FNOP *) Lreader.advance lr 1; Nop
+  | 0xc9
+  | 0xe0 | 0xe1 | 0xe4 | 0xe5 | 0xe8 | 0xe9
+  | 0xea | 0xeb | 0xec | 0xed | 0xee ->
+    unsupported_imm "float op" 1 lr
+  | n when n >= 0xf0 && n <= 0xff ->
+    unsupported_imm "float op" 1 lr
+  | _ ->
+    unsupported_modrm "float op" address_mode lr
+
+
+let read_db address_mode lr =
+  let byte = Lreader.Peek.u8 lr in
+  let _, spare = read_modrm address_mode lr in
+  if spare = 4 then
+    match byte with
+    | 0xe0 | 0xe1 | 0xe2 | 0xe3 | 0xe4 ->
+      unsupported "float op"
+    | _ -> abort ()
+  else
+    unsupported "float op"
+
+
+let read_da address_mode lr =
+  let byte = Lreader.Peek.u8 lr in
+  let _, spare = read_modrm address_mode lr in
+  if spare = 5 && byte = 0xe9 then
+    (* fucompp : just extracted as special case but behavior is the same *)
+    unsupported "float op"
+  else
+    (* all other cases *)
+    unsupported "float op"
+
+
+let read_2bytes_opcode mode address_mode rep lr =
+  let byte = Lreader.Read.u8 lr in
+  assert (byte = 0x0f);
+  let on_xmm_simd = with_xmm_simd mode in
+  let b2 = Lreader.Read.u8 lr in
+  match b2 with
+  | 0x00 ->
+    let _, spare = read_modrm address_mode lr in
+    begin match spare with
+    | 0 -> unsupported "sldt"
+    | 1 -> unsupported "str"
+    | 2 -> unsupported "lldt"
+    | 3 -> unsupported "ltr"
+    | 4 -> unsupported "verr"
+    | 5 -> unsupported "vrw"
+    | _ -> abort ()
+    end
+
+  | 0x01 ->
+    (* FIXME: detail all mnemonics *)
+    let byte = Lreader.Peek.u8 lr in
+    let _, spare = read_modrm address_mode lr in
+    let msg = Printf.sprintf "0x0f 01 %02x %i" byte spare in
+    unsupported_modrm msg address_mode lr
+
+  | 0x02 -> unsupported_modrm "lar" address_mode lr
+
+  | 0x03 ->
+    let dst, spare = read_modrm address_mode lr in
+    Lsl (of_mode mode, Reg (int_to_reg32 spare), dst)
+
+  | 0x06 -> unsupported "clts"
+  | 0x08 -> unsupported "invd"
+  | 0x09 -> unsupported "wbinvd"
+
+  | 0x0b -> unsupported "ud2"
+
+  | 0x0d ->
+    ignore (read_modrm address_mode lr);
+    Nop
+
+  | 0x10 -> unsupported_modrm "movups/movss/movupd/movsd" address_mode lr
+  | 0x11 -> unsupported_modrm "movups/movss/movupd/movsd" address_mode lr
+
+  | 0x12 ->
+    begin match rep, mode with
+      | _, `M16 ->
+        let src, spare = read_modrm_xmm address_mode lr in
+        Movlpd (S64, Reg (int_to_xmm_reg spare), src)
+      | NoRep,`M32 ->
+        let src, spare = read_modrm_xmm address_mode lr in
+        (match src with
+         | Reg _ -> Movhlps (S128, Reg (int_to_xmm_reg spare), src)
+         | Address _ -> Movlps (S64, Reg (int_to_xmm_reg spare), src)
+         | Imm _ -> abort ()
+        )
+      | RepNE, `M32 ->
+        let src, spare = read_modrm_xmm address_mode lr in
+        Movddup (S64, Reg (int_to_xmm_reg spare), src)
+
+      | RepE, `M32 ->
+        let src, spare = read_modrm_xmm address_mode lr in
+        Movsldup (S128, Reg (int_to_xmm_reg spare), src)
+    end
+  | 0x13 ->
+    begin match mode with
+      | `M32 ->
+        let dst, spare = read_modrm_xmm address_mode lr in
+        Movlps (S64, dst, Reg (int_to_xmm_reg spare))
+      | `M16 ->
+        let dst, spare = read_modrm_xmm address_mode lr in
+        Movlpd (S64, dst, Reg (int_to_xmm_reg spare))
+    end
+
+  | 0x14 -> unsupported_modrm "unpcklp(s|d)" address_mode lr
+  | 0x15 -> unsupported_modrm "unpckhp(s|d)" address_mode lr
+
+  | 0x16 ->
+    begin match rep, mode with
+      | _, `M16 ->
+        let src, spare = read_modrm_xmm address_mode lr in
+        Movhpd (S64, Reg (int_to_xmm_reg spare), src)
+      | RepE, `M32 ->
+        let src, spare = read_modrm_xmm address_mode lr in
+        Movshdup (S128, Reg (int_to_xmm_reg spare), src)
+
+      | _,`M32 ->
+        let src, spare = read_modrm_xmm address_mode lr in
+        match src with
+        | Reg _     -> Movlhps (S128, Reg (int_to_xmm_reg spare), src)
+        | Address _ -> Movhps  (S64 , Reg (int_to_xmm_reg spare), src)
+        | Imm _ -> abort ()
+    end
+  | 0x17 -> unsupported_modrm "movhp(s|d)" address_mode lr
+
+  | 0x18 ->
+    let _, spare = read_modrm address_mode lr in
+    begin match spare with
+      | 0 | 1 | 2 | 3 -> unsupported "prefetch<h>"
+      | 4 | 5 | 6 | 7 -> Nop
+      | _ -> abort ()
+    end
+
+  | 0x19
+  | 0x1a
+  | 0x1b
+  | 0x1c
+  | 0x1d
+  | 0x1e
+  | 0x1f ->
+    ignore (read_modrm address_mode lr);
+    Nop
+
+  | 0x20
+  | 0x21
+  | 0x22
+  | 0x23 -> unsupported_modrm "mov" address_mode lr
+
+  | 0x28 ->
+    begin match mode with
+      | `M32 ->
+        let src, spare = read_modrm_xmm address_mode lr in
+        Movaps (S128,Reg (int_to_xmm_reg spare), src)
+
+      | `M16 ->
+        let src, spare = read_modrm_xmm address_mode lr in
+        Movaps (S128, Reg (int_to_xmm_reg spare), src)
+
+    end
+  | 0x29 ->
+    begin match mode with
+      | `M16 ->
+        let dst, spare = read_modrm_xmm address_mode lr in
+        let instr = Movaps (S128, dst, Reg (int_to_xmm_reg spare)) in
+        instr
+      | `M32 ->
+        let dst, spare = read_modrm_xmm address_mode lr in
+        let instr = Movaps (S128, dst, Reg (int_to_xmm_reg spare)) in
+        instr
+    end
+
+  | 0x2a -> unsupported_modrm_xmm "cvtpi2ps" address_mode lr
+  | 0x2b -> unsupported_modrm_xmm "movntps" address_mode lr
+  | 0x2c -> unsupported_modrm_xmm "cvttps2pi" address_mode lr
+  | 0x2d -> unsupported_modrm_xmm "cvtps2pi" address_mode lr
+  | 0x2e -> unsupported_modrm_xmm "ucomiss" address_mode lr
+  | 0x2f -> unsupported_modrm_xmm "comiss" address_mode lr
+
+  | 0x30 -> unsupported "wrmsr"
+  | 0x31 -> unsupported "rdtsc"
+  | 0x32 -> unsupported "rdmsr"
+  | 0x33 -> unsupported "rdpmc"
+
+  | 0x34 -> unsupported "sysenter"
+  | 0x35 -> unsupported "sysexit"
+
+  | 0x37 -> unsupported "getsec"
+
+  | 0x38 -> read_0f_38 mode address_mode lr
+
+  | 0x3a -> read_0f_3a mode address_mode lr
+
+  | b2 when (b2 >= 0x40 && b2 < 0x40 + nCcs) ->
+    let dst, spare = read_modrm address_mode lr in
+    CMovcc (of_mode mode, int_to_cc (b2 - 0x40), Reg (int_to_reg32 spare), dst)
+
+  | 0x50 -> unsupported_modrm_xmm "movmskps/d" address_mode lr
+
+  | 0x51 -> unsupported_modrm_xmm "sqrtps/ss/pd/sd" address_mode lr
+  | 0x52 -> unsupported_modrm_xmm "rsqrtps/ss" address_mode lr
+
+  | 0x53 -> unsupported_modrm_xmm "rcpps/ss" address_mode lr
+
+  | 0x54 -> unsupported_modrm_xmm "andps/d" address_mode lr
+  | 0x55 -> unsupported_modrm_xmm "andnps/d" address_mode lr
+  | 0x56 -> unsupported_modrm_xmm "orps/d" address_mode lr
+  | 0x57 -> unsupported_modrm_xmm "xorps/d" address_mode lr
+
+  | 0x58 -> unsupported_modrm_xmm "addps/ss/pd/sd" address_mode lr
+  | 0x59 -> unsupported_modrm_xmm "mulps/ss/pd/sd" address_mode lr
+
+  | 0x5a -> unsupported_modrm_xmm "cvtps2pd/pd2ps/ss2sd/sd2ss" address_mode lr
+  | 0x5b -> unsupported_modrm_xmm "cvtdq2ps/ps2dq/tps2dq" address_mode lr
+
+  | 0x5c -> unsupported_modrm_xmm "subps/ss/pd/sd" address_mode lr
+  | 0x5d -> unsupported_modrm_xmm "minps/ss/pd/sd" address_mode lr
+  | 0x5e -> unsupported_modrm_xmm "divps/ss/pd/sd" address_mode lr
+  | 0x5f -> unsupported_modrm_xmm "maxps/ss/pd/sd" address_mode lr
+
+  | 0x60 ->
+    let src, spare = read_modrm_xmm address_mode lr in
+    on_xmm_simd
+      (fun xmm simd -> Punpcklbw (xmm, simd, Reg (int_to_xmm_reg spare), src) )
+  | 0x61 ->
+    let src, spare = read_modrm_xmm address_mode lr in
+    on_xmm_simd
+      (fun xmm simd -> Punpcklwd (xmm, simd, Reg (int_to_xmm_reg spare), src))
+  | 0x62 ->
+    let src, spare = read_modrm_xmm address_mode lr in
+    on_xmm_simd
+      (fun xmm simd -> Punpckldq (xmm, simd, Reg (int_to_xmm_reg spare), src) )
+
+  | 0x63 -> unsupported_modrm "packsswb" address_mode lr
+
+  | 0x64 ->
+    let src, spare = read_modrm_xmm address_mode lr in
+    on_xmm_simd
+      (fun mm simd_size ->
+         Pcmpgtb (mm, simd_size, Reg (int_to_xmm_reg spare), src))
+  | 0x65 ->
+    let src, spare = read_modrm_xmm address_mode lr in
+    on_xmm_simd
+      (fun mm simd_size ->
+         Pcmpgtw (mm, simd_size, Reg (int_to_xmm_reg spare), src))
+  | 0x66 ->
+    let src, spare = read_modrm_xmm address_mode lr in
+    on_xmm_simd
+      (fun mm simdsize ->
+         Pcmpgtd (mm, simdsize, Reg (int_to_xmm_reg spare), src))
+
+  | 0x67 -> unsupported_modrm "packuswb" address_mode lr
+
+  | 0x68 -> unsupported_modrm "punpckhbw" address_mode lr
+  | 0x69 -> unsupported_modrm "punpckhwd" address_mode lr
+  | 0x6a -> unsupported_modrm "punpckhdq" address_mode lr
+
+  | 0x6b -> unsupported_modrm "packssdw" address_mode lr
+
+  | 0x6c ->
+    unsupported_m16
+      (unsupported_modrm_xmm "punpcklqdq" address_mode lr)
+      mode
+  | 0x6d ->
+    unsupported_m16
+      (unsupported_modrm_xmm "punpckhqdq" address_mode lr)
+      mode
+
+  | 0x6e ->
+    let src, spare = read_modrm address_mode lr in
+    on_xmm_simd
+      (fun mm _ -> Movd(mm, Left, Reg (int_to_xmm_reg spare), src))
+
+  | 0x6f ->
+    let src, spare = read_modrm_xmm address_mode lr in
+    begin
+      match mode with
+      | `M16 -> MovdQA (XMM, S128, Reg (int_to_xmm_reg spare), src)
+      | `M32 ->
+        match rep with
+        | RepE -> MovdQU (XMM, S128, Reg (int_to_xmm_reg spare), src)
+        | _ -> MovQ (MM, S64, Reg (int_to_xmm_reg spare), src)
+    end
+
+  | 0x70 ->
+    let src, spare = read_modrm_xmm address_mode lr in
+    let imm = Lreader.Read.u8 lr in
+    let xmm_reg = int_to_xmm_reg spare in
+    begin
+      match mode with
+      | `M32 ->
+        begin
+          match rep with
+          | NoRep -> Pshufw  (MM,  S64,  xmm_reg, src, imm)
+          | RepNE -> Pshuflw (XMM, S128, xmm_reg, src, imm)
+          | RepE  -> Pshufhw (XMM, S128, xmm_reg, src, imm)
+        end
+
+      | `M16 -> Pshufd (XMM, S128, xmm_reg, src, imm)
+    end
+
+  | 0x71 ->
+    let gop, spare = read_modrm_xmm address_mode lr in
+    let imm = read_byte_as_int64 lr in
+    on_xmm_simd
+      (fun mm simd_size ->
+         match spare with
+         | 2 -> Psrlw (mm, simd_size, gop, Imm imm)
+         | 4 -> Psraw (mm, simd_size, gop, Imm imm)
+         | 6 -> Psllw (mm, simd_size, gop, Imm imm)
+         | _ -> abort ())
+
+  | 0x72 ->
+    let gop, spare = read_modrm_xmm address_mode lr in
+    let imm = read_byte_as_int64 lr in
+    on_xmm_simd
+      (fun mm simd_size ->
+         match spare with
+         | 2 -> Psrld (mm, simd_size, gop, Imm imm)
+         | 4 -> Psrad (mm, simd_size, gop, Imm imm)
+         | 6 -> Pslld (mm, simd_size, gop, Imm imm)
+         | _ -> abort ())
+
+  | 0x73 ->
+    let gop, spare = read_modrm_xmm address_mode lr in
+    let imm = read_byte_as_int64 lr in
+    begin match mode with
+      | `M32 ->
+        begin match spare with
+          | 2 -> Psrlq (MM, S64, gop, Imm imm)
+          | 6 -> Psllq (MM, S64, gop, Imm imm)
+          | _ -> abort ()
+        end
+      | `M16 ->
+        begin match spare with
+          | 2 -> Psrlq (XMM, S128, gop, Imm imm)
+          | 3 -> Psrldq (gop, Int64.to_int imm)
+          | 6 -> Psllq (XMM, S128, gop, Imm imm)
+          | 7 -> Pslldq (gop, Int64.to_int imm)
+          | _ -> abort ()
+        end
+    end
+
+  | 0x74 ->
+    let src, spare = read_modrm_xmm address_mode lr in
+    on_xmm_simd
+      (fun mm simd_size -> Pcmpeqb (mm, simd_size, Reg (int_to_xmm_reg spare), src))
+
+  | 0x75 ->
+    let src, spare = read_modrm_xmm address_mode lr in
+    on_xmm_simd
+      (fun mm simd_size -> Pcmpeqw (mm, simd_size, Reg (int_to_xmm_reg spare), src))
+
+  | 0x76 ->
+    let src, spare = read_modrm_xmm address_mode lr in
+    on_xmm_simd
+      (fun mm simd_size -> Pcmpeqd (mm, simd_size, Reg (int_to_xmm_reg spare), src))
+
+  | 0x77 -> unsupported "emms"
+
+  | 0x78 -> unsupported_modrm "vmread" address_mode lr
+  | 0x79 -> unsupported_modrm "vmwrite" address_mode lr
+
+  | 0x7c ->
+    begin match mode with
+      | `M16 -> unsupported_modrm_xmm "haddpd" address_mode lr
+      | `M32 ->
+        match rep with
+        | RepNE -> unsupported_modrm_xmm "haddps" address_mode lr
+        | _ -> abort ()
+    end
+
+  | 0x7d ->
+    begin match mode with
+      | `M16 -> unsupported_modrm_xmm "hsubpd" address_mode lr
+      | `M32 ->
+        match rep with
+        | RepNE -> unsupported_modrm_xmm "hsubps" address_mode lr
+        | _ -> abort ()
+    end
+
+  | 0x7e ->
+    begin match mode with
+      | `M16 ->
+        let src, spare = read_modrm address_mode lr in
+        Movd (XMM, Right, Reg (int_to_xmm_reg spare), src)
+      | `M32 ->
+        match rep with
+        | RepE ->
+          let src, spare = read_modrm_xmm address_mode lr in
+          MovQ (XMM, S64, Reg (int_to_xmm_reg spare), src)
+        | _ ->
+          let src, spare = read_modrm address_mode lr in
+          Movd (MM, Right, Reg (int_to_xmm_reg spare), src)
+    end
+
+  | 0x7f ->
+    let dst, spare = read_modrm_xmm address_mode lr in
+    begin
+      match mode with
+      | `M16 -> MovdQA (XMM, S128, dst, Reg (int_to_xmm_reg spare))
+      | `M32 ->
+        match rep with
+        | RepE -> MovdQU (XMM, S128, dst, Reg (int_to_xmm_reg spare))
+        | _    -> MovQ (MM, S64, dst, Reg (int_to_xmm_reg spare))
+    end
+
+  | b2 when b2 >= 0x80 && b2 < 0x80 + nCcs ->
+    (* FIXME: Operand size attribute could force that to read a word instead of a
+       double-word.
+       CHECK: if it corresponds to [mode] argument.
+    *)
+    let rel = Lreader.Read.u32 lr in
+    Jcc (int_to_cc (b2 - 0x80), Int64.of_int (displacement lr rel))
+
+  | b2 when (b2 >= 0x90 && b2 < 0x90 + nCcs) ->
+    let dst, _spare = read_rm8_with_spare lr in
+    SetCc (int_to_cc (b2 - 0x90), dst)
+
+  | 0xa0 -> PushS FS
+  | 0xa1 -> PopS  FS
+
+  | 0xa2 -> unsupported "cpuid"
+
+  | 0xa3 ->
+    let src, spare = read_modrm address_mode lr in
+    Bt (of_mode mode, src, Reg(int_to_reg32 spare))
+
+  | 0xa4 ->
+    let dst, spare = read_modrm address_mode lr in
+    let imm = read_byte_as_int64 lr in
+    Shiftd (of_mode mode, Shld, dst, Reg (int_to_reg32 spare), Imm imm)
+  | 0xa5 ->
+    let dst, spare = read_modrm address_mode lr in
+    Shiftd (of_mode mode, Shld, dst, Reg (int_to_reg32 spare), Reg CL)
+
+  | 0xa8 -> PushS GS
+  | 0xa9 -> PopS  GS
+
+  | 0xaa -> unsupported "rsm"
+
+  | 0xab ->
+    let src, spare = read_modrm address_mode lr in
+    Bts (of_mode mode, src, Reg (int_to_reg32 spare))
+
+  | 0xac ->
+    let dst, spare = read_modrm address_mode lr in
+    let imm = read_byte_as_int64 lr in
+    Shiftd (of_mode mode, Shrd, dst, Reg (int_to_reg32 spare), Imm imm)
+  | 0xad ->
+    let dst, spare = read_modrm address_mode lr in
+    Shiftd (of_mode mode, Shrd, dst, Reg (int_to_reg32 spare), Reg CL)
+
+  | 0xae ->
+    (* FIXME: detail all mnemonics *)
+    let _, spare = read_modrm address_mode lr in
+    let msg = Printf.sprintf "0x0f ae %i" spare in
+    unsupported msg
+
+  | 0xaf ->
+    let src, spare = read_modrm address_mode lr in
+    IMul2 (of_mode mode, Reg (int_to_reg32 spare), src)
+
+  | 0xb0 -> unsupported_modrm "cmpxchg" address_mode lr
+
+  | 0xb1 ->
+    let dst, spare = read_modrm address_mode lr in
+    CmpXchg (of_mode mode, dst, Reg (int_to_reg32 spare))
+
+  | 0xb2 -> unsupported_modrm "lss" address_mode lr
+
+  | 0xb3 -> unsupported_modrm "btr" address_mode lr
+
+  | 0xb4 -> unsupported_modrm "lfs" address_mode lr
+  | 0xb5 -> unsupported_modrm "lgs" address_mode lr
+
+  | 0xb6 ->
+    let src, spare = read_rm8_with_spare lr in
+    Movzx (of_mode mode, int_to_reg32 spare, src)
+  | 0xb7 ->
+    let src, spare = read_rm16_with_spare lr in
+    Movzx16 (of_mode mode, int_to_reg32 spare, src)
+
+  | 0xb8 -> (* added *)
+    begin match rep with
+      | RepE ->
+        let src, spare = read_modrm address_mode lr in
+        Popcnt (of_mode mode, Reg (int_to_reg32 spare), src)
+      | _ -> abort ()
+    end
+
+  | 0xb9 -> unsupported_modrm "ud" address_mode lr
+
+  | 0xba ->
+    let gop, spare = read_modrm address_mode lr in
+    begin match spare with
+      | 4 ->
+        let imm = read_byte_as_int64 lr in
+        Bt (of_mode mode, gop, Imm imm)
+      | 5 ->
+        let imm = read_byte_as_int64 lr in
+        Bts (of_mode mode, gop, Imm imm)
+      | 6 ->
+        let imm = read_byte_as_int64 lr in
+        Btr (of_mode mode, gop, Imm imm)
+      | _ -> abort ()
+    end
+
+  | 0xbb -> unsupported_modrm "btc" address_mode lr
+
+  | 0xbc ->
+    let src, spare = read_modrm address_mode lr in
+    Bsf (of_mode mode, int_to_reg32 spare, src)
+  | 0xbd ->
+    let src, spare = read_modrm address_mode lr in
+    Bsr (of_mode mode, int_to_reg32 spare, src)
+
+  | 0xbe ->
+    let src, spare = read_rm8_with_spare lr in
+    Movsx (of_mode mode, int_to_reg32 spare, src)
+  | 0xbf ->
+    let src, spare = read_rm16_with_spare lr in
+    Movsx16 (of_mode mode, int_to_reg32 spare, src)
+
+  | 0xc0 ->
+    let dst, spare = read_modrm address_mode lr in
+    Xadd (`M8, dst, Reg (int_to_reg32 spare))
+  | 0xc1 ->
+    let dst, spare = read_modrm address_mode lr in
+    Xadd (of_mode mode, dst, Reg (int_to_reg32 spare))
+
+  | 0xc2 -> unsupported_modrm_xmm "cmpps/ss/pd/sd" address_mode lr
+
+  | 0xc3 -> unsupported_modrm "movnti" address_mode lr
+
+  | 0xc4 -> unsupported_modrm "pinsrw" address_mode lr
+
+  | 0xc5 -> unsupported_modrm_imm "pextrw" address_mode 1 lr
+
+  | 0xc6 -> unsupported_modrm_imm "shufps/d" address_mode 1 lr
+
+  | 0xc7 ->
+    let src, spare = read_modrm_xmm address_mode lr in
+    begin match spare with
+      | 1 -> CmpXchg8b (MM, S64, src)
+      | 7 -> unsupported "vmptrst"
+      | 6 ->
+        begin match mode with
+          | `M16 -> unsupported "vmclear"
+          | `M32 ->
+            match rep with
+            | RepE -> unsupported "vmxon"
+            | _ -> unsupported "vlptrld"
+        end
+      | _ -> abort ()
+    end
+
+  | b2 when (b2 >= 0xc8 && b2 < 0xc8 + nRegs32) ->
+    Bswap (of_mode mode, int_to_reg32 (b2 - 0xc8))
+
+  | 0xd0 ->
+    begin match mode with
+      | `M16 -> unsupported_modrm_xmm "addsubpd" address_mode lr
+      | `M32 ->
+        match rep with
+        | RepNE -> unsupported_modrm_xmm "addsubps" address_mode lr
+        | _ -> abort ()
+    end
+
+  | 0xd1 ->
+    let gop, spare = read_modrm_xmm address_mode lr in
+    on_xmm_simd
+      (fun mm simd_size ->
+         Psrlw (mm, simd_size, Reg (int_to_xmm_reg spare), gop))
+  | 0xd2 ->
+    let gop, spare = read_modrm_xmm address_mode lr in
+    begin match mode with
+      | `M32 ->
+        Psrld (MM, S64, Reg (int_to_xmm_reg spare), gop)
+      | `M16 ->
+        Psrld (XMM, S128, Reg (int_to_xmm_reg spare), gop)
+    end
+  | 0xd3 ->
+    let gop, spare = read_modrm_xmm address_mode lr in
+    begin match mode with
+      | `M32 ->
+        Psrlq (MM, S64, Reg (int_to_xmm_reg spare), gop)
+      | `M16 ->
+        Psrlq (XMM, S128, Reg (int_to_xmm_reg spare), gop)
+    end
+
+  | 0xd4 -> unsupported_modrm "paddq" address_mode lr
+  | 0xd5 -> unsupported_modrm "pmullw" address_mode lr
+
+  | 0xd6 ->
+    let src, spare = read_modrm_xmm address_mode lr in
+    begin match mode with
+      | `M16 -> MovQ (XMM, S64, Reg (int_to_xmm_reg spare), src)
+      | `M32 ->
+        match rep with
+        | RepE -> unsupported "movq2dq"
+        | RepNE -> unsupported "movdq2q"
+        | NoRep -> abort ()
+    end
+
+  | 0xd7 ->
+    let src, spare = read_modrm_xmm address_mode lr in
+    on_xmm_simd
+      (fun mm simd -> PmovMSKB (mm, simd, Reg (int_to_reg32 spare), src) )
+
+  | 0xd8 -> unsupported_modrm "psubusb" address_mode lr
+  | 0xd9 -> unsupported_modrm "psubusw" address_mode lr
+
+  | 0xda ->
+    let src, spare = read_modrm_xmm address_mode lr in
+    on_xmm_simd
+      (fun mm simd -> Pminub (mm, simd, Reg (int_to_xmm_reg spare), src) )
+
+  | 0xdb ->
+    let src, spare = read_modrm_xmm address_mode lr in
+    on_xmm_simd
+      (fun mm simd -> Pand (mm, simd, Reg (int_to_xmm_reg spare), src) )
+
+  | 0xdc -> unsupported_modrm "paddusb" address_mode lr
+  | 0xdd -> unsupported_modrm "paddusw" address_mode lr
+
+  | 0xde ->
+    let src, spare = read_modrm_xmm address_mode lr in
+    on_xmm_simd
+      (fun mm simd -> Pmaxub (mm, simd, Reg (int_to_xmm_reg spare), src))
+
+  | 0xdf ->
+    let src, spare = read_modrm_xmm address_mode lr in
+    on_xmm_simd
+      (fun mm simd -> Pandn (mm, simd, Reg (int_to_xmm_reg spare), src))
+
+  | 0xe0 -> unsupported_modrm "pavgb" address_mode lr
+
+  | 0xe1 ->
+    let gop, spare = read_modrm_xmm address_mode lr in
+    on_xmm_simd
+      (fun xmm simd -> Psraw (xmm, simd, Reg (int_to_xmm_reg spare), gop))
+  | 0xe2 ->
+    let gop, spare = read_modrm_xmm address_mode lr in
+    on_xmm_simd
+      (fun xmm simd -> Psrad (xmm, simd, Reg (int_to_xmm_reg spare), gop))
+
+  | 0xe3 -> unsupported_modrm "pavgw" address_mode lr
+
+  | 0xe4 -> unsupported_modrm "pmulhuw" address_mode lr
+  | 0xe5 -> unsupported_modrm "pmulhw" address_mode lr
+
+  | 0xe6 ->
+    begin match mode with
+      | `M16 -> unsupported_modrm_xmm "cvttpd2dq" address_mode lr
+      | `M32 ->
+        match rep with
+        | RepNE -> unsupported_modrm_xmm "cvtpd2dq" address_mode lr
+        | RepE  -> unsupported_modrm_xmm "cvtdq2pd" address_mode lr
+        | NoRep -> abort ()
+    end
+
+  | 0xe7 ->
+    let dst, spare = read_modrm_xmm address_mode lr in
+    on_xmm_simd
+      (fun xmm simd -> Movntq (xmm, simd, dst, Reg (int_to_xmm_reg spare)))
+
+  | 0xe8 -> unsupported_modrm "psubsb" address_mode lr
+  | 0xe9 -> unsupported_modrm "psubsw" address_mode lr
+
+  | 0xea -> unsupported_modrm "pminsw" address_mode lr
+
+  | 0xeb ->
+    let src, spare = read_modrm_xmm address_mode lr in
+    on_xmm_simd
+      (fun xmm simd -> Por (xmm, simd, Reg (int_to_xmm_reg spare), src))
+
+  | 0xec -> unsupported_modrm "paddsb" address_mode lr
+  | 0xed -> unsupported_modrm "paddsw" address_mode lr
+
+  | 0xef ->
+    let src, spare = read_modrm_xmm address_mode lr in
+    on_xmm_simd
+      (fun xmm simd -> Pxor (xmm, simd, Reg (int_to_xmm_reg spare), src))
+
+  | 0xf0 ->
+    begin match rep with
+      | RepNE -> unsupported_modrm_xmm "lddqu" address_mode lr
+      | _ -> abort ()
+    end
+
+  | 0xf1 ->
+    let gop, spare = read_modrm_xmm address_mode lr in
+    on_xmm_simd
+      (fun mm simdsize ->
+         Psllw (mm, simdsize, Reg (int_to_xmm_reg spare), gop))
+  | 0xf2 ->
+    let gop, spare = read_modrm_xmm address_mode lr in
+    on_xmm_simd
+      (fun xmm simd -> Pslld (xmm, simd, Reg (int_to_xmm_reg spare), gop))
+  | 0xf3 ->
+    let gop, spare = read_modrm_xmm address_mode lr in
+    on_xmm_simd
+      (fun xmm simd -> Psllq (xmm, simd, Reg (int_to_xmm_reg spare), gop))
+
+  | 0xf4 -> unsupported_modrm "pmuludq" address_mode lr
+  | 0xf5 -> unsupported_modrm "pmaddwd" address_mode lr
+
+  | 0xf6 -> unsupported_modrm "psadbw" address_mode lr
+
+  | 0xf7 ->
+    begin match mode with
+      | `M32 -> unsupported_modrm "maskmovq" address_mode lr
+      | `M16 -> unsupported_modrm_xmm "maskmovdqu" address_mode lr
+    end
+
+  | 0xf8 ->
+    let src, spare = read_modrm_xmm address_mode lr in
+    on_xmm_simd
+      (fun xmm simd -> Psubb (xmm, simd, Reg (int_to_xmm_reg spare), src))
+  | 0xf9 -> unsupported_modrm "psubw" address_mode lr
+  | 0xfa -> unsupported_modrm "psubd" address_mode lr
+  | 0xfb -> unsupported_modrm "psubq" address_mode lr
+
+  | 0xfc -> unsupported_modrm "paddb" address_mode lr
+  | 0xfd -> unsupported_modrm "paddw" address_mode lr
+  | 0xfe -> unsupported_modrm "paddd" address_mode lr
+
+  | _byte -> abort ()
+;;
+
+
+let read lr =
+  (* lr is a cursor *)
+  (*  Logger.debug "@[EIP %x,%d(%x) : %a@]" (fst eip) (snd eip) (snd eip / 8)
+   *  Bits.pp bits; *)
+  Logger.debug ~level:4 "[x86 decode] %a" Lreader.pp lr;
+  let sreg = ref None in
+  let rep = ref NoRep in
+  (*   let succ_eip (bv_addr, off_addr) = succ bv_addr, succ off_addr in *)
+
+  let rec aux_read_instr mode address_mode lr =
+    let byte = Lreader.Peek.u8 lr in
+    (*    let byte, bits = Bits.read_uint bits 8 in *)
+    if byte = 0x0f then
+      read_2bytes_opcode mode address_mode !rep lr
+    else
+
+      let arith_to_rm aop =
+        let dst, spare = read_modrm address_mode lr in
+        Arith (of_mode mode, aop, dst, Reg (int_to_reg32 spare)) in
+
+      let arith_from_rm aop =
+        let src, spare = read_modrm address_mode lr in
+        Arith (of_mode mode, aop, Reg (int_to_reg32 spare), src) in
+
+      match Lreader.Read.u8 lr with
+      | 0x00 ->
+        let dst, spare = read_modrm address_mode lr in
+        Arith (`M8, Add, dst, Reg (int_to_reg32 spare))
+      | 0x01 -> arith_to_rm Add
+      | 0x02 -> (* added *)
+        let src, spare = read_modrm address_mode lr in
+        Arith (`M8, Add, Reg (int_to_reg32 spare), src)
+      | 0x03 -> arith_from_rm Add
+      | 0x04 -> (* added *)
+        let imm = read_byte_as_int64 lr in
+        Arith (`M8, Add, Reg EAX, Imm imm)
+      | 0x05 ->
+        let imm = select_reader (imode mode) lr in
+        Arith (of_mode mode, Add, Reg EAX, Imm (Int64.of_int imm))
+
+      | 0x06 -> PushS ES
+      | 0x07 -> PopS  ES
+
+      | 0x08 -> (* added *)
+        let dst, spare = read_modrm address_mode lr in
+        Arith (`M8, Or, dst, Reg (int_to_reg32 spare))
+      | 0x09 -> arith_to_rm Or
+      | 0x0a -> (* added *)
+        let src, spare = read_modrm address_mode lr in
+        Arith (`M8, Or, Reg (int_to_reg32 spare), src)
+      | 0x0b -> arith_from_rm Or
+      | 0x0c -> (* added *)
+        let imm = read_byte_as_int64 lr in
+        Arith (`M8, Or, Reg EAX, Imm imm)
+      | 0x0d -> (* added *)
+        let imm = select_reader (imode mode) lr in
+        Arith (of_mode mode, Or, Reg EAX, Imm (Int64.of_int imm))
+
+      | 0x0e -> PushS CS
+
+      | 0x10 -> (* added *)
+        let dst, spare = read_modrm address_mode lr in
+        Arith (`M8, Adc, dst, Reg (int_to_reg32 spare))
+      | 0x11 -> arith_to_rm Adc
+      | 0x12 -> (* added *)
+        let src, spare = read_modrm address_mode lr in
+        Arith (`M8, Adc, Reg (int_to_reg32 spare), src)
+      | 0x13 -> arith_from_rm Adc
+      | 0x14 ->
+        let imm = read_byte_as_int64 lr in
+        Arith (`M8, Adc, Reg EAX, Imm imm)
+      | 0x15 -> (* added *)
+        let imm = select_reader (imode mode) lr in
+        Arith (of_mode mode, Adc, Reg EAX, Imm (Int64.of_int imm))
+
+      | 0x16 -> PushS SS
+      | 0x17 -> PopS  SS
+
+      | 0x18 -> (* added *)
+        let dst, spare = read_modrm address_mode lr in
+        Arith (`M8, Sbb, dst, Reg (int_to_reg32 spare))
+      | 0x19 -> arith_to_rm Sbb
+      | 0x1a -> (* added *)
+        let src, spare = read_modrm address_mode lr in
+        Arith (`M8, Sbb, Reg (int_to_reg32 spare), src)
+      | 0x1b -> arith_from_rm Sbb
+      | 0x1c -> (* added *)
+        let imm = read_byte_as_int64 lr in
+        Arith (`M8, Sbb, Reg EAX, Imm imm)
+      | 0x1d -> (* added *)
+        let imm = select_reader (imode mode) lr in
+        Arith (of_mode mode, Sbb, Reg EAX, Imm (Int64.of_int imm))
+
+      | 0x1e -> PushS DS
+      | 0x1f -> PopS  DS
+
+      | 0x20 -> (* added *)
+        let dst, spare = read_modrm address_mode lr in
+        Arith (`M8, And, dst, Reg (int_to_reg32 spare))
+      | 0x21 -> arith_to_rm And
+      | 0x22 -> (* added *)
+        let src, spare = read_modrm address_mode lr in
+        Arith (`M8, And, Reg (int_to_reg32 spare), src)
+      | 0x23 -> arith_from_rm And
+      | 0x24 -> (* added *)
+        let imm = read_byte_as_int64 lr in
+        Arith (`M8, And, Reg EAX, Imm imm)
+      | 0x25 -> (* added *)
+        let imm = select_reader (imode mode) lr in
+        Arith (of_mode mode, And, Reg EAX, Imm (Int64.of_int imm))
+
+      | 0x26 -> (* Design choice *)
+        sreg := Some ES;
+        aux_read_instr mode address_mode lr
+
+      | 0x27 -> unsupported "daa"
+
+      | 0x28 ->
+        let dst, spare = read_modrm address_mode lr in
+        Arith (`M8, Sub, dst, Reg (int_to_reg32 spare))
+      | 0x29 -> arith_to_rm Sub
+      | 0x2a -> (* added *)
+        let src, spare = read_modrm address_mode lr in
+        Arith (`M8, Sub, Reg (int_to_reg32 spare), src)
+      | 0x2b -> arith_from_rm Sub
+      | 0x2c -> (* added *)
+        let imm = read_byte_as_int64 lr in
+        Arith (`M8, Sub, Reg EAX, Imm imm)
+      | 0x2d -> (* added *)
+        let imm = select_reader (imode mode) lr in
+        Arith (of_mode mode, Sub, Reg EAX, Imm (Int64.of_int imm))
+
+      | 0x2e -> (* Design choice *)
+        sreg := Some CS;
+        aux_read_instr mode address_mode lr
+
+      | 0x2f -> unsupported "das"
+
+      | 0x30 -> (* added *)
+        let dst, spare = read_modrm address_mode lr in
+        Arith (`M8, Xor, dst, Reg (int_to_reg32 spare))
+      | 0x31 -> arith_to_rm Xor
+      | 0x32 -> (* added *)
+        let src, spare = read_modrm address_mode lr in
+        Arith (`M8, Xor, Reg (int_to_reg32 spare), src)
+      | 0x33 -> arith_from_rm Xor
+      | 0x34 -> (* added *)
+        let imm = read_byte_as_int64 lr in
+        Arith (`M8, Xor, Reg EAX, Imm imm)
+      | 0x35 ->
+        let imm = select_reader (imode mode) lr in
+        Arith (`M32, Xor, Reg EAX, Imm (Int64.of_int imm))
+
+      | 0x36 ->
+        sreg := Some SS;
+        aux_read_instr mode address_mode lr
+
+      | 0x37 -> unsupported "aaa"
+
+      | 0x38 ->
+        let dst, spare = read_modrm address_mode lr in
+        Cmp (`M8, dst, Reg (int_to_reg32 spare))
+      | 0x39 ->
+        let dst, spare = read_modrm address_mode lr in
+        Cmp (of_mode mode, dst, Reg (int_to_reg32 spare))
+      | 0x3a -> (* added *)
+        let src, spare = read_modrm address_mode lr in
+        Cmp (`M8, Reg (int_to_reg32 spare), src)
+      | 0x3b ->
+        let src, spare = read_modrm address_mode lr in
+        Cmp (of_mode mode, Reg (int_to_reg32 spare), src)
+      | 0x3c -> (* added *)
+        let imm = read_byte_as_int64 lr in
+        Cmp (`M8, Reg EAX, Imm imm)
+      | 0x3d ->
+        let imm = select_reader (imode mode) lr in
+        Cmp (of_mode mode, Reg EAX, Imm (Int64.of_int imm))
+
+      | 0x3e -> (* Design choice *)
+        sreg := Some DS;
+        aux_read_instr mode address_mode lr
+
+      | 0x3f -> Aas
+
+      | byte when (byte >= 0x40 && byte < 0x40 + nRegs32) ->
+        Inc (of_mode mode, Reg (int_to_reg32 (byte - 0x40)))
+
+      | byte when (byte >= 0x48 && byte < 0x48 + nRegs32) ->
+        Dec (of_mode mode, Reg (int_to_reg32 (byte - 0x48)))
+
+      | byte when (byte >= 0x50 && byte < 0x50 + nRegs32) ->
+        Push (of_mode mode, Reg (int_to_reg32 (byte - 0x50)))
+
+      | byte when (byte >= 0x58 && byte < 0x58 + nRegs32) ->
+        Pop (of_mode mode, Reg (int_to_reg32 (byte - 0x58)))
+
+      | 0x60 -> PushA mode
+      | 0x61 -> PopA  mode
+
+      | 0x62 -> unsupported "bound"
+
+      | 0x63 -> unsupported "arpl"
+
+      | 0x64 ->
+        sreg := Some FS;
+        aux_read_instr mode address_mode lr
+      | 0x65 ->
+        sreg := Some GS;
+        aux_read_instr mode address_mode lr
+      | 0x66 ->
+        let mode = X86Util.switch_default_data_mode mode in
+        aux_read_instr mode address_mode lr
+      | 0x67 ->
+        let address_mode = X86Util.switch_address_mode address_mode in
+        aux_read_instr mode address_mode lr
+
+      | 0x68 ->
+        let imm = select_reader (imode mode) lr in
+        Push (of_mode mode, Imm (Int64.of_int imm))
+
+      | 0x69 -> (* added *)
+        let src, spare = read_modrm address_mode lr in
+        let imm = select_reader (imode mode) lr in
+        IMul3 (of_mode mode, Reg (int_to_reg32 spare), src,
+               Imm (Int64.of_int imm))
+
+      | 0x6a ->
+        let imm = read_byte_as_int64 lr in
+        Push (of_mode mode, Imm imm)
+
+      | 0x6b ->
+        let src, spare = read_modrm address_mode lr in
+        let imm = read_byte_as_int64 lr in
+        IMul3 (of_mode mode, Reg (int_to_reg32 spare), src, Imm imm)
+
+      | 0x6c -> unsupported "ins/insb"
+      | 0x6d -> unsupported "ins/insw"
+      | 0x6e -> unsupported "outs/outsb"
+      | 0x6f -> unsupported "outs/outsw/outsd"
+
+      | byte when (byte >= 0x70 && byte < 0x70 + nCcs) ->
+        let rel8 = Lreader.Read.u8 lr in
+        let v = Int64.of_int (signed_displacement lr rel8) in
+        Jcc (int_to_cc (byte - 0x70), v)
+
+      | 0x80 ->
+        let dst, spare = read_modrm address_mode lr in
+        let disp = read_byte_as_int64 lr in
+        begin match spare with
+          | 7 -> Cmp (`M8, dst, Imm disp)
+          | _ -> Arith (`M8, int_to_arith_op spare, dst, Imm disp)
+        end
+
+      | 0x81 ->
+        let dst, spare = read_modrm address_mode lr in
+        let imode = imode mode in
+        let disp = select_reader imode lr |> Int64.of_int in
+        begin match spare with
+          | 7 -> Cmp (of_mode mode, dst, Imm disp)
+          | _ -> Arith (of_mode mode, int_to_arith_op spare, dst, Imm disp)
+        end
+
+      | 0x82 ->
+        let dst, spare = read_modrm address_mode lr in
+        let disp = read_byte_as_int64 lr in
+        begin match spare with
+          | 7 -> Cmp (`M8, dst, Imm disp)
+          | _ -> Arith (`M8, int_to_arith_op spare, dst, Imm disp)
+        end
+
+      | 0x83 ->
+        let dst, spare = read_modrm address_mode lr in
+        let disp64 = Lreader.Read.u8 lr |> sign_extend |> Int64.of_int in
+        begin match spare with
+          | 7 -> Cmp (of_mode mode, dst, Imm disp64)
+          | _ -> Arith (of_mode mode, int_to_arith_op spare, dst, Imm disp64)
+        end
+
+      | 0x84 ->
+        let dst, spare = read_modrm address_mode lr in
+        Test (`M8, dst, Reg (int_to_reg32 spare))
+      | 0x85 ->
+        let dst, spare = read_modrm address_mode lr in
+        Test (of_mode mode, dst, Reg (int_to_reg32 spare))
+
+      | 0x86 ->
+        let src, spare = read_modrm address_mode lr in
+        Xchg (`M8, Reg (int_to_reg32 spare), src)
+      | 0x87 ->
+        let src, spare = read_modrm address_mode lr in
+        Xchg (of_mode mode, Reg (int_to_reg32 spare), src)
+
+      | 0x88 ->
+        let dst, spare = read_modrm address_mode lr in
+        Mov (`M8, dst, Reg (int_to_reg32 spare))
+      | 0x89 ->
+        let dst, spare = read_modrm address_mode lr in
+        Mov (of_mode mode, dst, Reg (int_to_reg32 spare))
+      | 0x8a ->
+        let src, spare = read_modrm address_mode lr in
+        Mov (`M8, Reg (int_to_reg32 spare), src)
+      | 0x8b ->
+        let src, spare = read_modrm address_mode lr in
+        Mov (of_mode mode, Reg (int_to_reg32 spare), src)
+      | 0x8c ->
+        let dst, spare = read_rm16_with_spare lr in
+        MovSegRight (dst, int_to_segment_reg spare)
+
+      | 0x8d ->
+        let gop, spare = read_modrm address_mode lr in
+        begin match gop with
+          | Address addr -> Lea (of_mode mode, int_to_reg32 spare, addr)
+          | _ -> abort ()
+        end
+
+      | 0x8e ->
+        let src, spare = read_rm16_with_spare lr in
+        MovSegLeft (int_to_segment_reg spare, src)
+
+      | 0x8f -> (* added *)
+        let dst, spare = read_modrm address_mode lr in
+        begin match spare with
+          | 0 -> Pop (of_mode mode, dst)
+          | _ -> abort ()
+        end
+
+      | 0x90 -> Nop
+
+      | byte when (byte > 0x90 && byte < 0x90 + nRegs32) ->
+        Xchg (of_mode mode, Reg (int_to_reg32 (byte - 0x90)), Reg EAX)
+
+      | 0x98 -> CBW mode
+      | 0x99 -> CWD mode
+
+      | 0x9a -> unsupported "callf"
+
+      | 0x9b -> Wait
+
+      | 0x9c -> Pushfd (of_mode mode)
+      | 0x9d -> Popfd  (of_mode mode)
+
+      | 0x9e -> Sahf
+      | 0x9f -> Lahf
+
+      | 0xa0 ->
+        let bits = (bitsize_of_address_mode address_mode:>int) in
+        let imm = select_reader bits lr in
+        let addr = X86Util.mk_address ~address_mode imm in
+        Mov (`M8, Reg EAX, addr)
+      | 0xa1 ->
+        let bits = (bitsize_of_address_mode address_mode:>int) in
+        let imm = select_reader bits lr in
+        let addr = X86Util.mk_address ~address_mode imm in
+        let inst = Mov (of_mode mode, Reg EAX, addr) in
+        inst
+      | 0xa2 ->
+        let bits = (bitsize_of_address_mode address_mode:>int) in
+        let imm = select_reader bits lr in
+        let addr = X86Util.mk_address ~address_mode imm in
+        Mov (of_mode mode, addr, Reg EAX)
+      | 0xa3 ->
+        let bits = (bitsize_of_address_mode address_mode:>int) in
+        let imm = select_reader bits lr in
+        let addr = X86Util.mk_address ~address_mode imm in
+        Mov (of_mode mode, addr, Reg EAX)
+
+      | 0xa4 -> Movs `M8
+      | 0xa5 -> Movs (of_mode mode)
+
+      | 0xa6 -> Cmps `M8
+      | 0xa7 -> Cmps (of_mode mode)
+
+      | 0xa8 ->
+        let imm = read_byte_as_int64 lr in
+        Test (`M8, Reg EAX, Imm imm)
+      | 0xa9 -> (* added *)
+        let imm = select_reader (imode mode) lr in
+        Test ((of_mode mode), Reg EAX, Imm (Int64.of_int imm))
+
+      | 0xaa -> Stos `M8
+      | 0xab -> Stos (of_mode mode)
+
+      | 0xac -> Lods `M8
+      | 0xad -> Lods (of_mode mode)
+
+      | 0xae -> Scas `M8
+      | 0xaf -> Scas (of_mode mode)
+
+      | byte when (byte >= 0xb0 && byte < 0xb0 + nRegs32) ->
+        let imm = read_byte_as_int64 lr in
+        Mov (`M8, Reg (int_to_reg32 (byte - 0xb0)), Imm imm)
+
+      | byte when (byte >= 0xb8 && byte < 0xb8 + nRegs32) ->
+        let imm = select_reader (imode mode) lr in
+        Mov (of_mode mode, Reg (int_to_reg32 (byte - 0xb8)),
+             Imm (Int64.of_int imm))
+
+      | 0xc0 ->
+        let dst, spare = read_modrm address_mode lr in
+        let imm64 = Imm (read_byte_as_int64 lr) in
+        let rotate rot_type = Rotate (`M8, rot_type, dst, imm64)
+        and shift shift_type = Shift (`M8, shift_type, dst, imm64) in
+        shift_or_rotate_from_spare ~shift ~rotate spare
+      | 0xc1 ->
+        let dst, spare = read_modrm address_mode lr in
+        let imm64 = Imm (read_byte_as_int64 lr) in
+        let rotate rot_type = Rotate (of_mode mode, rot_type, dst, imm64)
+        and shift shift_type = Shift (of_mode mode, shift_type, dst, imm64) in
+        shift_or_rotate_from_spare ~shift ~rotate spare
+
+      | 0xc2 ->
+        let imm = Lreader.Read.u16 lr in
+        Reti imm
+      | 0xc3 -> Ret
+
+      | 0xc4 -> unsupported_modrm "les" address_mode lr
+      | 0xc5 -> unsupported_modrm "lds" address_mode lr
+
+      | 0xc6 ->
+        let dst, spare = read_modrm address_mode lr in
+        begin match spare with
+          | 0 ->
+            let imm = read_byte_as_int64 lr in
+            Mov (`M8, dst, Imm imm)
+          | _ -> abort ()
+        end
+      | 0xc7 ->
+        let dst, spare = read_modrm address_mode lr in
+        begin match spare with
+          | 0 ->
+            let imode = imode mode in
+            let imm = select_reader imode lr in
+            Mov (of_mode mode, dst, Imm (Int64.of_int imm))
+          | _ -> abort ()
+        end
+
+      | 0xc8 -> (* enter imm16 imm8 : make stack frame *)
+        unsupported_imm "enter" 3 lr
+
+      | 0xc9 -> Leave
+
+      | 0xca ->
+        let imm = Lreader.Read.u16 lr in
+        Retfi imm
+      | 0xcb ->  Retf
+
+      | 0xcc -> unsupported "int 3"
+      | 0xcd -> (* int imm8 *)
+        let v = Lreader.Read.u8 lr in
+        let msg = Printf.sprintf "int %d" v in
+        unsupported msg
+      | 0xce -> unsupported "into"
+      | 0xcf -> unsupported "iret/iretd"
+
+      | 0xd0 ->
+        let dst, spare = read_modrm address_mode lr in
+        let shift shift_type = Shift (`M8, shift_type, dst, Imm Int64.one)
+        and rotate rotate_type =
+          Rotate (`M8, rotate_type, dst, Imm Int64.one) in
+        shift_or_rotate_from_spare ~shift ~rotate spare
+      | 0xd1 ->
+        let dst, spare = read_modrm address_mode lr in
+        let shift shift_type =
+          Shift (of_mode mode, shift_type, dst, Imm Int64.one)
+        and rotate rotate_type =
+          Rotate (of_mode mode, rotate_type, dst, Imm Int64.one) in
+        shift_or_rotate_from_spare ~shift ~rotate spare
+      | 0xd2 ->
+        let dst, spare = read_modrm address_mode lr in
+        let rotate rotate_type = Rotate (`M8, rotate_type, dst, Reg CL)
+        and shift shift_type = Shift (`M8, shift_type, dst, Reg CL) in
+        shift_or_rotate_from_spare ~shift ~rotate spare
+      | 0xd3 ->
+        let dst, spare = read_modrm address_mode lr in
+        let rotate rotate_type = Rotate (of_mode mode, rotate_type, dst, Reg CL)
+        and shift shift_type = Shift (of_mode mode, shift_type, dst, Reg CL) in
+        shift_or_rotate_from_spare ~shift ~rotate spare
+
+      | 0xd4 -> let imm = Lreader.Read.u8 lr in Aam imm
+      | 0xd5 -> let imm = Lreader.Read.u8 lr in Aad imm
+
+      | 0xd6 -> Salc
+
+      | 0xd7 -> unsupported "xlat/xlatb"
+
+      | 0xd8 -> read_d8 address_mode lr
+      | 0xd9 -> read_d9 address_mode lr
+      | 0xda -> read_da address_mode lr
+      | 0xdb -> read_db address_mode lr
+      | 0xdc
+      | 0xdd
+      | 0xde
+      | 0xdf -> unsupported_modrm "float op" address_mode lr
+
+      | 0xe0 ->
+        let rel8 = Lreader.Read.u8 lr in
+        let v = signed_displacement lr rel8 |> Int64.of_int in
+        Loopnz (mode, address_mode, v)
+      | 0xe1 ->
+        let rel8 = Lreader.Read.u8 lr in
+        let v = signed_displacement lr rel8 |> Int64.of_int in
+        Loopz (mode, address_mode, v)
+      | 0xe2 ->
+        let rel8 = Lreader.Read.u8 lr in
+        let v = signed_displacement lr rel8 |> Int64.of_int in
+        Loop (mode, address_mode, v)
+
+      | 0xe3 ->
+        let rel8 = Lreader.Read.u8 lr in
+        let v = signed_displacement lr rel8 |> Int64.of_int in
+        Jcxz (of_mode mode, v)
+
+      | 0xe4 -> unsupported_imm "in al imm8" 1 lr
+      | 0xe5 -> unsupported_imm "in eax imm8" 1 lr
+      | 0xe6 -> unsupported_imm "out imm8 al" 1 lr
+      | 0xe7 -> unsupported_imm "out imm8 eax" 1 lr
+
+      | 0xe8 ->
+        let rel32 = Lreader.Read.u32 lr in
+        let v = displacement lr rel32 |> Int64.of_int in
+        Call v
+
+      | 0xe9 ->
+        (* FIXME: Can be 16/32 bits 3-333 *)
+        let rel32 = Lreader.Read.u32 lr in
+        let v = displacement lr rel32 |> Int64.of_int in
+        Jmp v
+      | 0xea ->
+        ignore (Lreader.Read.u16 lr);
+        ignore (select_reader (imode mode) lr);
+        unsupported "jmpf"
+      | 0xeb ->
+        let rel8 = Lreader.Read.u8 lr in
+        let v = signed_displacement lr rel8 |> Int64.of_int in
+        Jmp v
+
+      | 0xec -> unsupported "in al dx"
+      | 0xed -> unsupported "in eax dx"
+      | 0xee -> unsupported "out dx al"
+      | 0xef -> unsupported "out dx eax"
+
+      | 0xf0 -> aux_read_instr mode address_mode lr
+
+      | 0xf1 -> unsupported "int1/icebp"
+
+      | 0xf2 -> (* added *)
+        begin match Lreader.Peek.u8 lr with
+          | 0xc3 ->
+            Lreader.advance lr 1;
+            Ret
+          | _ ->
+            rep := RepNE;
+            aux_read_instr mode address_mode lr
+        end
+      | 0xf3 -> (* added *)
+        begin match Lreader.Peek.u8 lr with
+          | 0xc3 ->
+            Lreader.advance lr 1;
+            Ret
+          | _ ->
+            rep := RepE;
+            aux_read_instr mode address_mode lr
+        end
+
+      | 0xf4 -> Halt
+
+      | 0xf5 -> Cmc
+
+      | 0xf6 ->
+        (* Lookup http://ref.x86asm.net/coder32.html#xF6 *)
+        let src, spare = read_modrm address_mode lr in
+        begin match spare with
+          | 0
+          | 1 ->
+            let v = Lreader.Read.u8 lr |> Int64.of_int in
+            Test (`M8, src, Imm v)
+          | 2 -> Not (`M8, src)
+          | 3 -> Neg (`M8, src)
+          | 4 -> Mul (`M8, src)
+          | 5 -> IMul (`M8, src)
+          | 6 -> Div (`M8, src)
+          | 7 -> IDiv (`M8, src)
+          | _ -> abort ()
+        end
+
+      | 0xf7 ->
+        let src, spare = read_modrm address_mode lr in
+        begin match spare with
+          | 0
+          | 1 ->
+            let imm16_32 = select_reader (imode mode) lr |> Int64.of_int in
+            Test (of_mode mode, src, Imm imm16_32)
+          | 2 -> Not (of_mode mode, src)
+          | 3 -> Neg (of_mode mode, src)
+          | 4 -> Mul (of_mode mode, src)
+          | 5 -> IMul (of_mode mode, src)
+          | 6 -> Div (of_mode mode, src)
+          | 7 -> IDiv (of_mode mode, src)
+          | _ -> abort ()
+        end
+
+      | 0xf8 -> Clc
+      | 0xf9 -> Stc
+
+      | 0xfa ->
+        (* clear interrupt flags *)
+        unsupported "cli"
+      | 0xfb ->
+        (* set interrupt flags *)
+        unsupported "sti"
+
+      | 0xfc -> Cld
+      | 0xfd -> Std
+
+      | 0xfe ->
+        let gop, spare = read_modrm address_mode lr in
+        begin match spare with
+          | 0 -> Inc (`M8, gop)
+          | 1 -> Dec (`M8, gop)
+          | _ -> abort ()
+        end
+
+      | 0xff ->
+        let gop, spare = read_modrm address_mode lr in
+        begin
+          match spare with
+          | 0 -> Inc (of_mode mode, gop)
+          | 1 -> Dec (of_mode mode, gop)
+          | 2 -> DCall gop
+          | 3 -> unsupported "callf"
+          | 4 -> DJmp gop
+          | 5 -> unsupported "jmpf"
+          | 6 -> Push (of_mode mode, gop)
+          | _ -> abort ()
+        end
+
+      | _byte -> abort ()
+  in
+  let initial_position = Lreader.get_virtual_cursor lr in
+  (* TODO: mode & address_mode should be settable by caller *)
+  let mode = `M32 in
+  let address_mode = A32 in
+  let mnemonic =
+    match aux_read_instr mode address_mode lr with
+    | m -> m
+    | exception Decode_abort -> Bad in
+  let opcode =
+    Lreader.get_slice lr ~lo:initial_position ~hi:(Lreader.get_virtual_cursor lr)
+    |> bytes_to_opcode_string
+  in
+  Logger.debug ~level:3 "@[<v 0>Opcode %s %@ [%x, %x[:@ %a@]"
+    opcode
+    initial_position (Lreader.get_virtual_cursor lr)
+    X86pp.pp_instr mnemonic;
+  let size = Lreader.get_virtual_cursor lr - initial_position in
+  let instruction = X86Instruction.create size opcode mnemonic in
+  instruction, !rep, !sreg

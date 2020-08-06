@@ -1,0 +1,9 @@
+==27559== Invalid write of size 4
+==27559==    at 0x804854F: main (example.c:26)
+==27559==  Address 0x421d060 is 0 bytes inside a block of size 4 free'd
+==27559==    at 0x402D358: free (in /usr/lib/valgrind/vgpreload_memcheck-x86-linux.so)
+==27559==    by 0x80484AE: bad_func (example.c:11)
+==27559==    by 0x804853E: main (example.c:24)
+==27559==  Block was alloc'd at
+==27559==    at 0x402C17C: malloc (in /usr/lib/valgrind/vgpreload_memcheck-x86-linux.so)
+==27559==    by 0x804851C: main (example.c:20)

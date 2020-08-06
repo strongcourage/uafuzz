@@ -1,0 +1,1636 @@
+General note concerning the use of guest agent interfaces:
+
+"unsupported" is a higher-level error than the errors that individual
+commands might document. The caller should always be prepared to receive
+QERR_UNSUPPORTED, even if the given command doesn't specify it, or doesn't
+document any failure mode at all.
+
+
+@deftypefn Command {} guest-sync-delimited
+
+Echo back a unique integer value, and prepend to response a
+leading sentinel byte (0xFF) the client can check scan for.
+
+This is used by clients talking to the guest agent over the
+wire to ensure the stream is in sync and doesn't contain stale
+data from previous client. It must be issued upon initial
+connection, and after any client-side timeouts (including
+timeouts on receiving a response to this command).
+
+After issuing this request, all guest agent responses should be
+ignored until the response containing the unique integer value
+the client passed in is returned. Receival of the 0xFF sentinel
+byte must be handled as an indication that the client's
+lexer/tokenizer/parser state should be flushed/reset in
+preparation for reliably receiving the subsequent response. As
+an optimization, clients may opt to ignore all data until a
+sentinel value is receiving to avoid unnecessary processing of
+stale data.
+
+Similarly, clients should also precede this @strong{request}
+with a 0xFF byte to make sure the guest agent flushes any
+partially read JSON data from a previous client connection.
+
+@b{Arguments:}
+@table @asis
+@item @code{id: int}
+randomly generated 64-bit integer
+@end table
+
+
+@b{Returns:}
+The unique integer id passed in by the client
+
+@b{Since:}
+1.1
+
+@end deftypefn
+
+
+
+@deftypefn Command {} guest-sync
+
+Echo back a unique integer value
+
+This is used by clients talking to the guest agent over the
+wire to ensure the stream is in sync and doesn't contain stale
+data from previous client. All guest agent responses should be
+ignored until the provided unique integer value is returned,
+and it is up to the client to handle stale whole or
+partially-delivered JSON text in such a way that this response
+can be obtained.
+
+In cases where a partial stale response was previously
+received by the client, this cannot always be done reliably.
+One particular scenario being if qemu-ga responses are fed
+character-by-character into a JSON parser. In these situations,
+using guest-sync-delimited may be optimal.
+
+For clients that fetch responses line by line and convert them
+to JSON objects, guest-sync should be sufficient, but note that
+in cases where the channel is dirty some attempts at parsing the
+response may result in a parser error.
+
+Such clients should also precede this command
+with a 0xFF byte to make sure the guest agent flushes any
+partially read JSON data from a previous session.
+
+@b{Arguments:}
+@table @asis
+@item @code{id: int}
+randomly generated 64-bit integer
+@end table
+
+
+@b{Returns:}
+The unique integer id passed in by the client
+
+@b{Since:}
+0.15.0
+
+@end deftypefn
+
+
+
+@deftypefn Command {} guest-ping
+
+Ping the guest agent, a non-error return implies success
+
+
+@b{Since:}
+0.15.0
+
+@end deftypefn
+
+
+
+@deftypefn Command {} guest-get-time
+
+Get the information about guest's System Time relative to
+the Epoch of 1970-01-01 in UTC.
+
+
+@b{Returns:}
+Time in nanoseconds.
+
+@b{Since:}
+1.5
+
+@end deftypefn
+
+
+
+@deftypefn Command {} guest-set-time
+
+Set guest time.
+
+When a guest is paused or migrated to a file then loaded
+from that file, the guest OS has no idea that there
+was a big gap in the time. Depending on how long the
+gap was, NTP might not be able to resynchronize the
+guest.
+
+This command tries to set guest's System Time to the
+given value, then sets the Hardware Clock (RTC) to the
+current System Time. This will make it easier for a guest
+to resynchronize without waiting for NTP. If no @code{time} is
+specified, then the time to set is read from RTC. However,
+this may not be supported on all platforms (i.e. Windows).
+If that's the case users are advised to always pass a
+value.
+
+@b{Arguments:}
+@table @asis
+@item @code{time: int} (optional)
+time of nanoseconds, relative to the Epoch
+of 1970-01-01 in UTC.
+@end table
+
+
+@b{Returns:}
+Nothing on success.
+
+@b{Since:}
+1.5
+
+@end deftypefn
+
+
+
+@deftp {Object} GuestAgentCommandInfo
+
+Information about guest agent commands.
+
+@b{Members:}
+@table @asis
+@item @code{name: string}
+name of the command
+@item @code{enabled: boolean}
+whether command is currently enabled by guest admin
+@item @code{success-response: boolean}
+whether command returns a response on success
+(since 1.7)
+@end table
+
+
+@b{Since:}
+1.1.0
+
+@end deftp
+
+
+
+@deftp {Object} GuestAgentInfo
+
+Information about guest agent.
+
+@b{Members:}
+@table @asis
+@item @code{version: string}
+guest agent version
+@item @code{supported_commands: array of GuestAgentCommandInfo}
+Information about guest agent commands
+@end table
+
+
+@b{Since:}
+0.15.0
+
+@end deftp
+
+
+
+@deftypefn Command {} guest-info
+
+Get some information about the guest agent.
+
+
+@b{Returns:}
+@code{GuestAgentInfo}
+
+@b{Since:}
+0.15.0
+
+@end deftypefn
+
+
+
+@deftypefn Command {} guest-shutdown
+
+Initiate guest-activated shutdown. Note: this is an asynchronous
+shutdown request, with no guarantee of successful shutdown.
+
+@b{Arguments:}
+@table @asis
+@item @code{mode: string} (optional)
+"halt", "powerdown" (default), or "reboot"
+@end table
+This command does NOT return a response on success. Success condition
+is indicated by the VM exiting with a zero exit status or, when
+running with --no-shutdown, by issuing the query-status QMP command
+to confirm the VM status is "shutdown".
+
+@b{Since:}
+0.15.0
+
+@end deftypefn
+
+
+
+@deftypefn Command {} guest-file-open
+
+Open a file in the guest and retrieve a file handle for it
+
+@b{Arguments:}
+@table @asis
+@item @code{path: string}
+Full path to the file in the guest to open.
+@item @code{mode: string} (optional)
+open mode, as per fopen(), "r" is the default.
+@end table
+
+
+@b{Returns:}
+Guest file handle on success.
+
+@b{Since:}
+0.15.0
+
+@end deftypefn
+
+
+
+@deftypefn Command {} guest-file-close
+
+Close an open file in the guest
+
+@b{Arguments:}
+@table @asis
+@item @code{handle: int}
+filehandle returned by guest-file-open
+@end table
+
+
+@b{Returns:}
+Nothing on success.
+
+@b{Since:}
+0.15.0
+
+@end deftypefn
+
+
+
+@deftp {Object} GuestFileRead
+
+Result of guest agent file-read operation
+
+@b{Members:}
+@table @asis
+@item @code{count: int}
+number of bytes read (note: count is @strong{before}
+base64-encoding is applied)
+@item @code{buf-b64: string}
+base64-encoded bytes read
+@item @code{eof: boolean}
+whether EOF was encountered during read operation.
+@end table
+
+
+@b{Since:}
+0.15.0
+
+@end deftp
+
+
+
+@deftypefn Command {} guest-file-read
+
+Read from an open file in the guest. Data will be base64-encoded
+
+@b{Arguments:}
+@table @asis
+@item @code{handle: int}
+filehandle returned by guest-file-open
+@item @code{count: int} (optional)
+maximum number of bytes to read (default is 4KB)
+@end table
+
+
+@b{Returns:}
+@code{GuestFileRead} on success.
+
+@b{Since:}
+0.15.0
+
+@end deftypefn
+
+
+
+@deftp {Object} GuestFileWrite
+
+Result of guest agent file-write operation
+
+@b{Members:}
+@table @asis
+@item @code{count: int}
+number of bytes written (note: count is actual bytes
+written, after base64-decoding of provided buffer)
+@item @code{eof: boolean}
+whether EOF was encountered during write operation.
+@end table
+
+
+@b{Since:}
+0.15.0
+
+@end deftp
+
+
+
+@deftypefn Command {} guest-file-write
+
+Write to an open file in the guest.
+
+@b{Arguments:}
+@table @asis
+@item @code{handle: int}
+filehandle returned by guest-file-open
+@item @code{buf-b64: string}
+base64-encoded string representing data to be written
+@item @code{count: int} (optional)
+bytes to write (actual bytes, after base64-decode),
+default is all content in buf-b64 buffer after base64 decoding
+@end table
+
+
+@b{Returns:}
+@code{GuestFileWrite} on success.
+
+@b{Since:}
+0.15.0
+
+@end deftypefn
+
+
+
+@deftp {Object} GuestFileSeek
+
+Result of guest agent file-seek operation
+
+@b{Members:}
+@table @asis
+@item @code{position: int}
+current file position
+@item @code{eof: boolean}
+whether EOF was encountered during file seek
+@end table
+
+
+@b{Since:}
+0.15.0
+
+@end deftp
+
+
+
+@deftp {Enum} QGASeek
+
+Symbolic names for use in @code{guest-file-seek}
+
+@b{Values:}
+@table @asis
+@item @code{set}
+Set to the specified offset (same effect as 'whence':0)
+@item @code{cur}
+Add offset to the current location (same effect as 'whence':1)
+@item @code{end}
+Add offset to the end of the file (same effect as 'whence':2)
+@end table
+
+
+@b{Since:}
+2.6
+
+@end deftp
+
+
+
+@deftp {Alternate} GuestFileWhence
+
+Controls the meaning of offset to @code{guest-file-seek}.
+
+@b{Members:}
+@table @asis
+@item @code{value: int}
+Integral value (0 for set, 1 for cur, 2 for end), available
+for historical reasons, and might differ from the host's or
+guest's SEEK_* values (since: 0.15)
+@item @code{name: QGASeek}
+Symbolic name, and preferred interface
+@end table
+
+
+@b{Since:}
+2.6
+
+@end deftp
+
+
+
+@deftypefn Command {} guest-file-seek
+
+Seek to a position in the file, as with fseek(), and return the
+current file position afterward. Also encapsulates ftell()'s
+functionality, with offset=0 and whence=1.
+
+@b{Arguments:}
+@table @asis
+@item @code{handle: int}
+filehandle returned by guest-file-open
+@item @code{offset: int}
+bytes to skip over in the file stream
+@item @code{whence: GuestFileWhence}
+Symbolic or numeric code for interpreting offset
+@end table
+
+
+@b{Returns:}
+@code{GuestFileSeek} on success.
+
+@b{Since:}
+0.15.0
+
+@end deftypefn
+
+
+
+@deftypefn Command {} guest-file-flush
+
+Write file changes bufferred in userspace to disk/kernel buffers
+
+@b{Arguments:}
+@table @asis
+@item @code{handle: int}
+filehandle returned by guest-file-open
+@end table
+
+
+@b{Returns:}
+Nothing on success.
+
+@b{Since:}
+0.15.0
+
+@end deftypefn
+
+
+
+@deftp {Enum} GuestFsfreezeStatus
+
+An enumeration of filesystem freeze states
+
+@b{Values:}
+@table @asis
+@item @code{thawed}
+filesystems thawed/unfrozen
+@item @code{frozen}
+all non-network guest filesystems frozen
+@end table
+
+
+@b{Since:}
+0.15.0
+
+@end deftp
+
+
+
+@deftypefn Command {} guest-fsfreeze-status
+
+Get guest fsfreeze state. error state indicates
+
+
+@b{Returns:}
+GuestFsfreezeStatus ("thawed", "frozen", etc., as defined below)
+
+@b{Note:}
+This may fail to properly report the current state as a result of
+some other guest processes having issued an fs freeze/thaw.
+
+@b{Since:}
+0.15.0
+
+@end deftypefn
+
+
+
+@deftypefn Command {} guest-fsfreeze-freeze
+
+Sync and freeze all freezable, local guest filesystems. If this
+command succeeded, you may call @code{guest-fsfreeze-thaw} later to
+unfreeze.
+
+
+@b{Note:}
+On Windows, the command is implemented with the help of a
+Volume Shadow-copy Service DLL helper. The frozen state is limited
+for up to 10 seconds by VSS.
+
+@b{Returns:}
+Number of file systems currently frozen. On error, all filesystems
+will be thawed.
+
+@b{Since:}
+0.15.0
+
+@end deftypefn
+
+
+
+@deftypefn Command {} guest-fsfreeze-freeze-list
+
+Sync and freeze specified guest filesystems.
+See also @code{guest-fsfreeze-freeze}.
+
+@b{Arguments:}
+@table @asis
+@item @code{mountpoints: array of string} (optional)
+an array of mountpoints of filesystems to be frozen.
+If omitted, every mounted filesystem is frozen.
+Invalid mount points are ignored.
+@end table
+
+
+@b{Returns:}
+Number of file systems currently frozen. On error, all filesystems
+will be thawed.
+
+@b{Since:}
+2.2
+
+@end deftypefn
+
+
+
+@deftypefn Command {} guest-fsfreeze-thaw
+
+Unfreeze all frozen guest filesystems
+
+
+@b{Returns:}
+Number of file systems thawed by this call
+
+@b{Note:}
+if return value does not match the previous call to
+guest-fsfreeze-freeze, this likely means some freezable
+filesystems were unfrozen before this call, and that the
+filesystem state may have changed before issuing this
+command.
+
+@b{Since:}
+0.15.0
+
+@end deftypefn
+
+
+
+@deftp {Object} GuestFilesystemTrimResult
+
+
+
+@b{Members:}
+@table @asis
+@item @code{path: string}
+path that was trimmed
+@item @code{error: string} (optional)
+an error message when trim failed
+@item @code{trimmed: int} (optional)
+bytes trimmed for this path
+@item @code{minimum: int} (optional)
+reported effective minimum for this path
+@end table
+
+
+@b{Since:}
+2.4
+
+@end deftp
+
+
+
+@deftp {Object} GuestFilesystemTrimResponse
+
+
+
+@b{Members:}
+@table @asis
+@item @code{paths: array of GuestFilesystemTrimResult}
+list of @code{GuestFilesystemTrimResult} per path that was trimmed
+@end table
+
+
+@b{Since:}
+2.4
+
+@end deftp
+
+
+
+@deftypefn Command {} guest-fstrim
+
+Discard (or "trim") blocks which are not in use by the filesystem.
+
+@b{Arguments:}
+@table @asis
+@item @code{minimum: int} (optional)
+Minimum contiguous free range to discard, in bytes. Free ranges
+smaller than this may be ignored (this is a hint and the guest
+may not respect it).  By increasing this value, the fstrim
+operation will complete more quickly for filesystems with badly
+fragmented free space, although not all blocks will be discarded.
+The default value is zero, meaning "discard every free block".
+@end table
+
+
+@b{Returns:}
+A @code{GuestFilesystemTrimResponse} which contains the
+status of all trimmed paths. (since 2.4)
+
+@b{Since:}
+1.2
+
+@end deftypefn
+
+
+
+@deftypefn Command {} guest-suspend-disk
+
+Suspend guest to disk.
+
+This command tries to execute the scripts provided by the pm-utils package.
+If it's not available, the suspend operation will be performed by manually
+writing to a sysfs file.
+
+For the best results it's strongly recommended to have the pm-utils
+package installed in the guest.
+
+This command does NOT return a response on success. There is a high chance
+the command succeeded if the VM exits with a zero exit status or, when
+running with --no-shutdown, by issuing the query-status QMP command to
+to confirm the VM status is "shutdown". However, the VM could also exit
+(or set its status to "shutdown") due to other reasons.
+
+The following errors may be returned:
+If suspend to disk is not supported, Unsupported
+
+
+@b{Notes:}
+It's strongly recommended to issue the guest-sync command before
+sending commands when the guest resumes
+
+@b{Since:}
+1.1
+
+@end deftypefn
+
+
+
+@deftypefn Command {} guest-suspend-ram
+
+Suspend guest to ram.
+
+This command tries to execute the scripts provided by the pm-utils package.
+If it's not available, the suspend operation will be performed by manually
+writing to a sysfs file.
+
+For the best results it's strongly recommended to have the pm-utils
+package installed in the guest.
+
+IMPORTANT: guest-suspend-ram requires QEMU to support the 'system_wakeup'
+command.  Thus, it's @strong{required} to query QEMU for the presence of the
+'system_wakeup' command before issuing guest-suspend-ram.
+
+This command does NOT return a response on success. There are two options
+to check for success:
+@enumerate
+@item
+Wait for the SUSPEND QMP event from QEMU
+@item
+Issue the query-status QMP command to confirm the VM status is
+"suspended"
+
+@end enumerate
+
+The following errors may be returned:
+If suspend to ram is not supported, Unsupported
+
+
+@b{Notes:}
+It's strongly recommended to issue the guest-sync command before
+sending commands when the guest resumes
+
+@b{Since:}
+1.1
+
+@end deftypefn
+
+
+
+@deftypefn Command {} guest-suspend-hybrid
+
+Save guest state to disk and suspend to ram.
+
+This command requires the pm-utils package to be installed in the guest.
+
+IMPORTANT: guest-suspend-hybrid requires QEMU to support the 'system_wakeup'
+command.  Thus, it's @strong{required} to query QEMU for the presence of the
+'system_wakeup' command before issuing guest-suspend-hybrid.
+
+This command does NOT return a response on success. There are two options
+to check for success:
+@enumerate
+@item
+Wait for the SUSPEND QMP event from QEMU
+@item
+Issue the query-status QMP command to confirm the VM status is
+"suspended"
+
+@end enumerate
+
+The following errors may be returned:
+If hybrid suspend is not supported, Unsupported
+
+
+@b{Notes:}
+It's strongly recommended to issue the guest-sync command before
+sending commands when the guest resumes
+
+@b{Since:}
+1.1
+
+@end deftypefn
+
+
+
+@deftp {Enum} GuestIpAddressType
+
+An enumeration of supported IP address types
+
+@b{Values:}
+@table @asis
+@item @code{ipv4}
+IP version 4
+@item @code{ipv6}
+IP version 6
+@end table
+
+
+@b{Since:}
+1.1
+
+@end deftp
+
+
+
+@deftp {Object} GuestIpAddress
+
+
+
+@b{Members:}
+@table @asis
+@item @code{ip-address: string}
+IP address
+@item @code{ip-address-type: GuestIpAddressType}
+Type of @code{ip-address} (e.g. ipv4, ipv6)
+@item @code{prefix: int}
+Network prefix length of @code{ip-address}
+@end table
+
+
+@b{Since:}
+1.1
+
+@end deftp
+
+
+
+@deftp {Object} GuestNetworkInterface
+
+
+
+@b{Members:}
+@table @asis
+@item @code{name: string}
+The name of interface for which info are being delivered
+@item @code{hardware-address: string} (optional)
+Hardware address of @code{name}
+@item @code{ip-addresses: array of GuestIpAddress} (optional)
+List of addresses assigned to @code{name}
+@end table
+
+
+@b{Since:}
+1.1
+
+@end deftp
+
+
+
+@deftypefn Command {} guest-network-get-interfaces
+
+Get list of guest IP addresses, MAC addresses
+and netmasks.
+
+
+@b{Returns:}
+List of GuestNetworkInfo on success.
+
+@b{Since:}
+1.1
+
+@end deftypefn
+
+
+
+@deftp {Object} GuestLogicalProcessor
+
+
+
+@b{Members:}
+@table @asis
+@item @code{logical-id: int}
+Arbitrary guest-specific unique identifier of the VCPU.
+@item @code{online: boolean}
+Whether the VCPU is enabled.
+@item @code{can-offline: boolean} (optional)
+Whether offlining the VCPU is possible. This member
+is always filled in by the guest agent when the structure is
+returned, and always ignored on input (hence it can be omitted
+then).
+@end table
+
+
+@b{Since:}
+1.5
+
+@end deftp
+
+
+
+@deftypefn Command {} guest-get-vcpus
+
+Retrieve the list of the guest's logical processors.
+
+This is a read-only operation.
+
+
+@b{Returns:}
+The list of all VCPUs the guest knows about. Each VCPU is put on the
+list exactly once, but their order is unspecified.
+
+@b{Since:}
+1.5
+
+@end deftypefn
+
+
+
+@deftypefn Command {} guest-set-vcpus
+
+Attempt to reconfigure (currently: enable/disable) logical processors inside
+the guest.
+
+The input list is processed node by node in order. In each node @code{logical-id}
+is used to look up the guest VCPU, for which @code{online} specifies the requested
+state. The set of distinct @code{logical-id}'s is only required to be a subset of
+the guest-supported identifiers. There's no restriction on list length or on
+repeating the same @code{logical-id} (with possibly different @code{online} field).
+Preferably the input list should describe a modified subset of
+@code{guest-get-vcpus}' return value.
+
+@b{Arguments:}
+@table @asis
+@item @code{vcpus: array of GuestLogicalProcessor}
+Not documented
+@end table
+
+
+@b{Returns:}
+The length of the initial sublist that has been successfully
+processed. The guest agent maximizes this value. Possible cases:
+
+@itemize @minus
+@item
+0:              if the @code{vcpus} list was empty on input. Guest state
+has not been changed. Otherwise,
+@item
+Error:          processing the first node of @code{vcpus} failed for the
+reason returned. Guest state has not been changed.
+Otherwise,
+@item
+< length(@code{vcpus}): more than zero initial nodes have been processed,
+but not the entire @code{vcpus} list. Guest state has
+changed accordingly. To retrieve the error
+(assuming it persists), repeat the call with the
+successfully processed initial sublist removed.
+Otherwise,
+@item
+length(@code{vcpus}): call successful.
+@end itemize
+
+
+@b{Since:}
+1.5
+
+@end deftypefn
+
+
+
+@deftp {Enum} GuestDiskBusType
+
+An enumeration of bus type of disks
+
+@b{Values:}
+@table @asis
+@item @code{ide}
+IDE disks
+@item @code{fdc}
+floppy disks
+@item @code{scsi}
+SCSI disks
+@item @code{virtio}
+virtio disks
+@item @code{xen}
+Xen disks
+@item @code{usb}
+USB disks
+@item @code{uml}
+UML disks
+@item @code{sata}
+SATA disks
+@item @code{sd}
+SD cards
+@item @code{unknown}
+Unknown bus type
+@item @code{ieee1394}
+Win IEEE 1394 bus type
+@item @code{ssa}
+Win SSA bus type
+@item @code{fibre}
+Win fiber channel bus type
+@item @code{raid}
+Win RAID bus type
+@item @code{iscsi}
+Win iScsi bus type
+@item @code{sas}
+Win serial-attaches SCSI bus type
+@item @code{mmc}
+Win multimedia card (MMC) bus type
+@item @code{virtual}
+Win virtual bus type
+@code{file-backed} virtual: Win file-backed bus type
+@item @code{file-backed-virtual}
+Not documented
+@end table
+
+
+@b{Since:}
+2.2; 'Unknown' and all entries below since 2.4
+
+@end deftp
+
+
+
+@deftp {Object} GuestPCIAddress
+
+
+
+@b{Members:}
+@table @asis
+@item @code{domain: int}
+domain id
+@item @code{bus: int}
+bus id
+@item @code{slot: int}
+slot id
+@item @code{function: int}
+function id
+@end table
+
+
+@b{Since:}
+2.2
+
+@end deftp
+
+
+
+@deftp {Object} GuestDiskAddress
+
+
+
+@b{Members:}
+@table @asis
+@item @code{pci-controller: GuestPCIAddress}
+controller's PCI address
+@item @code{bus-type: GuestDiskBusType}
+bus type
+@item @code{bus: int}
+bus id
+@item @code{target: int}
+target id
+@item @code{unit: int}
+unit id
+@end table
+
+
+@b{Since:}
+2.2
+
+@end deftp
+
+
+
+@deftp {Object} GuestFilesystemInfo
+
+
+
+@b{Members:}
+@table @asis
+@item @code{name: string}
+disk name
+@item @code{mountpoint: string}
+mount point path
+@item @code{type: string}
+file system type string
+@item @code{disk: array of GuestDiskAddress}
+an array of disk hardware information that the volume lies on,
+which may be empty if the disk type is not supported
+@end table
+
+
+@b{Since:}
+2.2
+
+@end deftp
+
+
+
+@deftypefn Command {} guest-get-fsinfo
+
+
+
+
+@b{Returns:}
+The list of filesystems information mounted in the guest.
+The returned mountpoints may be specified to
+@code{guest-fsfreeze-freeze-list}.
+Network filesystems (such as CIFS and NFS) are not listed.
+
+@b{Since:}
+2.2
+
+@end deftypefn
+
+
+
+@deftypefn Command {} guest-set-user-password
+
+
+
+@b{Arguments:}
+@table @asis
+@item @code{username: string}
+the user account whose password to change
+@item @code{password: string}
+the new password entry string, base64 encoded
+@item @code{crypted: boolean}
+true if password is already crypt()d, false if raw
+@end table
+If the @code{crypted} flag is true, it is the caller's responsibility
+to ensure the correct crypt() encryption scheme is used. This
+command does not attempt to interpret or report on the encryption
+scheme. Refer to the documentation of the guest operating system
+in question to determine what is supported.
+
+Not all guest operating systems will support use of the
+@code{crypted} flag, as they may require the clear-text password
+
+The @code{password} parameter must always be base64 encoded before
+transmission, even if already crypt()d, to ensure it is 8-bit
+safe when passed as JSON.
+
+@b{Returns:}
+Nothing on success.
+
+@b{Since:}
+2.3
+
+@end deftypefn
+
+
+
+@deftp {Object} GuestMemoryBlock
+
+
+
+@b{Members:}
+@table @asis
+@item @code{phys-index: int}
+Arbitrary guest-specific unique identifier of the MEMORY BLOCK.
+@item @code{online: boolean}
+Whether the MEMORY BLOCK is enabled in guest.
+@item @code{can-offline: boolean} (optional)
+Whether offlining the MEMORY BLOCK is possible.
+This member is always filled in by the guest agent when the
+structure is returned, and always ignored on input (hence it
+can be omitted then).
+@end table
+
+
+@b{Since:}
+2.3
+
+@end deftp
+
+
+
+@deftypefn Command {} guest-get-memory-blocks
+
+Retrieve the list of the guest's memory blocks.
+
+This is a read-only operation.
+
+
+@b{Returns:}
+The list of all memory blocks the guest knows about.
+Each memory block is put on the list exactly once, but their order
+is unspecified.
+
+@b{Since:}
+2.3
+
+@end deftypefn
+
+
+
+@deftp {Enum} GuestMemoryBlockResponseType
+
+An enumeration of memory block operation result.
+
+@b{Values:}
+@table @asis
+@item @code{success}
+the operation of online/offline memory block is successful.
+@item @code{not-found}
+can't find the corresponding memoryXXX directory in sysfs.
+@item @code{operation-not-supported}
+for some old kernels, it does not support
+online or offline memory block.
+@item @code{operation-failed}
+the operation of online/offline memory block fails,
+because of some errors happen.
+@end table
+
+
+@b{Since:}
+2.3
+
+@end deftp
+
+
+
+@deftp {Object} GuestMemoryBlockResponse
+
+
+
+@b{Members:}
+@table @asis
+@item @code{phys-index: int}
+same with the 'phys-index' member of @code{GuestMemoryBlock}.
+@item @code{response: GuestMemoryBlockResponseType}
+the result of memory block operation.
+@item @code{error-code: int} (optional)
+the error number.
+When memory block operation fails, we assign the value of
+'errno' to this member, it indicates what goes wrong.
+When the operation succeeds, it will be omitted.
+@end table
+
+
+@b{Since:}
+2.3
+
+@end deftp
+
+
+
+@deftypefn Command {} guest-set-memory-blocks
+
+Attempt to reconfigure (currently: enable/disable) state of memory blocks
+inside the guest.
+
+The input list is processed node by node in order. In each node @code{phys-index}
+is used to look up the guest MEMORY BLOCK, for which @code{online} specifies the
+requested state. The set of distinct @code{phys-index}'s is only required to be a
+subset of the guest-supported identifiers. There's no restriction on list
+length or on repeating the same @code{phys-index} (with possibly different @code{online}
+field).
+Preferably the input list should describe a modified subset of
+@code{guest-get-memory-blocks}' return value.
+
+@b{Arguments:}
+@table @asis
+@item @code{mem-blks: array of GuestMemoryBlock}
+Not documented
+@end table
+
+
+@b{Returns:}
+The operation results, it is a list of @code{GuestMemoryBlockResponse},
+which is corresponding to the input list.
+
+Note: it will return NULL if the @code{mem-blks} list was empty on input,
+or there is an error, and in this case, guest state will not be
+changed.
+
+@b{Since:}
+2.3
+
+@end deftypefn
+
+
+
+@deftp {Object} GuestMemoryBlockInfo
+
+
+
+@b{Members:}
+@table @asis
+@item @code{size: int}
+the size (in bytes) of the guest memory blocks,
+which are the minimal units of memory block online/offline
+operations (also called Logical Memory Hotplug).
+@end table
+
+
+@b{Since:}
+2.3
+
+@end deftp
+
+
+
+@deftypefn Command {} guest-get-memory-block-info
+
+Get information relating to guest memory blocks.
+
+
+@b{Returns:}
+@code{GuestMemoryBlockInfo}
+
+@b{Since:}
+2.3
+
+@end deftypefn
+
+
+
+@deftp {Object} GuestExecStatus
+
+
+
+@b{Members:}
+@table @asis
+@item @code{exited: boolean}
+true if process has already terminated.
+@item @code{exitcode: int} (optional)
+process exit code if it was normally terminated.
+@item @code{signal: int} (optional)
+signal number (linux) or unhandled exception code
+(windows) if the process was abnormally terminated.
+@item @code{out-data: string} (optional)
+base64-encoded stdout of the process
+@item @code{err-data: string} (optional)
+base64-encoded stderr of the process
+Note: @code{out-data} and @code{err-data} are present only
+if 'capture-output' was specified for 'guest-exec'
+@item @code{out-truncated: boolean} (optional)
+true if stdout was not fully captured
+due to size limitation.
+@item @code{err-truncated: boolean} (optional)
+true if stderr was not fully captured
+due to size limitation.
+@end table
+
+
+@b{Since:}
+2.5
+
+@end deftp
+
+
+
+@deftypefn Command {} guest-exec-status
+
+Check status of process associated with PID retrieved via guest-exec.
+Reap the process and associated metadata if it has exited.
+
+@b{Arguments:}
+@table @asis
+@item @code{pid: int}
+pid returned from guest-exec
+@end table
+
+
+@b{Returns:}
+GuestExecStatus on success.
+
+@b{Since:}
+2.5
+
+@end deftypefn
+
+
+
+@deftp {Object} GuestExec
+
+
+
+@b{Members:}
+@table @asis
+@item @code{pid: int}
+pid of child process in guest OS
+@end table
+
+
+@b{Since:}
+2.5
+
+@end deftp
+
+
+
+@deftypefn Command {} guest-exec
+
+Execute a command in the guest
+
+@b{Arguments:}
+@table @asis
+@item @code{path: string}
+path or executable name to execute
+@item @code{arg: array of string} (optional)
+argument list to pass to executable
+@item @code{env: array of string} (optional)
+environment variables to pass to executable
+@item @code{input-data: string} (optional)
+data to be passed to process stdin (base64 encoded)
+@item @code{capture-output: boolean} (optional)
+bool flag to enable capture of
+stdout/stderr of running process. defaults to false.
+@end table
+
+
+@b{Returns:}
+PID on success.
+
+@b{Since:}
+2.5
+
+@end deftypefn
+
+
+
+@deftp {Object} GuestHostName
+
+
+
+@b{Members:}
+@table @asis
+@item @code{host-name: string}
+Fully qualified domain name of the guest OS
+@end table
+
+
+@b{Since:}
+2.10
+
+@end deftp
+
+
+
+@deftypefn Command {} guest-get-host-name
+
+Return a name for the machine.
+
+The returned name is not necessarily a fully-qualified domain name, or even
+present in DNS or some other name service at all. It need not even be unique
+on your local network or site, but usually it is.
+
+
+@b{Returns:}
+the host name of the machine on success
+
+@b{Since:}
+2.10
+
+@end deftypefn
+
+
+
+@deftp {Object} GuestUser
+
+
+
+@b{Members:}
+@table @asis
+@item @code{user: string}
+Username
+@item @code{domain: string} (optional)
+Logon domain (windows only)
+@item @code{login-time: number}
+Time of login of this user on the computer. If multiple
+instances of the user are logged in, the earliest login time is
+reported. The value is in fractional seconds since epoch time.
+@end table
+
+
+@b{Since:}
+2.10
+
+@end deftp
+
+
+
+@deftypefn Command {} guest-get-users
+
+Retrieves a list of currently active users on the VM.
+
+
+@b{Returns:}
+A unique list of users.
+
+@b{Since:}
+2.10
+
+@end deftypefn
+
+
+
+@deftp {Object} GuestTimezone
+
+
+
+@b{Members:}
+@table @asis
+@item @code{zone: string} (optional)
+Timezone name. These values may differ depending on guest/OS and
+should only be used for informational purposes.
+@item @code{offset: int}
+Offset to UTC in seconds, negative numbers for time zones west of
+GMT, positive numbers for east
+@end table
+
+
+@b{Since:}
+2.10
+
+@end deftp
+
+
+
+@deftypefn Command {} guest-get-timezone
+
+Retrieves the timezone information from the guest.
+
+
+@b{Returns:}
+A GuestTimezone dictionary.
+
+@b{Since:}
+2.10
+
+@end deftypefn
+
+
+
+@deftp {Object} GuestOSInfo
+
+
+
+@b{Members:}
+@table @asis
+@item @code{kernel-release: string} (optional)
+@itemize @bullet
+@item
+POSIX: release field returned by uname(2)
+@item
+Windows: version number of the OS
+@end itemize
+
+@item @code{kernel-version: string} (optional)
+@itemize @bullet
+@item
+POSIX: version field returned by uname(2)
+@item
+Windows: build number of the OS
+@end itemize
+
+@item @code{machine: string} (optional)
+@itemize @bullet
+@item
+POSIX: machine field returned by uname(2)
+@item
+Windows: one of x86, x86_64, arm, ia64
+@end itemize
+
+@item @code{id: string} (optional)
+@itemize @bullet
+@item
+POSIX: as defined by os-release(5)
+@item
+Windows: contains string "mswindows"
+@end itemize
+
+@item @code{name: string} (optional)
+@itemize @bullet
+@item
+POSIX: as defined by os-release(5)
+@item
+Windows: contains string "Microsoft Windows"
+@end itemize
+
+@item @code{pretty-name: string} (optional)
+@itemize @bullet
+@item
+POSIX: as defined by os-release(5)
+@item
+Windows: product name, e.g. "Microsoft Windows 10 Enterprise"
+@end itemize
+
+@item @code{version: string} (optional)
+@itemize @bullet
+@item
+POSIX: as defined by os-release(5)
+@item
+Windows: long version string, e.g. "Microsoft Windows Server 2008"
+@end itemize
+
+@item @code{version-id: string} (optional)
+@itemize @bullet
+@item
+POSIX: as defined by os-release(5)
+@item
+Windows: short version identifier, e.g. "7" or "20012r2"
+@end itemize
+
+@item @code{variant: string} (optional)
+@itemize @bullet
+@item
+POSIX: as defined by os-release(5)
+@item
+Windows: contains string "server" or "client"
+@end itemize
+
+@item @code{variant-id: string} (optional)
+@itemize @bullet
+@item
+POSIX: as defined by os-release(5)
+@item
+Windows: contains string "server" or "client"
+@end itemize
+
+@end table
+
+
+@b{Notes:}
+On POSIX systems the fields @code{id}, @code{name}, @code{pretty-name}, @code{version}, @code{version-id},
+@code{variant} and @code{variant-id} follow the definition specified in os-release(5).
+Refer to the manual page for exact description of the fields. Their values
+are taken from the os-release file. If the file is not present in the system,
+or the values are not present in the file, the fields are not included.
+
+On Windows the values are filled from information gathered from the system.
+
+@b{Since:}
+2.10
+
+@end deftp
+
+
+
+@deftypefn Command {} guest-get-osinfo
+
+Retrieve guest operating system information
+
+
+@b{Returns:}
+@code{GuestOSInfo}
+
+@b{Since:}
+2.10
+
+@end deftypefn
+
+

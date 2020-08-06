@@ -1,0 +1,238 @@
+\documentclass{report}
+
+\usepackage{multirow}
+
+\begin{document}
+
+ \chapter{Binsec -  Trace Format}
+
+
+\footnotesize
+\begin{tabular}{| * {7} {c|} }
+\hline
+\multirow{3}{*}{\bf Header}  & \bf Size & \multicolumn{5}{|c|}{\bf Name} \\ \cline{2-7}
+						 & 1    & \multicolumn{5}{|c|}{architecture} \\ \cline{2-7}
+						 & 1    & \multicolumn{5}{|c|}{addr\_size} \\ \hline
+\multirow{15}{*}{\bf Body}  & 1 & \bf content\_type & \multicolumn{4}{|c|}{} \\ \cline{2-7}
+					    & \multicolumn{1}{c|}{}  & 0x0 & \multicolumn{4}{|c|}{\bf Metadata} \\ \cline{3-7}
+						& \multicolumn{2}{|c|}{} & \bf size & \multicolumn{3}{|c|}{\bf name} \\ \cline{4-7} 
+						& \multicolumn{2}{|c|}{} & 1 & meta\_data\_code &  \multicolumn{2}{|c|}{} \\ \cline{4-7}
+						& \multicolumn{3}{|c|}{}  & 0x0 & Exception &  \multicolumn{1}{|c|}{} \\ \cline{5-7}
+						& \multicolumn{4}{|c|}{} & 4 & type  \\ \cline{6-7}
+						& \multicolumn{4}{|c|}{} & addr\_size & handler  \\ \cline{5-7}
+						& \multicolumn{3}{|c|}{} & 0x1& Module & \multicolumn{1}{|c|}{}  \\ \cline{5-7}
+						& \multicolumn{4}{|c|}{} & name\_size & name  \\ \cline{5-7}
+						& \multicolumn{3}{|c|}{} & 0x2 & Layer  & \multicolumn{1}{|c|}{}  \\ \cline{5-7}
+						& \multicolumn{4}{|c|}{} & 4 & number \\ \cline{3-7}
+						& \multicolumn{1}{|c|}{} & 0x1 & \multicolumn{4}{|c|}{\bf Instruction} \\ \cline{3-7}
+						& \multicolumn{2}{|c|}{} & \bf size & \multicolumn{3}{|c|}{\bf name} \\ \cline{4-7} 
+						& \multicolumn{2}{|c|}{} & 4 & \multicolumn{3}{|c|}{thred\_id} \\ \cline{4-7}
+						& \multicolumn{2}{|c|}{} & addr\_size& \multicolumn{3}{|c|}{location/address} \\ \cline{4-7}
+						& \multicolumn{2}{|c|}{} & opcode\_size & \multicolumn{3}{|c|}{opcode} \\ \cline{4-7} 
+						& \multicolumn{2}{|c|}{} & 1 & \bf concrete\_info\_code &  \multicolumn{2}{|c|}{} \\ \cline{4-7}
+						& \multicolumn{3}{|c|}{} & 0x0 & \multicolumn{2}{|c|}{RegLoad :} \\ \cline{5-7}
+						& \multicolumn{4}{|c|}{} & name\_size & name \\ \cline{6-7}
+						& \multicolumn{4}{|c|}{} & addr\_size & value \\ \cline{5-7}
+						& \multicolumn{3}{|c|}{} & 0x1 & \multicolumn{2}{|c|}{RegStore :} \\ \cline{5-7}
+						& \multicolumn{4}{|c|}{} & name\_size & name \\ \cline{6-7}
+						& \multicolumn{4}{|c|}{} & addr\_size & value \\ \cline{5-7}
+						& \multicolumn{3}{|c|}{} & 0x2 & \multicolumn{2}{|c|}{MemLoad :} \\ \cline{5-7}
+						& \multicolumn{4}{|c|}{} & addr\_size & address \\ \cline{6-7}
+						& \multicolumn{4}{|c|}{} & addr\_size & value \\ \cline{5-7}
+						& \multicolumn{3}{|c|}{} & 0x3 & \multicolumn{2}{|c|}{MemStore :} \\ \cline{5-7}
+						& \multicolumn{4}{|c|}{} & addr\_size & address \\ \cline{6-7}
+						& \multicolumn{4}{|c|}{} & addr\_size & value \\ \cline{5-7}
+						& \multicolumn{3}{|c|}{} & 0x4 & \multicolumn{2}{|c|}{Call :} \\ \cline{5-7}
+						& \multicolumn{4}{|c|}{} & addr\_size & func\_addr \\ \cline{6-7}
+						& \multicolumn{4}{|c|}{} & size\_name & func\_name \\ \cline{6-7}
+						& \multicolumn{4}{|c|}{} & 1 & is\_traced \\ \cline{5-7}
+						& \multicolumn{3}{|c|}{} & 0x5 & \multicolumn{2}{|c|}{Ret :} \\ \cline{5-7}
+						& \multicolumn{4}{|c|}{} & addr\_size & ret\_value \\ \cline{5-7}
+						& \multicolumn{3}{|c|}{} & 0x6 & \multicolumn{2}{|c|}{Syscall :} \\ \cline{5-7}
+						& \multicolumn{4}{|c|}{} & 4 & number \\ \cline{6-7}
+						& \multicolumn{4}{|c|}{} & 4 & size\_info\_syscall \\ \cline{5-7}
+						& \multicolumn{3}{|c|}{} & 0x7 & \multicolumn{2}{|c|}{Not retrieved} \\ \cline{5-7}
+						& \multicolumn{3}{|c|}{} & 0xff & \multicolumn{2}{|c|}{Commentary :} \\ \cline{5-7}
+%						& \multicolumn{4}{|c|}{} & 4 & size\_comment \\ \cline{6-7}
+						& \multicolumn{4}{|c|}{} & size\_comment & comment \\ \hline
+
+			
+
+\end{tabular}
+
+\chapter{Syscall}
+
+\section{Linux - x86}
+
+\subsection{File manipulation}
+
+\subsubsection*{open}
+
+\begin{itemize}
+  \item \textbf{eax} : 5
+  \item \textbf{ebx} : char* filename
+  \item \textbf{ecx} : int flags
+  \item \textbf{edx} : int mode
+  \item \textbf{eax} (return value) : int fd
+\end{itemize}
+\begin{tabular}{| c | c | }
+\hline
+1 & syscall\_number = 5 \\ \hline 
+%1 & filename \\ \hline 
+%1 & size\_name \\ \hline 
+size\_name & filename \\ \hline 
+1 & flags \\ \hline 
+1 & mode \\ \hline
+\end{tabular}
+
+\subsubsection*{read}
+%read :
+\begin{itemize}
+  \item \textbf{eax} : 3
+  \item \textbf{ebx} : unsigned int fd
+  \item \textbf{ecx} : char * buf\footnote{Pour la trace, on note l'adresse de buf, puis à la fin du syscall on note aussi ce qui a été lu non?}
+  \item \textbf{edx} : size count
+  \item \textbf{eax} (return value) : effective size count
+\end{itemize}
+\noindent
+\begin{tabular}{ | c | c | }
+\hline
+1 & syscall\_number = 3 \\ \hline 
+1 & fd \\ \hline 
+1 & buf \\ \hline 
+1 & count \\ \hline
+effective count & *buf \\ \hline
+\end{tabular}
+
+\subsubsection*{write}
+%write :
+\begin{itemize}
+  \item \textbf{eax} : 4
+  \item \textbf{ebx} : unsigned int fd
+  \item \textbf{ecx} : char * buf
+  \item \textbf{edx} : size count
+  \item \textbf{eax} (return value) : effective size count
+\end{itemize}
+\begin{tabular}{ | c | c | }
+\hline
+1 & syscall\_number = 4 \\ \hline 
+1 & fd \\ \hline 
+1 & buf \\ \hline 
+1 & count \\ \hline
+effective count & *buf \\ \hline
+\end{tabular}
+\\
+\subsection{Network manipulation}\footnote{}
+Note : Pour le réseau, le syscall number est le meme socketcall (102 ) et en fonction de ebx, le syscall reseau est appele\\
+%\url{http://jkukunas.blogspot.fr/2010/05/x86-linux-networking-system-calls.html}
+%\url{http://lxr.free-electrons.com/source/include/linux/syscalls.h?v=3.10#L574}
+connect
+\begin{itemize}
+\item \textbf{eax} : 102
+\item \textbf{ebx} : 3
+\item \textbf{ecx} : unsigned  long * args
+\item \textbf{ecx[0]} : socket
+\item \textbf{ecx[1]} : sockaddr
+\item \textbf{ecx[2]} : addrlen
+\end{itemize}
+\begin{tabular}{| c | c | }
+\hline
+1 & syscall\_number = 102 \\ \hline 
+1 & call = 3 \\ \hline 
+1 & socket \\ \hline 
+1 & sockaddr  \\ \hline
+struct sockaddr & *sockaddr \\ \hline
+1 & addrlen  \\ \hline
+\end{tabular}
+\\
+send
+\begin{itemize}
+\item \textbf{eax} : 102
+\item \textbf{ebx} : 9
+\item \textbf{ecx} : unsigned  long * args
+\item \textbf{ecx[0]} : socket
+\item \textbf{ecx[1]} : buff
+\item \textbf{ecx[2]} : len
+\end{itemize}
+\begin{tabular}{| c | c | }
+\hline
+1 & syscall\_number = 102 \\ \hline 
+1 & call = 9 \\ \hline 
+1 & socket \\ \hline 
+1 & len \\ \hline 
+1 & buf  \\ \hline
+len & *buf  \\ \hline
+\end{tabular}
+\\
+sendto
+\begin{itemize}
+\item \textbf{eax} : 102
+\item \textbf{ebx} : 11
+\item \textbf{ecx} : unsigned  long * args
+\item \textbf{ecx[0]} : socket
+\item \textbf{ecx[1]} : buff
+\item \textbf{ecx[2]} : len
+\item \textbf{ecx[3]} : sockaddr
+\item \textbf{ecx[4]} : addrlen
+\end{itemize}
+\begin{tabular}{| c | c | }
+\hline
+1 & syscall\_number = 102 \\ \hline 
+1 & call = 11 \\ \hline 
+1 & socket \\ \hline 
+1 & len \\ \hline 
+1 & buf  \\ \hline
+len & *buf  \\ \hline
+1 & sockaddr  \\ \hline
+struct sockaddr & *sockaddr \\ \hline
+1 & addrlen  \\ \hline
+\end{tabular}
+\\
+recv
+\begin{itemize}
+\item \textbf{eax} : 102
+\item \textbf{ebx} : 10
+\item \textbf{ecx} : unsigned  long * args
+\item \textbf{ecx[0]} : socket
+\item \textbf{ecx[1]} : buff
+\item \textbf{ecx[2]} : len
+\end{itemize}
+\begin{tabular}{| c | c | }
+\hline
+1 & syscall\_number = 102 \\ \hline 
+1 & call = 10 \\ \hline 
+1 & socket \\ \hline 
+1 & len \\ \hline 
+1 & buf  \\ \hline
+len & *buf  \\ \hline
+\end{tabular}
+\\
+recvfrom
+\begin{itemize}
+\item \textbf{eax} : 102
+\item \textbf{ebx} : 12
+\item \textbf{ecx} : unsigned  long * args
+\item \textbf{ecx[0]} : socket
+\item \textbf{ecx[1]} : buff
+\item \textbf{ecx[2]} : len
+\item \textbf{ecx[3]} : sockaddr
+\item \textbf{ecx[4]} : addrlen
+\end{itemize}
+\begin{tabular}{| c | c | }
+\hline
+1 & syscall\_number = 102 \\ \hline 
+1 & call = 12 \\ \hline 
+1 & socket \\ \hline 
+1 & len \\ \hline 
+1 & buf  \\ \hline
+len & *buf  \\ \hline
+1 & sockaddr  \\ \hline
+struct sockaddr & *sockaddr \\ \hline
+1 & addrlen  \\ \hline
+\end{tabular}
+\\
+
+
+\end{document}
+
+

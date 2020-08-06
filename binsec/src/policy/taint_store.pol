@@ -1,0 +1,4 @@
+* :: @[?a] := _ :: !a :: istainted(Ti, !a) || istainted(Tp, !a) => Ps
+* :: @[?a] := _ :: !a :: * => C
+default => Ps
+

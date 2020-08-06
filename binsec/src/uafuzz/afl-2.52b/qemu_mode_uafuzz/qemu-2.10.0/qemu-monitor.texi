@@ -1,0 +1,558 @@
+@table @option
+@item help or ? [@var{cmd}]
+@findex help
+Show the help for all commands or just for command @var{cmd}.
+@item commit
+@findex commit
+Commit changes to the disk images (if -snapshot is used) or backing files.
+If the backing file is smaller than the snapshot, then the backing file will be
+resized to be the same size as the snapshot.  If the snapshot is smaller than
+the backing file, the backing file will not be truncated.  If you want the
+backing file to match the size of the smaller snapshot, you can safely truncate
+it yourself once the commit operation successfully completes.
+@item q or quit
+@findex quit
+Quit the emulator.
+@item block_resize
+@findex block_resize
+Resize a block image while a guest is running.  Usually requires guest
+action to see the updated size.  Resize to a lower size is supported,
+but should be used with extreme caution.  Note that this command only
+resizes image files, it can not resize block devices like LVM volumes.
+@item block_stream
+@findex block_stream
+Copy data from a backing file into a block device.
+@item block_job_set_speed
+@findex block_job_set_speed
+Set maximum speed for a background block operation.
+@item block_job_cancel
+@findex block_job_cancel
+Stop an active background block operation (streaming, mirroring).
+@item block_job_complete
+@findex block_job_complete
+Manually trigger completion of an active background block operation.
+For mirroring, this will switch the device to the destination path.
+@item block_job_pause
+@findex block_job_pause
+Pause an active block streaming operation.
+@item block_job_resume
+@findex block_job_resume
+Resume a paused block streaming operation.
+@item eject [-f] @var{device}
+@findex eject
+Eject a removable medium (use -f to force it).
+@item drive_del @var{device}
+@findex drive_del
+Remove host block device.  The result is that guest generated IO is no longer
+submitted against the host device underlying the disk.  Once a drive has
+been deleted, the QEMU Block layer returns -EIO which results in IO
+errors in the guest for applications that are reading/writing to the device.
+These errors are always reported to the guest, regardless of the drive's error
+actions (drive options rerror, werror).
+@item change @var{device} @var{setting}
+@findex change
+Change the configuration of a device.
+
+@table @option
+@item change @var{diskdevice} @var{filename} [@var{format} [@var{read-only-mode}]]
+Change the medium for a removable disk device to point to @var{filename}. eg
+
+@example
+(qemu) change ide1-cd0 /path/to/some.iso
+@end example
+
+@var{format} is optional.
+
+@var{read-only-mode} may be used to change the read-only status of the device.
+It accepts the following values:
+
+@table @var
+@item retain
+Retains the current status; this is the default.
+
+@item read-only
+Makes the device read-only.
+
+@item read-write
+Makes the device writable.
+@end table
+
+@item change vnc @var{display},@var{options}
+Change the configuration of the VNC server. The valid syntax for @var{display}
+and @var{options} are described at @ref{sec_invocation}. eg
+
+@example
+(qemu) change vnc localhost:1
+@end example
+
+@item change vnc password [@var{password}]
+
+Change the password associated with the VNC server. If the new password is not
+supplied, the monitor will prompt for it to be entered. VNC passwords are only
+significant up to 8 letters. eg
+
+@example
+(qemu) change vnc password
+Password: ********
+@end example
+
+@end table
+@item screendump @var{filename}
+@findex screendump
+Save screen into PPM image @var{filename}.
+@item logfile @var{filename}
+@findex logfile
+Output logs to @var{filename}.
+@item trace-event
+@findex trace-event
+changes status of a trace event
+@item trace-file on|off|flush
+@findex trace-file
+Open, close, or flush the trace file.  If no argument is given, the status of the trace file is displayed.
+@item log @var{item1}[,...]
+@findex log
+Activate logging of the specified items.
+@item savevm [@var{tag}|@var{id}]
+@findex savevm
+Create a snapshot of the whole virtual machine. If @var{tag} is
+provided, it is used as human readable identifier. If there is already
+a snapshot with the same tag or ID, it is replaced. More info at
+@ref{vm_snapshots}.
+@item loadvm @var{tag}|@var{id}
+@findex loadvm
+Set the whole virtual machine to the snapshot identified by the tag
+@var{tag} or the unique snapshot ID @var{id}.
+@item delvm @var{tag}|@var{id}
+@findex delvm
+Delete the snapshot identified by @var{tag} or @var{id}.
+@item singlestep [off]
+@findex singlestep
+Run the emulation in single step mode.
+If called with option off, the emulation returns to normal mode.
+@item stop
+@findex stop
+Stop emulation.
+@item c or cont
+@findex cont
+Resume emulation.
+@item system_wakeup
+@findex system_wakeup
+Wakeup guest from suspend.
+@item gdbserver [@var{port}]
+@findex gdbserver
+Start gdbserver session (default @var{port}=1234)
+@item x/fmt @var{addr}
+@findex x
+Virtual memory dump starting at @var{addr}.
+@item xp /@var{fmt} @var{addr}
+@findex xp
+Physical memory dump starting at @var{addr}.
+
+@var{fmt} is a format which tells the command how to format the
+data. Its syntax is: @option{/@{count@}@{format@}@{size@}}
+
+@table @var
+@item count
+is the number of items to be dumped.
+
+@item format
+can be x (hex), d (signed decimal), u (unsigned decimal), o (octal),
+c (char) or i (asm instruction).
+
+@item size
+can be b (8 bits), h (16 bits), w (32 bits) or g (64 bits). On x86,
+@code{h} or @code{w} can be specified with the @code{i} format to
+respectively select 16 or 32 bit code instruction size.
+
+@end table
+
+Examples:
+@itemize
+@item
+Dump 10 instructions at the current instruction pointer:
+@example
+(qemu) x/10i $eip
+0x90107063:  ret
+0x90107064:  sti
+0x90107065:  lea    0x0(%esi,1),%esi
+0x90107069:  lea    0x0(%edi,1),%edi
+0x90107070:  ret
+0x90107071:  jmp    0x90107080
+0x90107073:  nop
+0x90107074:  nop
+0x90107075:  nop
+0x90107076:  nop
+@end example
+
+@item
+Dump 80 16 bit values at the start of the video memory.
+@smallexample
+(qemu) xp/80hx 0xb8000
+0x000b8000: 0x0b50 0x0b6c 0x0b65 0x0b78 0x0b38 0x0b36 0x0b2f 0x0b42
+0x000b8010: 0x0b6f 0x0b63 0x0b68 0x0b73 0x0b20 0x0b56 0x0b47 0x0b41
+0x000b8020: 0x0b42 0x0b69 0x0b6f 0x0b73 0x0b20 0x0b63 0x0b75 0x0b72
+0x000b8030: 0x0b72 0x0b65 0x0b6e 0x0b74 0x0b2d 0x0b63 0x0b76 0x0b73
+0x000b8040: 0x0b20 0x0b30 0x0b35 0x0b20 0x0b4e 0x0b6f 0x0b76 0x0b20
+0x000b8050: 0x0b32 0x0b30 0x0b30 0x0b33 0x0720 0x0720 0x0720 0x0720
+0x000b8060: 0x0720 0x0720 0x0720 0x0720 0x0720 0x0720 0x0720 0x0720
+0x000b8070: 0x0720 0x0720 0x0720 0x0720 0x0720 0x0720 0x0720 0x0720
+0x000b8080: 0x0720 0x0720 0x0720 0x0720 0x0720 0x0720 0x0720 0x0720
+0x000b8090: 0x0720 0x0720 0x0720 0x0720 0x0720 0x0720 0x0720 0x0720
+@end smallexample
+@end itemize
+@item gpa2hva @var{addr}
+@findex gpa2hva
+Print the host virtual address at which the guest's physical address @var{addr}
+is mapped.
+@item gpa2hpa @var{addr}
+@findex gpa2hpa
+Print the host physical address at which the guest's physical address @var{addr}
+is mapped.
+@item p or print/@var{fmt} @var{expr}
+@findex print
+Print expression value. Only the @var{format} part of @var{fmt} is
+used.
+@item i/@var{fmt} @var{addr} [.@var{index}]
+@findex i
+Read I/O port.
+@item o/@var{fmt} @var{addr} @var{val}
+@findex o
+Write to I/O port.
+@item sendkey @var{keys}
+@findex sendkey
+Send @var{keys} to the guest. @var{keys} could be the name of the
+key or the raw value in hexadecimal format. Use @code{-} to press
+several keys simultaneously. Example:
+@example
+sendkey ctrl-alt-f1
+@end example
+
+This command is useful to send keys that your graphical user interface
+intercepts at low level, such as @code{ctrl-alt-f1} in X Window.
+@item system_reset
+@findex system_reset
+Reset the system.
+@item system_powerdown
+@findex system_powerdown
+Power down the system (if supported).
+@item sum @var{addr} @var{size}
+@findex sum
+Compute the checksum of a memory region.
+@item usb_add @var{devname}
+@findex usb_add
+Add the USB device @var{devname}. This command is deprecated, please
+use @code{device_add} instead. For details of available devices see
+@ref{usb_devices}
+@item usb_del @var{devname}
+@findex usb_del
+Remove the USB device @var{devname} from the QEMU virtual USB
+hub. @var{devname} has the syntax @code{bus.addr}. Use the monitor
+command @code{info usb} to see the devices you can remove. This
+command is deprecated, please use @code{device_del} instead.
+@item device_add @var{config}
+@findex device_add
+Add device.
+@item device_del @var{id}
+@findex device_del
+Remove device @var{id}. @var{id} may be a short ID
+or a QOM object path.
+@item cpu @var{index}
+@findex cpu
+Set the default CPU.
+@item mouse_move @var{dx} @var{dy} [@var{dz}]
+@findex mouse_move
+Move the active mouse to the specified coordinates @var{dx} @var{dy}
+with optional scroll axis @var{dz}.
+@item mouse_button @var{val}
+@findex mouse_button
+Change the active mouse button state @var{val} (1=L, 2=M, 4=R).
+@item mouse_set @var{index}
+@findex mouse_set
+Set which mouse device receives events at given @var{index}, index
+can be obtained with
+@example
+info mice
+@end example
+@item wavcapture @var{filename} [@var{frequency} [@var{bits} [@var{channels}]]]
+@findex wavcapture
+Capture audio into @var{filename}. Using sample rate @var{frequency}
+bits per sample @var{bits} and number of channels @var{channels}.
+
+Defaults:
+@itemize @minus
+@item Sample rate = 44100 Hz - CD quality
+@item Bits = 16
+@item Number of channels = 2 - Stereo
+@end itemize
+@item stopcapture @var{index}
+@findex stopcapture
+Stop capture with a given @var{index}, index can be obtained with
+@example
+info capture
+@end example
+@item memsave @var{addr} @var{size} @var{file}
+@findex memsave
+save to disk virtual memory dump starting at @var{addr} of size @var{size}.
+@item pmemsave @var{addr} @var{size} @var{file}
+@findex pmemsave
+save to disk physical memory dump starting at @var{addr} of size @var{size}.
+@item boot_set @var{bootdevicelist}
+@findex boot_set
+Define new values for the boot device list. Those values will override
+the values specified on the command line through the @code{-boot} option.
+
+The values that can be specified here depend on the machine type, but are
+the same that can be specified in the @code{-boot} command line option.
+@item nmi @var{cpu}
+@findex nmi
+Inject an NMI on the default CPU (x86/s390) or all CPUs (ppc64).
+
+@item ringbuf_write @var{device} @var{data}
+@findex ringbuf_write
+Write @var{data} to ring buffer character device @var{device}.
+@var{data} must be a UTF-8 string.
+
+@item ringbuf_read @var{device}
+@findex ringbuf_read
+Read and print up to @var{size} bytes from ring buffer character
+device @var{device}.
+Certain non-printable characters are printed \uXXXX, where XXXX is the
+character code in hexadecimal.  Character \ is printed \\.
+Bug: can screw up when the buffer contains invalid UTF-8 sequences,
+NUL characters, after the ring buffer lost data, and when reading
+stops because the size limit is reached.
+
+@item migrate [-d] [-b] [-i] @var{uri}
+@findex migrate
+Migrate to @var{uri} (using -d to not wait for completion).
+-b for migration with full copy of disk
+-i for migration with incremental copy of disk (base image is shared)
+@item migrate_cancel
+@findex migrate_cancel
+Cancel the current VM migration.
+
+@item migrate_incoming @var{uri}
+@findex migrate_incoming
+Continue an incoming migration using the @var{uri} (that has the same syntax
+as the -incoming option).
+
+@item migrate_set_cache_size @var{value}
+@findex migrate_set_cache_size
+Set cache size to @var{value} (in bytes) for xbzrle migrations.
+@item migrate_set_speed @var{value}
+@findex migrate_set_speed
+Set maximum speed to @var{value} (in bytes) for migrations.
+@item migrate_set_downtime @var{second}
+@findex migrate_set_downtime
+Set maximum tolerated downtime (in seconds) for migration.
+@item migrate_set_capability @var{capability} @var{state}
+@findex migrate_set_capability
+Enable/Disable the usage of a capability @var{capability} for migration.
+@item migrate_set_parameter @var{parameter} @var{value}
+@findex migrate_set_parameter
+Set the parameter @var{parameter} for migration.
+@item migrate_start_postcopy
+@findex migrate_start_postcopy
+Switch in-progress migration to postcopy mode. Ignored after the end of
+migration (or once already in postcopy).
+@item x_colo_lost_heartbeat
+@findex x_colo_lost_heartbeat
+Tell COLO that heartbeat is lost, a failover or takeover is needed.
+@item client_migrate_info @var{protocol} @var{hostname} @var{port} @var{tls-port} @var{cert-subject}
+@findex client_migrate_info
+Set migration information for remote display.  This makes the server
+ask the client to automatically reconnect using the new parameters
+once migration finished successfully.  Only implemented for SPICE.
+@item dump-guest-memory [-p] @var{filename} @var{begin} @var{length}
+@item dump-guest-memory [-z|-l|-s] @var{filename}
+@findex dump-guest-memory
+Dump guest memory to @var{protocol}. The file can be processed with crash or
+gdb. Without -z|-l|-s, the dump format is ELF.
+-p: do paging to get guest's memory mapping.
+-z: dump in kdump-compressed format, with zlib compression.
+-l: dump in kdump-compressed format, with lzo compression.
+-s: dump in kdump-compressed format, with snappy compression.
+filename: dump file name.
+begin: the starting physical address. It's optional, and should be
+specified together with length.
+length: the memory size, in bytes. It's optional, and should be specified
+together with begin.
+@item dump-skeys @var{filename}
+@findex dump-skeys
+Save guest storage keys to a file.
+@item migration_mode @var{mode}
+@findex migration_mode
+Enables or disables migration mode.
+@item snapshot_blkdev
+@findex snapshot_blkdev
+Snapshot device, using snapshot file as target if provided
+@item snapshot_blkdev_internal
+@findex snapshot_blkdev_internal
+Take an internal snapshot on device if it support
+@item snapshot_delete_blkdev_internal
+@findex snapshot_delete_blkdev_internal
+Delete an internal snapshot on device if it support
+@item drive_mirror
+@findex drive_mirror
+Start mirroring a block device's writes to a new destination,
+using the specified target.
+@item drive_backup
+@findex drive_backup
+Start a point-in-time copy of a block device to a specificed target.
+@item drive_add
+@findex drive_add
+Add drive to PCI storage controller.
+@item pcie_aer_inject_error
+@findex pcie_aer_inject_error
+Inject PCIe AER error
+@item host_net_add
+@findex host_net_add
+Add host VLAN client. Deprecated, please use @code{netdev_add} instead.
+@item host_net_remove
+@findex host_net_remove
+Remove host VLAN client. Deprecated, please use @code{netdev_del} instead.
+@item netdev_add
+@findex netdev_add
+Add host network device.
+@item netdev_del
+@findex netdev_del
+Remove host network device.
+@item object_add
+@findex object_add
+Create QOM object.
+@item object_del
+@findex object_del
+Destroy QOM object.
+@item hostfwd_add
+@findex hostfwd_add
+Redirect TCP or UDP connections from host to guest (requires -net user).
+@item hostfwd_remove
+@findex hostfwd_remove
+Remove host-to-guest TCP or UDP redirection.
+@item balloon @var{value}
+@findex balloon
+Request VM to change its memory allocation to @var{value} (in MB).
+@item set_link @var{name} [on|off]
+@findex set_link
+Switch link @var{name} on (i.e. up) or off (i.e. down).
+@item watchdog_action
+@findex watchdog_action
+Change watchdog action.
+@item acl_show @var{aclname}
+@findex acl_show
+List all the matching rules in the access control list, and the default
+policy. There are currently two named access control lists,
+@var{vnc.x509dname} and @var{vnc.username} matching on the x509 client
+certificate distinguished name, and SASL username respectively.
+@item acl_policy @var{aclname} @code{allow|deny}
+@findex acl_policy
+Set the default access control list policy, used in the event that
+none of the explicit rules match. The default policy at startup is
+always @code{deny}.
+@item acl_add @var{aclname} @var{match} @code{allow|deny} [@var{index}]
+@findex acl_add
+Add a match rule to the access control list, allowing or denying access.
+The match will normally be an exact username or x509 distinguished name,
+but can optionally include wildcard globs. eg @code{*@@EXAMPLE.COM} to
+allow all users in the @code{EXAMPLE.COM} kerberos realm. The match will
+normally be appended to the end of the ACL, but can be inserted
+earlier in the list if the optional @var{index} parameter is supplied.
+@item acl_remove @var{aclname} @var{match}
+@findex acl_remove
+Remove the specified match rule from the access control list.
+@item acl_reset @var{aclname}
+@findex acl_reset
+Remove all matches from the access control list, and set the default
+policy back to @code{deny}.
+@item nbd_server_start @var{host}:@var{port}
+@findex nbd_server_start
+Start an NBD server on the given host and/or port.  If the @option{-a}
+option is included, all of the virtual machine's block devices that
+have an inserted media on them are automatically exported; in this case,
+the @option{-w} option makes the devices writable too.
+@item nbd_server_add @var{device}
+@findex nbd_server_add
+Export a block device through QEMU's NBD server, which must be started
+beforehand with @command{nbd_server_start}.  The @option{-w} option makes the
+exported device writable too.
+@item nbd_server_stop
+@findex nbd_server_stop
+Stop the QEMU embedded NBD server.
+@item mce @var{cpu} @var{bank} @var{status} @var{mcgstatus} @var{addr} @var{misc}
+@findex mce (x86)
+Inject an MCE on the given CPU (x86 only).
+@item getfd @var{fdname}
+@findex getfd
+If a file descriptor is passed alongside this command using the SCM_RIGHTS
+mechanism on unix sockets, it is stored using the name @var{fdname} for
+later use by other monitor commands.
+@item closefd @var{fdname}
+@findex closefd
+Close the file descriptor previously assigned to @var{fdname} using the
+@code{getfd} command. This is only needed if the file descriptor was never
+used by another monitor command.
+@item block_passwd @var{device} @var{password}
+@findex block_passwd
+Set the encrypted device @var{device} password to @var{password}
+
+This command is now obsolete and will always return an error since 2.10
+@item block_set_io_throttle @var{device} @var{bps} @var{bps_rd} @var{bps_wr} @var{iops} @var{iops_rd} @var{iops_wr}
+@findex block_set_io_throttle
+Change I/O throttle limits for a block drive to @var{bps} @var{bps_rd} @var{bps_wr} @var{iops} @var{iops_rd} @var{iops_wr}
+@item set_password [ vnc | spice ] password [ action-if-connected ]
+@findex set_password
+Change spice/vnc password.  Use zero to make the password stay valid
+forever.  @var{action-if-connected} specifies what should happen in
+case a connection is established: @var{fail} makes the password change
+fail.  @var{disconnect} changes the password and disconnects the
+client.  @var{keep} changes the password and keeps the connection up.
+@var{keep} is the default.
+@item expire_password [ vnc | spice ] expire-time
+@findex expire_password
+Specify when a password for spice/vnc becomes
+invalid. @var{expire-time} accepts:
+
+@table @var
+@item now
+Invalidate password instantly.
+
+@item never
+Password stays valid forever.
+
+@item +nsec
+Password stays valid for @var{nsec} seconds starting now.
+
+@item nsec
+Password is invalidated at the given time.  @var{nsec} are the seconds
+passed since 1970, i.e. unix epoch.
+
+@end table
+@item chardev-add args
+@findex chardev-add
+chardev-add accepts the same parameters as the -chardev command line switch.
+
+@item chardev-change args
+@findex chardev-change
+chardev-change accepts existing chardev @var{id} and then the same arguments
+as the -chardev command line switch (except for "id").
+
+@item chardev-remove id
+@findex chardev-remove
+Removes the chardev @var{id}.
+
+@item chardev-send-break id
+@findex chardev-send-break
+Send a break on the chardev @var{id}.
+
+@item qemu-io @var{device} @var{command}
+@findex qemu-io
+Executes a qemu-io command on the given block device.
+
+@item cpu-add @var{id}
+@findex cpu-add
+Add CPU with id @var{id}
+@item qom-list [@var{path}]
+Print QOM properties of object at location @var{path}
+@item qom-set @var{path} @var{property} @var{value}
+Set QOM property @var{property} of object at location @var{path} to value @var{value}
+@end table

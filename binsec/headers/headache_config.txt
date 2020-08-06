@@ -1,0 +1,76 @@
+##################
+# Objective Caml #
+##################
+| ".*\.mly"      -> frame open:"/*" line:"*" close:"*/"
+| ".*\.ml[il4]?.*" -> frame open:"(*" line:"*" close:"*)"
+
+############
+# C source #
+############
+| ".*\.h"      -> frame open:"/*" line:"*" close:"*/"
+| ".*\.cpp"      -> frame open:"/*" line:"*" close:"*/"
+| ".*\.hpp"      -> frame open:"/*" line:"*" close:"*/"
+| ".*\.i"      -> frame open:"/*" line:"*" close:"*/"
+| ".*\.c"      -> frame open:"/*" line:"*" close:"*/"
+| ".*\.ast"    -> frame open:"//" line:" " close:" "
+| ".*\.cc"     -> frame open:"/*" line:"*" close:"*/"
+
+
+###################
+# Protocol buffer #
+###################
+| ".*\.proto"  -> frame open:"//" line:" " close:" "
+
+
+#######
+# Asm #
+#######
+| ".*\.S"      -> frame open:"/*" line:"*" close:"*/"
+
+#############
+# Configure #
+#############
+| ".*config\.h\.in" -> frame open:"/*"  line:"*" close:"*/"
+| ".*configure\..*" -> frame open:"#"  line:"#" close:"#"
+
+############
+# Makefile #
+############
+| ".*Make.*" -> frame open:"#"  line:"#" close:"#"
+| ".*\.mk" -> frame open:"#"  line:"#" close:"#"
+| ".*\.mk\.in" -> frame open:"#"  line:"#" close:"#"
+
+
+#################
+# Shell scripts #
+#################
+| ".*\.sh" -> frame open:"#"  line:"#" close:"#"
+
+################
+# Perl scripts #
+################
+| ".*\.perl" -> frame open:"#"  line:"#" close:"#"
+
+#########################
+# MS-Windows Ressources #
+#########################
+| ".*\.rc" -> frame open:"#"  line:"#" close:"#"
+
+#############
+# man pages #
+#############
+| ".*\.[1-9]" -> frame open:".\\\"" line: " " close:""
+
+
+########
+# HTML #
+########
+| ".*\.htm.*" -> frame open: "<!--" line: " " close: "-->"
+
+
+#######
+# CSS #
+#######
+| ".*\.css" -> frame open: "/*" line: "*" close: "*/"
+# plug-in's ocamldoc introductions
+| "intro_.*\.txt" -> frame open: "@ignore" line: " " close: ""

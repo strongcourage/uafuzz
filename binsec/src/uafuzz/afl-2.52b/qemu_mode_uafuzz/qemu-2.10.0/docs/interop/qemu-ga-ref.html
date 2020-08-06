@@ -1,0 +1,2010 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<!-- This is the QEMU Guest Agent Protocol reference manual.
+
+Copyright (C) 2016 The QEMU Project developers
+
+This manual is free documentation: you can redistribute it and/or
+modify it under the terms of the GNU General Public License as
+published by the Free Software Foundation, either version 2 of the
+License, or (at your option) any later version.
+
+This manual is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this manual.  If not, see http://www.gnu.org/licenses/. -->
+<!-- Created by GNU Texinfo 6.1, http://www.gnu.org/software/texinfo/ -->
+<head>
+<title>QEMU Guest Agent Protocol Reference</title>
+
+<meta name="description" content="QEMU Guest Agent Protocol Reference">
+<meta name="keywords" content="QEMU Guest Agent Protocol Reference">
+<meta name="resource-type" content="document">
+<meta name="distribution" content="global">
+<meta name="Generator" content="makeinfo">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link href="#Top" rel="start" title="Top">
+<link href="#Commands-and-Events-Index" rel="index" title="Commands and Events Index">
+<link href="#SEC_Contents" rel="contents" title="Table of Contents">
+<link href="dir.html#Top" rel="up" title="(dir)">
+<style type="text/css">
+<!--
+a.summary-letter {text-decoration: none}
+blockquote.indentedblock {margin-right: 0em}
+blockquote.smallindentedblock {margin-right: 0em; font-size: smaller}
+blockquote.smallquotation {font-size: smaller}
+div.display {margin-left: 3.2em}
+div.example {margin-left: 3.2em}
+div.lisp {margin-left: 3.2em}
+div.smalldisplay {margin-left: 3.2em}
+div.smallexample {margin-left: 3.2em}
+div.smalllisp {margin-left: 3.2em}
+kbd {font-style: oblique}
+pre.display {font-family: inherit}
+pre.format {font-family: inherit}
+pre.menu-comment {font-family: serif}
+pre.menu-preformatted {font-family: serif}
+pre.smalldisplay {font-family: inherit; font-size: smaller}
+pre.smallexample {font-size: smaller}
+pre.smallformat {font-family: inherit; font-size: smaller}
+pre.smalllisp {font-size: smaller}
+span.nolinebreak {white-space: nowrap}
+span.roman {font-family: initial; font-weight: normal}
+span.sansserif {font-family: sans-serif; font-weight: normal}
+ul.no-bullet {list-style: none}
+-->
+</style>
+
+
+</head>
+
+<body lang="en">
+<h1 class="settitle" align="center">QEMU Guest Agent Protocol Reference</h1>
+
+
+
+
+
+
+
+
+<a name="SEC_Contents"></a>
+<h2 class="contents-heading">Table of Contents</h2>
+
+<div class="contents">
+
+<ul class="no-bullet">
+  <li><a name="toc-API-Reference-1" href="#API-Reference">1 API Reference</a></li>
+  <li><a name="toc-Commands-and-Events-Index-1" href="#Commands-and-Events-Index">Commands and Events Index</a></li>
+  <li><a name="toc-Data-Types-Index-1" href="#Data-Types-Index">Data Types Index</a></li>
+</ul>
+</div>
+
+
+<a name="Top"></a>
+<a name="QEMU-Guest-Agent-protocol-reference"></a>
+<h1 class="top">QEMU Guest Agent protocol reference</h1>
+
+
+<hr>
+<a name="API-Reference"></a>
+<a name="API-Reference-1"></a>
+<h2 class="chapter">1 API Reference</h2>
+
+
+<p>General note concerning the use of guest agent interfaces:
+</p>
+<p>&quot;unsupported&quot; is a higher-level error than the errors that individual
+commands might document. The caller should always be prepared to receive
+QERR_UNSUPPORTED, even if the given command doesn&rsquo;t specify it, or doesn&rsquo;t
+document any failure mode at all.
+</p>
+
+<dl>
+<dt><a name="index-guest_002dsync_002ddelimited"></a>Command: <em></em> <strong>guest-sync-delimited</strong></dt>
+<dd>
+<p>Echo back a unique integer value, and prepend to response a
+leading sentinel byte (0xFF) the client can check scan for.
+</p>
+<p>This is used by clients talking to the guest agent over the
+wire to ensure the stream is in sync and doesn&rsquo;t contain stale
+data from previous client. It must be issued upon initial
+connection, and after any client-side timeouts (including
+timeouts on receiving a response to this command).
+</p>
+<p>After issuing this request, all guest agent responses should be
+ignored until the response containing the unique integer value
+the client passed in is returned. Receival of the 0xFF sentinel
+byte must be handled as an indication that the client&rsquo;s
+lexer/tokenizer/parser state should be flushed/reset in
+preparation for reliably receiving the subsequent response. As
+an optimization, clients may opt to ignore all data until a
+sentinel value is receiving to avoid unnecessary processing of
+stale data.
+</p>
+<p>Similarly, clients should also precede this <strong>request</strong>
+with a 0xFF byte to make sure the guest agent flushes any
+partially read JSON data from a previous client connection.
+</p>
+<p><b>Arguments:</b>
+</p><dl compact="compact">
+<dt><code>id: int</code></dt>
+<dd><p>randomly generated 64-bit integer
+</p></dd>
+</dl>
+
+
+<p><b>Returns:</b>
+The unique integer id passed in by the client
+</p>
+<p><b>Since:</b>
+1.1
+</p>
+</dd></dl>
+
+
+
+<dl>
+<dt><a name="index-guest_002dsync"></a>Command: <em></em> <strong>guest-sync</strong></dt>
+<dd>
+<p>Echo back a unique integer value
+</p>
+<p>This is used by clients talking to the guest agent over the
+wire to ensure the stream is in sync and doesn&rsquo;t contain stale
+data from previous client. All guest agent responses should be
+ignored until the provided unique integer value is returned,
+and it is up to the client to handle stale whole or
+partially-delivered JSON text in such a way that this response
+can be obtained.
+</p>
+<p>In cases where a partial stale response was previously
+received by the client, this cannot always be done reliably.
+One particular scenario being if qemu-ga responses are fed
+character-by-character into a JSON parser. In these situations,
+using guest-sync-delimited may be optimal.
+</p>
+<p>For clients that fetch responses line by line and convert them
+to JSON objects, guest-sync should be sufficient, but note that
+in cases where the channel is dirty some attempts at parsing the
+response may result in a parser error.
+</p>
+<p>Such clients should also precede this command
+with a 0xFF byte to make sure the guest agent flushes any
+partially read JSON data from a previous session.
+</p>
+<p><b>Arguments:</b>
+</p><dl compact="compact">
+<dt><code>id: int</code></dt>
+<dd><p>randomly generated 64-bit integer
+</p></dd>
+</dl>
+
+
+<p><b>Returns:</b>
+The unique integer id passed in by the client
+</p>
+<p><b>Since:</b>
+0.15.0
+</p>
+</dd></dl>
+
+
+
+<dl>
+<dt><a name="index-guest_002dping"></a>Command: <em></em> <strong>guest-ping</strong></dt>
+<dd>
+<p>Ping the guest agent, a non-error return implies success
+</p>
+
+<p><b>Since:</b>
+0.15.0
+</p>
+</dd></dl>
+
+
+
+<dl>
+<dt><a name="index-guest_002dget_002dtime"></a>Command: <em></em> <strong>guest-get-time</strong></dt>
+<dd>
+<p>Get the information about guest&rsquo;s System Time relative to
+the Epoch of 1970-01-01 in UTC.
+</p>
+
+<p><b>Returns:</b>
+Time in nanoseconds.
+</p>
+<p><b>Since:</b>
+1.5
+</p>
+</dd></dl>
+
+
+
+<dl>
+<dt><a name="index-guest_002dset_002dtime"></a>Command: <em></em> <strong>guest-set-time</strong></dt>
+<dd>
+<p>Set guest time.
+</p>
+<p>When a guest is paused or migrated to a file then loaded
+from that file, the guest OS has no idea that there
+was a big gap in the time. Depending on how long the
+gap was, NTP might not be able to resynchronize the
+guest.
+</p>
+<p>This command tries to set guest&rsquo;s System Time to the
+given value, then sets the Hardware Clock (RTC) to the
+current System Time. This will make it easier for a guest
+to resynchronize without waiting for NTP. If no <code>time</code> is
+specified, then the time to set is read from RTC. However,
+this may not be supported on all platforms (i.e. Windows).
+If that&rsquo;s the case users are advised to always pass a
+value.
+</p>
+<p><b>Arguments:</b>
+</p><dl compact="compact">
+<dt><code>time: int</code> (optional)</dt>
+<dd><p>time of nanoseconds, relative to the Epoch
+of 1970-01-01 in UTC.
+</p></dd>
+</dl>
+
+
+<p><b>Returns:</b>
+Nothing on success.
+</p>
+<p><b>Since:</b>
+1.5
+</p>
+</dd></dl>
+
+
+
+<dl>
+<dt><a name="index-GuestAgentCommandInfo"></a>Object: <strong>GuestAgentCommandInfo</strong></dt>
+<dd>
+<p>Information about guest agent commands.
+</p>
+<p><b>Members:</b>
+</p><dl compact="compact">
+<dt><code>name: string</code></dt>
+<dd><p>name of the command
+</p></dd>
+<dt><code>enabled: boolean</code></dt>
+<dd><p>whether command is currently enabled by guest admin
+</p></dd>
+<dt><code>success-response: boolean</code></dt>
+<dd><p>whether command returns a response on success
+(since 1.7)
+</p></dd>
+</dl>
+
+
+<p><b>Since:</b>
+1.1.0
+</p>
+</dd></dl>
+
+
+
+<dl>
+<dt><a name="index-GuestAgentInfo"></a>Object: <strong>GuestAgentInfo</strong></dt>
+<dd>
+<p>Information about guest agent.
+</p>
+<p><b>Members:</b>
+</p><dl compact="compact">
+<dt><code>version: string</code></dt>
+<dd><p>guest agent version
+</p></dd>
+<dt><code>supported_commands: array of GuestAgentCommandInfo</code></dt>
+<dd><p>Information about guest agent commands
+</p></dd>
+</dl>
+
+
+<p><b>Since:</b>
+0.15.0
+</p>
+</dd></dl>
+
+
+
+<dl>
+<dt><a name="index-guest_002dinfo"></a>Command: <em></em> <strong>guest-info</strong></dt>
+<dd>
+<p>Get some information about the guest agent.
+</p>
+
+<p><b>Returns:</b>
+<code>GuestAgentInfo</code>
+</p>
+<p><b>Since:</b>
+0.15.0
+</p>
+</dd></dl>
+
+
+
+<dl>
+<dt><a name="index-guest_002dshutdown"></a>Command: <em></em> <strong>guest-shutdown</strong></dt>
+<dd>
+<p>Initiate guest-activated shutdown. Note: this is an asynchronous
+shutdown request, with no guarantee of successful shutdown.
+</p>
+<p><b>Arguments:</b>
+</p><dl compact="compact">
+<dt><code>mode: string</code> (optional)</dt>
+<dd><p>&quot;halt&quot;, &quot;powerdown&quot; (default), or &quot;reboot&quot;
+</p></dd>
+</dl>
+<p>This command does NOT return a response on success. Success condition
+is indicated by the VM exiting with a zero exit status or, when
+running with &ndash;no-shutdown, by issuing the query-status QMP command
+to confirm the VM status is &quot;shutdown&quot;.
+</p>
+<p><b>Since:</b>
+0.15.0
+</p>
+</dd></dl>
+
+
+
+<dl>
+<dt><a name="index-guest_002dfile_002dopen"></a>Command: <em></em> <strong>guest-file-open</strong></dt>
+<dd>
+<p>Open a file in the guest and retrieve a file handle for it
+</p>
+<p><b>Arguments:</b>
+</p><dl compact="compact">
+<dt><code>path: string</code></dt>
+<dd><p>Full path to the file in the guest to open.
+</p></dd>
+<dt><code>mode: string</code> (optional)</dt>
+<dd><p>open mode, as per fopen(), &quot;r&quot; is the default.
+</p></dd>
+</dl>
+
+
+<p><b>Returns:</b>
+Guest file handle on success.
+</p>
+<p><b>Since:</b>
+0.15.0
+</p>
+</dd></dl>
+
+
+
+<dl>
+<dt><a name="index-guest_002dfile_002dclose"></a>Command: <em></em> <strong>guest-file-close</strong></dt>
+<dd>
+<p>Close an open file in the guest
+</p>
+<p><b>Arguments:</b>
+</p><dl compact="compact">
+<dt><code>handle: int</code></dt>
+<dd><p>filehandle returned by guest-file-open
+</p></dd>
+</dl>
+
+
+<p><b>Returns:</b>
+Nothing on success.
+</p>
+<p><b>Since:</b>
+0.15.0
+</p>
+</dd></dl>
+
+
+
+<dl>
+<dt><a name="index-GuestFileRead"></a>Object: <strong>GuestFileRead</strong></dt>
+<dd>
+<p>Result of guest agent file-read operation
+</p>
+<p><b>Members:</b>
+</p><dl compact="compact">
+<dt><code>count: int</code></dt>
+<dd><p>number of bytes read (note: count is <strong>before</strong>
+base64-encoding is applied)
+</p></dd>
+<dt><code>buf-b64: string</code></dt>
+<dd><p>base64-encoded bytes read
+</p></dd>
+<dt><code>eof: boolean</code></dt>
+<dd><p>whether EOF was encountered during read operation.
+</p></dd>
+</dl>
+
+
+<p><b>Since:</b>
+0.15.0
+</p>
+</dd></dl>
+
+
+
+<dl>
+<dt><a name="index-guest_002dfile_002dread"></a>Command: <em></em> <strong>guest-file-read</strong></dt>
+<dd>
+<p>Read from an open file in the guest. Data will be base64-encoded
+</p>
+<p><b>Arguments:</b>
+</p><dl compact="compact">
+<dt><code>handle: int</code></dt>
+<dd><p>filehandle returned by guest-file-open
+</p></dd>
+<dt><code>count: int</code> (optional)</dt>
+<dd><p>maximum number of bytes to read (default is 4KB)
+</p></dd>
+</dl>
+
+
+<p><b>Returns:</b>
+<code>GuestFileRead</code> on success.
+</p>
+<p><b>Since:</b>
+0.15.0
+</p>
+</dd></dl>
+
+
+
+<dl>
+<dt><a name="index-GuestFileWrite"></a>Object: <strong>GuestFileWrite</strong></dt>
+<dd>
+<p>Result of guest agent file-write operation
+</p>
+<p><b>Members:</b>
+</p><dl compact="compact">
+<dt><code>count: int</code></dt>
+<dd><p>number of bytes written (note: count is actual bytes
+written, after base64-decoding of provided buffer)
+</p></dd>
+<dt><code>eof: boolean</code></dt>
+<dd><p>whether EOF was encountered during write operation.
+</p></dd>
+</dl>
+
+
+<p><b>Since:</b>
+0.15.0
+</p>
+</dd></dl>
+
+
+
+<dl>
+<dt><a name="index-guest_002dfile_002dwrite"></a>Command: <em></em> <strong>guest-file-write</strong></dt>
+<dd>
+<p>Write to an open file in the guest.
+</p>
+<p><b>Arguments:</b>
+</p><dl compact="compact">
+<dt><code>handle: int</code></dt>
+<dd><p>filehandle returned by guest-file-open
+</p></dd>
+<dt><code>buf-b64: string</code></dt>
+<dd><p>base64-encoded string representing data to be written
+</p></dd>
+<dt><code>count: int</code> (optional)</dt>
+<dd><p>bytes to write (actual bytes, after base64-decode),
+default is all content in buf-b64 buffer after base64 decoding
+</p></dd>
+</dl>
+
+
+<p><b>Returns:</b>
+<code>GuestFileWrite</code> on success.
+</p>
+<p><b>Since:</b>
+0.15.0
+</p>
+</dd></dl>
+
+
+
+<dl>
+<dt><a name="index-GuestFileSeek"></a>Object: <strong>GuestFileSeek</strong></dt>
+<dd>
+<p>Result of guest agent file-seek operation
+</p>
+<p><b>Members:</b>
+</p><dl compact="compact">
+<dt><code>position: int</code></dt>
+<dd><p>current file position
+</p></dd>
+<dt><code>eof: boolean</code></dt>
+<dd><p>whether EOF was encountered during file seek
+</p></dd>
+</dl>
+
+
+<p><b>Since:</b>
+0.15.0
+</p>
+</dd></dl>
+
+
+
+<dl>
+<dt><a name="index-QGASeek"></a>Enum: <strong>QGASeek</strong></dt>
+<dd>
+<p>Symbolic names for use in <code>guest-file-seek</code>
+</p>
+<p><b>Values:</b>
+</p><dl compact="compact">
+<dt><code>set</code></dt>
+<dd><p>Set to the specified offset (same effect as &rsquo;whence&rsquo;:0)
+</p></dd>
+<dt><code>cur</code></dt>
+<dd><p>Add offset to the current location (same effect as &rsquo;whence&rsquo;:1)
+</p></dd>
+<dt><code>end</code></dt>
+<dd><p>Add offset to the end of the file (same effect as &rsquo;whence&rsquo;:2)
+</p></dd>
+</dl>
+
+
+<p><b>Since:</b>
+2.6
+</p>
+</dd></dl>
+
+
+
+<dl>
+<dt><a name="index-GuestFileWhence"></a>Alternate: <strong>GuestFileWhence</strong></dt>
+<dd>
+<p>Controls the meaning of offset to <code>guest-file-seek</code>.
+</p>
+<p><b>Members:</b>
+</p><dl compact="compact">
+<dt><code>value: int</code></dt>
+<dd><p>Integral value (0 for set, 1 for cur, 2 for end), available
+for historical reasons, and might differ from the host&rsquo;s or
+guest&rsquo;s SEEK_* values (since: 0.15)
+</p></dd>
+<dt><code>name: QGASeek</code></dt>
+<dd><p>Symbolic name, and preferred interface
+</p></dd>
+</dl>
+
+
+<p><b>Since:</b>
+2.6
+</p>
+</dd></dl>
+
+
+
+<dl>
+<dt><a name="index-guest_002dfile_002dseek"></a>Command: <em></em> <strong>guest-file-seek</strong></dt>
+<dd>
+<p>Seek to a position in the file, as with fseek(), and return the
+current file position afterward. Also encapsulates ftell()&rsquo;s
+functionality, with offset=0 and whence=1.
+</p>
+<p><b>Arguments:</b>
+</p><dl compact="compact">
+<dt><code>handle: int</code></dt>
+<dd><p>filehandle returned by guest-file-open
+</p></dd>
+<dt><code>offset: int</code></dt>
+<dd><p>bytes to skip over in the file stream
+</p></dd>
+<dt><code>whence: GuestFileWhence</code></dt>
+<dd><p>Symbolic or numeric code for interpreting offset
+</p></dd>
+</dl>
+
+
+<p><b>Returns:</b>
+<code>GuestFileSeek</code> on success.
+</p>
+<p><b>Since:</b>
+0.15.0
+</p>
+</dd></dl>
+
+
+
+<dl>
+<dt><a name="index-guest_002dfile_002dflush"></a>Command: <em></em> <strong>guest-file-flush</strong></dt>
+<dd>
+<p>Write file changes bufferred in userspace to disk/kernel buffers
+</p>
+<p><b>Arguments:</b>
+</p><dl compact="compact">
+<dt><code>handle: int</code></dt>
+<dd><p>filehandle returned by guest-file-open
+</p></dd>
+</dl>
+
+
+<p><b>Returns:</b>
+Nothing on success.
+</p>
+<p><b>Since:</b>
+0.15.0
+</p>
+</dd></dl>
+
+
+
+<dl>
+<dt><a name="index-GuestFsfreezeStatus"></a>Enum: <strong>GuestFsfreezeStatus</strong></dt>
+<dd>
+<p>An enumeration of filesystem freeze states
+</p>
+<p><b>Values:</b>
+</p><dl compact="compact">
+<dt><code>thawed</code></dt>
+<dd><p>filesystems thawed/unfrozen
+</p></dd>
+<dt><code>frozen</code></dt>
+<dd><p>all non-network guest filesystems frozen
+</p></dd>
+</dl>
+
+
+<p><b>Since:</b>
+0.15.0
+</p>
+</dd></dl>
+
+
+
+<dl>
+<dt><a name="index-guest_002dfsfreeze_002dstatus"></a>Command: <em></em> <strong>guest-fsfreeze-status</strong></dt>
+<dd>
+<p>Get guest fsfreeze state. error state indicates
+</p>
+
+<p><b>Returns:</b>
+GuestFsfreezeStatus (&quot;thawed&quot;, &quot;frozen&quot;, etc., as defined below)
+</p>
+<p><b>Note:</b>
+This may fail to properly report the current state as a result of
+some other guest processes having issued an fs freeze/thaw.
+</p>
+<p><b>Since:</b>
+0.15.0
+</p>
+</dd></dl>
+
+
+
+<dl>
+<dt><a name="index-guest_002dfsfreeze_002dfreeze"></a>Command: <em></em> <strong>guest-fsfreeze-freeze</strong></dt>
+<dd>
+<p>Sync and freeze all freezable, local guest filesystems. If this
+command succeeded, you may call <code>guest-fsfreeze-thaw</code> later to
+unfreeze.
+</p>
+
+<p><b>Note:</b>
+On Windows, the command is implemented with the help of a
+Volume Shadow-copy Service DLL helper. The frozen state is limited
+for up to 10 seconds by VSS.
+</p>
+<p><b>Returns:</b>
+Number of file systems currently frozen. On error, all filesystems
+will be thawed.
+</p>
+<p><b>Since:</b>
+0.15.0
+</p>
+</dd></dl>
+
+
+
+<dl>
+<dt><a name="index-guest_002dfsfreeze_002dfreeze_002dlist"></a>Command: <em></em> <strong>guest-fsfreeze-freeze-list</strong></dt>
+<dd>
+<p>Sync and freeze specified guest filesystems.
+See also <code>guest-fsfreeze-freeze</code>.
+</p>
+<p><b>Arguments:</b>
+</p><dl compact="compact">
+<dt><code>mountpoints: array of string</code> (optional)</dt>
+<dd><p>an array of mountpoints of filesystems to be frozen.
+If omitted, every mounted filesystem is frozen.
+Invalid mount points are ignored.
+</p></dd>
+</dl>
+
+
+<p><b>Returns:</b>
+Number of file systems currently frozen. On error, all filesystems
+will be thawed.
+</p>
+<p><b>Since:</b>
+2.2
+</p>
+</dd></dl>
+
+
+
+<dl>
+<dt><a name="index-guest_002dfsfreeze_002dthaw"></a>Command: <em></em> <strong>guest-fsfreeze-thaw</strong></dt>
+<dd>
+<p>Unfreeze all frozen guest filesystems
+</p>
+
+<p><b>Returns:</b>
+Number of file systems thawed by this call
+</p>
+<p><b>Note:</b>
+if return value does not match the previous call to
+guest-fsfreeze-freeze, this likely means some freezable
+filesystems were unfrozen before this call, and that the
+filesystem state may have changed before issuing this
+command.
+</p>
+<p><b>Since:</b>
+0.15.0
+</p>
+</dd></dl>
+
+
+
+<dl>
+<dt><a name="index-GuestFilesystemTrimResult"></a>Object: <strong>GuestFilesystemTrimResult</strong></dt>
+<dd>
+
+
+<p><b>Members:</b>
+</p><dl compact="compact">
+<dt><code>path: string</code></dt>
+<dd><p>path that was trimmed
+</p></dd>
+<dt><code>error: string</code> (optional)</dt>
+<dd><p>an error message when trim failed
+</p></dd>
+<dt><code>trimmed: int</code> (optional)</dt>
+<dd><p>bytes trimmed for this path
+</p></dd>
+<dt><code>minimum: int</code> (optional)</dt>
+<dd><p>reported effective minimum for this path
+</p></dd>
+</dl>
+
+
+<p><b>Since:</b>
+2.4
+</p>
+</dd></dl>
+
+
+
+<dl>
+<dt><a name="index-GuestFilesystemTrimResponse"></a>Object: <strong>GuestFilesystemTrimResponse</strong></dt>
+<dd>
+
+
+<p><b>Members:</b>
+</p><dl compact="compact">
+<dt><code>paths: array of GuestFilesystemTrimResult</code></dt>
+<dd><p>list of <code>GuestFilesystemTrimResult</code> per path that was trimmed
+</p></dd>
+</dl>
+
+
+<p><b>Since:</b>
+2.4
+</p>
+</dd></dl>
+
+
+
+<dl>
+<dt><a name="index-guest_002dfstrim"></a>Command: <em></em> <strong>guest-fstrim</strong></dt>
+<dd>
+<p>Discard (or &quot;trim&quot;) blocks which are not in use by the filesystem.
+</p>
+<p><b>Arguments:</b>
+</p><dl compact="compact">
+<dt><code>minimum: int</code> (optional)</dt>
+<dd><p>Minimum contiguous free range to discard, in bytes. Free ranges
+smaller than this may be ignored (this is a hint and the guest
+may not respect it).  By increasing this value, the fstrim
+operation will complete more quickly for filesystems with badly
+fragmented free space, although not all blocks will be discarded.
+The default value is zero, meaning &quot;discard every free block&quot;.
+</p></dd>
+</dl>
+
+
+<p><b>Returns:</b>
+A <code>GuestFilesystemTrimResponse</code> which contains the
+status of all trimmed paths. (since 2.4)
+</p>
+<p><b>Since:</b>
+1.2
+</p>
+</dd></dl>
+
+
+
+<dl>
+<dt><a name="index-guest_002dsuspend_002ddisk"></a>Command: <em></em> <strong>guest-suspend-disk</strong></dt>
+<dd>
+<p>Suspend guest to disk.
+</p>
+<p>This command tries to execute the scripts provided by the pm-utils package.
+If it&rsquo;s not available, the suspend operation will be performed by manually
+writing to a sysfs file.
+</p>
+<p>For the best results it&rsquo;s strongly recommended to have the pm-utils
+package installed in the guest.
+</p>
+<p>This command does NOT return a response on success. There is a high chance
+the command succeeded if the VM exits with a zero exit status or, when
+running with &ndash;no-shutdown, by issuing the query-status QMP command to
+to confirm the VM status is &quot;shutdown&quot;. However, the VM could also exit
+(or set its status to &quot;shutdown&quot;) due to other reasons.
+</p>
+<p>The following errors may be returned:
+If suspend to disk is not supported, Unsupported
+</p>
+
+<p><b>Notes:</b>
+It&rsquo;s strongly recommended to issue the guest-sync command before
+sending commands when the guest resumes
+</p>
+<p><b>Since:</b>
+1.1
+</p>
+</dd></dl>
+
+
+
+<dl>
+<dt><a name="index-guest_002dsuspend_002dram"></a>Command: <em></em> <strong>guest-suspend-ram</strong></dt>
+<dd>
+<p>Suspend guest to ram.
+</p>
+<p>This command tries to execute the scripts provided by the pm-utils package.
+If it&rsquo;s not available, the suspend operation will be performed by manually
+writing to a sysfs file.
+</p>
+<p>For the best results it&rsquo;s strongly recommended to have the pm-utils
+package installed in the guest.
+</p>
+<p>IMPORTANT: guest-suspend-ram requires QEMU to support the &rsquo;system_wakeup&rsquo;
+command.  Thus, it&rsquo;s <strong>required</strong> to query QEMU for the presence of the
+&rsquo;system_wakeup&rsquo; command before issuing guest-suspend-ram.
+</p>
+<p>This command does NOT return a response on success. There are two options
+to check for success:
+</p><ol>
+<li> Wait for the SUSPEND QMP event from QEMU
+</li><li> Issue the query-status QMP command to confirm the VM status is
+&quot;suspended&quot;
+
+</li></ol>
+
+<p>The following errors may be returned:
+If suspend to ram is not supported, Unsupported
+</p>
+
+<p><b>Notes:</b>
+It&rsquo;s strongly recommended to issue the guest-sync command before
+sending commands when the guest resumes
+</p>
+<p><b>Since:</b>
+1.1
+</p>
+</dd></dl>
+
+
+
+<dl>
+<dt><a name="index-guest_002dsuspend_002dhybrid"></a>Command: <em></em> <strong>guest-suspend-hybrid</strong></dt>
+<dd>
+<p>Save guest state to disk and suspend to ram.
+</p>
+<p>This command requires the pm-utils package to be installed in the guest.
+</p>
+<p>IMPORTANT: guest-suspend-hybrid requires QEMU to support the &rsquo;system_wakeup&rsquo;
+command.  Thus, it&rsquo;s <strong>required</strong> to query QEMU for the presence of the
+&rsquo;system_wakeup&rsquo; command before issuing guest-suspend-hybrid.
+</p>
+<p>This command does NOT return a response on success. There are two options
+to check for success:
+</p><ol>
+<li> Wait for the SUSPEND QMP event from QEMU
+</li><li> Issue the query-status QMP command to confirm the VM status is
+&quot;suspended&quot;
+
+</li></ol>
+
+<p>The following errors may be returned:
+If hybrid suspend is not supported, Unsupported
+</p>
+
+<p><b>Notes:</b>
+It&rsquo;s strongly recommended to issue the guest-sync command before
+sending commands when the guest resumes
+</p>
+<p><b>Since:</b>
+1.1
+</p>
+</dd></dl>
+
+
+
+<dl>
+<dt><a name="index-GuestIpAddressType"></a>Enum: <strong>GuestIpAddressType</strong></dt>
+<dd>
+<p>An enumeration of supported IP address types
+</p>
+<p><b>Values:</b>
+</p><dl compact="compact">
+<dt><code>ipv4</code></dt>
+<dd><p>IP version 4
+</p></dd>
+<dt><code>ipv6</code></dt>
+<dd><p>IP version 6
+</p></dd>
+</dl>
+
+
+<p><b>Since:</b>
+1.1
+</p>
+</dd></dl>
+
+
+
+<dl>
+<dt><a name="index-GuestIpAddress"></a>Object: <strong>GuestIpAddress</strong></dt>
+<dd>
+
+
+<p><b>Members:</b>
+</p><dl compact="compact">
+<dt><code>ip-address: string</code></dt>
+<dd><p>IP address
+</p></dd>
+<dt><code>ip-address-type: GuestIpAddressType</code></dt>
+<dd><p>Type of <code>ip-address</code> (e.g. ipv4, ipv6)
+</p></dd>
+<dt><code>prefix: int</code></dt>
+<dd><p>Network prefix length of <code>ip-address</code>
+</p></dd>
+</dl>
+
+
+<p><b>Since:</b>
+1.1
+</p>
+</dd></dl>
+
+
+
+<dl>
+<dt><a name="index-GuestNetworkInterface"></a>Object: <strong>GuestNetworkInterface</strong></dt>
+<dd>
+
+
+<p><b>Members:</b>
+</p><dl compact="compact">
+<dt><code>name: string</code></dt>
+<dd><p>The name of interface for which info are being delivered
+</p></dd>
+<dt><code>hardware-address: string</code> (optional)</dt>
+<dd><p>Hardware address of <code>name</code>
+</p></dd>
+<dt><code>ip-addresses: array of GuestIpAddress</code> (optional)</dt>
+<dd><p>List of addresses assigned to <code>name</code>
+</p></dd>
+</dl>
+
+
+<p><b>Since:</b>
+1.1
+</p>
+</dd></dl>
+
+
+
+<dl>
+<dt><a name="index-guest_002dnetwork_002dget_002dinterfaces"></a>Command: <em></em> <strong>guest-network-get-interfaces</strong></dt>
+<dd>
+<p>Get list of guest IP addresses, MAC addresses
+and netmasks.
+</p>
+
+<p><b>Returns:</b>
+List of GuestNetworkInfo on success.
+</p>
+<p><b>Since:</b>
+1.1
+</p>
+</dd></dl>
+
+
+
+<dl>
+<dt><a name="index-GuestLogicalProcessor"></a>Object: <strong>GuestLogicalProcessor</strong></dt>
+<dd>
+
+
+<p><b>Members:</b>
+</p><dl compact="compact">
+<dt><code>logical-id: int</code></dt>
+<dd><p>Arbitrary guest-specific unique identifier of the VCPU.
+</p></dd>
+<dt><code>online: boolean</code></dt>
+<dd><p>Whether the VCPU is enabled.
+</p></dd>
+<dt><code>can-offline: boolean</code> (optional)</dt>
+<dd><p>Whether offlining the VCPU is possible. This member
+is always filled in by the guest agent when the structure is
+returned, and always ignored on input (hence it can be omitted
+then).
+</p></dd>
+</dl>
+
+
+<p><b>Since:</b>
+1.5
+</p>
+</dd></dl>
+
+
+
+<dl>
+<dt><a name="index-guest_002dget_002dvcpus"></a>Command: <em></em> <strong>guest-get-vcpus</strong></dt>
+<dd>
+<p>Retrieve the list of the guest&rsquo;s logical processors.
+</p>
+<p>This is a read-only operation.
+</p>
+
+<p><b>Returns:</b>
+The list of all VCPUs the guest knows about. Each VCPU is put on the
+list exactly once, but their order is unspecified.
+</p>
+<p><b>Since:</b>
+1.5
+</p>
+</dd></dl>
+
+
+
+<dl>
+<dt><a name="index-guest_002dset_002dvcpus"></a>Command: <em></em> <strong>guest-set-vcpus</strong></dt>
+<dd>
+<p>Attempt to reconfigure (currently: enable/disable) logical processors inside
+the guest.
+</p>
+<p>The input list is processed node by node in order. In each node <code>logical-id</code>
+is used to look up the guest VCPU, for which <code>online</code> specifies the requested
+state. The set of distinct <code>logical-id</code>&rsquo;s is only required to be a subset of
+the guest-supported identifiers. There&rsquo;s no restriction on list length or on
+repeating the same <code>logical-id</code> (with possibly different <code>online</code> field).
+Preferably the input list should describe a modified subset of
+<code>guest-get-vcpus</code>&rsquo; return value.
+</p>
+<p><b>Arguments:</b>
+</p><dl compact="compact">
+<dt><code>vcpus: array of GuestLogicalProcessor</code></dt>
+<dd><p>Not documented
+</p></dd>
+</dl>
+
+
+<p><b>Returns:</b>
+The length of the initial sublist that has been successfully
+processed. The guest agent maximizes this value. Possible cases:
+</p>
+<ul class="no-bullet">
+<li>- 0:              if the <code>vcpus</code> list was empty on input. Guest state
+has not been changed. Otherwise,
+</li><li>- Error:          processing the first node of <code>vcpus</code> failed for the
+reason returned. Guest state has not been changed.
+Otherwise,
+</li><li>- &lt; length(<code>vcpus</code>): more than zero initial nodes have been processed,
+but not the entire <code>vcpus</code> list. Guest state has
+changed accordingly. To retrieve the error
+(assuming it persists), repeat the call with the
+successfully processed initial sublist removed.
+Otherwise,
+</li><li>- length(<code>vcpus</code>): call successful.
+</li></ul>
+
+
+<p><b>Since:</b>
+1.5
+</p>
+</dd></dl>
+
+
+
+<dl>
+<dt><a name="index-GuestDiskBusType"></a>Enum: <strong>GuestDiskBusType</strong></dt>
+<dd>
+<p>An enumeration of bus type of disks
+</p>
+<p><b>Values:</b>
+</p><dl compact="compact">
+<dt><code>ide</code></dt>
+<dd><p>IDE disks
+</p></dd>
+<dt><code>fdc</code></dt>
+<dd><p>floppy disks
+</p></dd>
+<dt><code>scsi</code></dt>
+<dd><p>SCSI disks
+</p></dd>
+<dt><code>virtio</code></dt>
+<dd><p>virtio disks
+</p></dd>
+<dt><code>xen</code></dt>
+<dd><p>Xen disks
+</p></dd>
+<dt><code>usb</code></dt>
+<dd><p>USB disks
+</p></dd>
+<dt><code>uml</code></dt>
+<dd><p>UML disks
+</p></dd>
+<dt><code>sata</code></dt>
+<dd><p>SATA disks
+</p></dd>
+<dt><code>sd</code></dt>
+<dd><p>SD cards
+</p></dd>
+<dt><code>unknown</code></dt>
+<dd><p>Unknown bus type
+</p></dd>
+<dt><code>ieee1394</code></dt>
+<dd><p>Win IEEE 1394 bus type
+</p></dd>
+<dt><code>ssa</code></dt>
+<dd><p>Win SSA bus type
+</p></dd>
+<dt><code>fibre</code></dt>
+<dd><p>Win fiber channel bus type
+</p></dd>
+<dt><code>raid</code></dt>
+<dd><p>Win RAID bus type
+</p></dd>
+<dt><code>iscsi</code></dt>
+<dd><p>Win iScsi bus type
+</p></dd>
+<dt><code>sas</code></dt>
+<dd><p>Win serial-attaches SCSI bus type
+</p></dd>
+<dt><code>mmc</code></dt>
+<dd><p>Win multimedia card (MMC) bus type
+</p></dd>
+<dt><code>virtual</code></dt>
+<dd><p>Win virtual bus type
+<code>file-backed</code> virtual: Win file-backed bus type
+</p></dd>
+<dt><code>file-backed-virtual</code></dt>
+<dd><p>Not documented
+</p></dd>
+</dl>
+
+
+<p><b>Since:</b>
+2.2; &rsquo;Unknown&rsquo; and all entries below since 2.4
+</p>
+</dd></dl>
+
+
+
+<dl>
+<dt><a name="index-GuestPCIAddress"></a>Object: <strong>GuestPCIAddress</strong></dt>
+<dd>
+
+
+<p><b>Members:</b>
+</p><dl compact="compact">
+<dt><code>domain: int</code></dt>
+<dd><p>domain id
+</p></dd>
+<dt><code>bus: int</code></dt>
+<dd><p>bus id
+</p></dd>
+<dt><code>slot: int</code></dt>
+<dd><p>slot id
+</p></dd>
+<dt><code>function: int</code></dt>
+<dd><p>function id
+</p></dd>
+</dl>
+
+
+<p><b>Since:</b>
+2.2
+</p>
+</dd></dl>
+
+
+
+<dl>
+<dt><a name="index-GuestDiskAddress"></a>Object: <strong>GuestDiskAddress</strong></dt>
+<dd>
+
+
+<p><b>Members:</b>
+</p><dl compact="compact">
+<dt><code>pci-controller: GuestPCIAddress</code></dt>
+<dd><p>controller&rsquo;s PCI address
+</p></dd>
+<dt><code>bus-type: GuestDiskBusType</code></dt>
+<dd><p>bus type
+</p></dd>
+<dt><code>bus: int</code></dt>
+<dd><p>bus id
+</p></dd>
+<dt><code>target: int</code></dt>
+<dd><p>target id
+</p></dd>
+<dt><code>unit: int</code></dt>
+<dd><p>unit id
+</p></dd>
+</dl>
+
+
+<p><b>Since:</b>
+2.2
+</p>
+</dd></dl>
+
+
+
+<dl>
+<dt><a name="index-GuestFilesystemInfo"></a>Object: <strong>GuestFilesystemInfo</strong></dt>
+<dd>
+
+
+<p><b>Members:</b>
+</p><dl compact="compact">
+<dt><code>name: string</code></dt>
+<dd><p>disk name
+</p></dd>
+<dt><code>mountpoint: string</code></dt>
+<dd><p>mount point path
+</p></dd>
+<dt><code>type: string</code></dt>
+<dd><p>file system type string
+</p></dd>
+<dt><code>disk: array of GuestDiskAddress</code></dt>
+<dd><p>an array of disk hardware information that the volume lies on,
+which may be empty if the disk type is not supported
+</p></dd>
+</dl>
+
+
+<p><b>Since:</b>
+2.2
+</p>
+</dd></dl>
+
+
+
+<dl>
+<dt><a name="index-guest_002dget_002dfsinfo"></a>Command: <em></em> <strong>guest-get-fsinfo</strong></dt>
+<dd>
+
+
+
+<p><b>Returns:</b>
+The list of filesystems information mounted in the guest.
+The returned mountpoints may be specified to
+<code>guest-fsfreeze-freeze-list</code>.
+Network filesystems (such as CIFS and NFS) are not listed.
+</p>
+<p><b>Since:</b>
+2.2
+</p>
+</dd></dl>
+
+
+
+<dl>
+<dt><a name="index-guest_002dset_002duser_002dpassword"></a>Command: <em></em> <strong>guest-set-user-password</strong></dt>
+<dd>
+
+
+<p><b>Arguments:</b>
+</p><dl compact="compact">
+<dt><code>username: string</code></dt>
+<dd><p>the user account whose password to change
+</p></dd>
+<dt><code>password: string</code></dt>
+<dd><p>the new password entry string, base64 encoded
+</p></dd>
+<dt><code>crypted: boolean</code></dt>
+<dd><p>true if password is already crypt()d, false if raw
+</p></dd>
+</dl>
+<p>If the <code>crypted</code> flag is true, it is the caller&rsquo;s responsibility
+to ensure the correct crypt() encryption scheme is used. This
+command does not attempt to interpret or report on the encryption
+scheme. Refer to the documentation of the guest operating system
+in question to determine what is supported.
+</p>
+<p>Not all guest operating systems will support use of the
+<code>crypted</code> flag, as they may require the clear-text password
+</p>
+<p>The <code>password</code> parameter must always be base64 encoded before
+transmission, even if already crypt()d, to ensure it is 8-bit
+safe when passed as JSON.
+</p>
+<p><b>Returns:</b>
+Nothing on success.
+</p>
+<p><b>Since:</b>
+2.3
+</p>
+</dd></dl>
+
+
+
+<dl>
+<dt><a name="index-GuestMemoryBlock"></a>Object: <strong>GuestMemoryBlock</strong></dt>
+<dd>
+
+
+<p><b>Members:</b>
+</p><dl compact="compact">
+<dt><code>phys-index: int</code></dt>
+<dd><p>Arbitrary guest-specific unique identifier of the MEMORY BLOCK.
+</p></dd>
+<dt><code>online: boolean</code></dt>
+<dd><p>Whether the MEMORY BLOCK is enabled in guest.
+</p></dd>
+<dt><code>can-offline: boolean</code> (optional)</dt>
+<dd><p>Whether offlining the MEMORY BLOCK is possible.
+This member is always filled in by the guest agent when the
+structure is returned, and always ignored on input (hence it
+can be omitted then).
+</p></dd>
+</dl>
+
+
+<p><b>Since:</b>
+2.3
+</p>
+</dd></dl>
+
+
+
+<dl>
+<dt><a name="index-guest_002dget_002dmemory_002dblocks"></a>Command: <em></em> <strong>guest-get-memory-blocks</strong></dt>
+<dd>
+<p>Retrieve the list of the guest&rsquo;s memory blocks.
+</p>
+<p>This is a read-only operation.
+</p>
+
+<p><b>Returns:</b>
+The list of all memory blocks the guest knows about.
+Each memory block is put on the list exactly once, but their order
+is unspecified.
+</p>
+<p><b>Since:</b>
+2.3
+</p>
+</dd></dl>
+
+
+
+<dl>
+<dt><a name="index-GuestMemoryBlockResponseType"></a>Enum: <strong>GuestMemoryBlockResponseType</strong></dt>
+<dd>
+<p>An enumeration of memory block operation result.
+</p>
+<p><b>Values:</b>
+</p><dl compact="compact">
+<dt><code>success</code></dt>
+<dd><p>the operation of online/offline memory block is successful.
+</p></dd>
+<dt><code>not-found</code></dt>
+<dd><p>can&rsquo;t find the corresponding memoryXXX directory in sysfs.
+</p></dd>
+<dt><code>operation-not-supported</code></dt>
+<dd><p>for some old kernels, it does not support
+online or offline memory block.
+</p></dd>
+<dt><code>operation-failed</code></dt>
+<dd><p>the operation of online/offline memory block fails,
+because of some errors happen.
+</p></dd>
+</dl>
+
+
+<p><b>Since:</b>
+2.3
+</p>
+</dd></dl>
+
+
+
+<dl>
+<dt><a name="index-GuestMemoryBlockResponse"></a>Object: <strong>GuestMemoryBlockResponse</strong></dt>
+<dd>
+
+
+<p><b>Members:</b>
+</p><dl compact="compact">
+<dt><code>phys-index: int</code></dt>
+<dd><p>same with the &rsquo;phys-index&rsquo; member of <code>GuestMemoryBlock</code>.
+</p></dd>
+<dt><code>response: GuestMemoryBlockResponseType</code></dt>
+<dd><p>the result of memory block operation.
+</p></dd>
+<dt><code>error-code: int</code> (optional)</dt>
+<dd><p>the error number.
+When memory block operation fails, we assign the value of
+&rsquo;errno&rsquo; to this member, it indicates what goes wrong.
+When the operation succeeds, it will be omitted.
+</p></dd>
+</dl>
+
+
+<p><b>Since:</b>
+2.3
+</p>
+</dd></dl>
+
+
+
+<dl>
+<dt><a name="index-guest_002dset_002dmemory_002dblocks"></a>Command: <em></em> <strong>guest-set-memory-blocks</strong></dt>
+<dd>
+<p>Attempt to reconfigure (currently: enable/disable) state of memory blocks
+inside the guest.
+</p>
+<p>The input list is processed node by node in order. In each node <code>phys-index</code>
+is used to look up the guest MEMORY BLOCK, for which <code>online</code> specifies the
+requested state. The set of distinct <code>phys-index</code>&rsquo;s is only required to be a
+subset of the guest-supported identifiers. There&rsquo;s no restriction on list
+length or on repeating the same <code>phys-index</code> (with possibly different <code>online</code>
+field).
+Preferably the input list should describe a modified subset of
+<code>guest-get-memory-blocks</code>&rsquo; return value.
+</p>
+<p><b>Arguments:</b>
+</p><dl compact="compact">
+<dt><code>mem-blks: array of GuestMemoryBlock</code></dt>
+<dd><p>Not documented
+</p></dd>
+</dl>
+
+
+<p><b>Returns:</b>
+The operation results, it is a list of <code>GuestMemoryBlockResponse</code>,
+which is corresponding to the input list.
+</p>
+<p>Note: it will return NULL if the <code>mem-blks</code> list was empty on input,
+or there is an error, and in this case, guest state will not be
+changed.
+</p>
+<p><b>Since:</b>
+2.3
+</p>
+</dd></dl>
+
+
+
+<dl>
+<dt><a name="index-GuestMemoryBlockInfo"></a>Object: <strong>GuestMemoryBlockInfo</strong></dt>
+<dd>
+
+
+<p><b>Members:</b>
+</p><dl compact="compact">
+<dt><code>size: int</code></dt>
+<dd><p>the size (in bytes) of the guest memory blocks,
+which are the minimal units of memory block online/offline
+operations (also called Logical Memory Hotplug).
+</p></dd>
+</dl>
+
+
+<p><b>Since:</b>
+2.3
+</p>
+</dd></dl>
+
+
+
+<dl>
+<dt><a name="index-guest_002dget_002dmemory_002dblock_002dinfo"></a>Command: <em></em> <strong>guest-get-memory-block-info</strong></dt>
+<dd>
+<p>Get information relating to guest memory blocks.
+</p>
+
+<p><b>Returns:</b>
+<code>GuestMemoryBlockInfo</code>
+</p>
+<p><b>Since:</b>
+2.3
+</p>
+</dd></dl>
+
+
+
+<dl>
+<dt><a name="index-GuestExecStatus"></a>Object: <strong>GuestExecStatus</strong></dt>
+<dd>
+
+
+<p><b>Members:</b>
+</p><dl compact="compact">
+<dt><code>exited: boolean</code></dt>
+<dd><p>true if process has already terminated.
+</p></dd>
+<dt><code>exitcode: int</code> (optional)</dt>
+<dd><p>process exit code if it was normally terminated.
+</p></dd>
+<dt><code>signal: int</code> (optional)</dt>
+<dd><p>signal number (linux) or unhandled exception code
+(windows) if the process was abnormally terminated.
+</p></dd>
+<dt><code>out-data: string</code> (optional)</dt>
+<dd><p>base64-encoded stdout of the process
+</p></dd>
+<dt><code>err-data: string</code> (optional)</dt>
+<dd><p>base64-encoded stderr of the process
+Note: <code>out-data</code> and <code>err-data</code> are present only
+if &rsquo;capture-output&rsquo; was specified for &rsquo;guest-exec&rsquo;
+</p></dd>
+<dt><code>out-truncated: boolean</code> (optional)</dt>
+<dd><p>true if stdout was not fully captured
+due to size limitation.
+</p></dd>
+<dt><code>err-truncated: boolean</code> (optional)</dt>
+<dd><p>true if stderr was not fully captured
+due to size limitation.
+</p></dd>
+</dl>
+
+
+<p><b>Since:</b>
+2.5
+</p>
+</dd></dl>
+
+
+
+<dl>
+<dt><a name="index-guest_002dexec_002dstatus"></a>Command: <em></em> <strong>guest-exec-status</strong></dt>
+<dd>
+<p>Check status of process associated with PID retrieved via guest-exec.
+Reap the process and associated metadata if it has exited.
+</p>
+<p><b>Arguments:</b>
+</p><dl compact="compact">
+<dt><code>pid: int</code></dt>
+<dd><p>pid returned from guest-exec
+</p></dd>
+</dl>
+
+
+<p><b>Returns:</b>
+GuestExecStatus on success.
+</p>
+<p><b>Since:</b>
+2.5
+</p>
+</dd></dl>
+
+
+
+<dl>
+<dt><a name="index-GuestExec"></a>Object: <strong>GuestExec</strong></dt>
+<dd>
+
+
+<p><b>Members:</b>
+</p><dl compact="compact">
+<dt><code>pid: int</code></dt>
+<dd><p>pid of child process in guest OS
+</p></dd>
+</dl>
+
+
+<p><b>Since:</b>
+2.5
+</p>
+</dd></dl>
+
+
+
+<dl>
+<dt><a name="index-guest_002dexec"></a>Command: <em></em> <strong>guest-exec</strong></dt>
+<dd>
+<p>Execute a command in the guest
+</p>
+<p><b>Arguments:</b>
+</p><dl compact="compact">
+<dt><code>path: string</code></dt>
+<dd><p>path or executable name to execute
+</p></dd>
+<dt><code>arg: array of string</code> (optional)</dt>
+<dd><p>argument list to pass to executable
+</p></dd>
+<dt><code>env: array of string</code> (optional)</dt>
+<dd><p>environment variables to pass to executable
+</p></dd>
+<dt><code>input-data: string</code> (optional)</dt>
+<dd><p>data to be passed to process stdin (base64 encoded)
+</p></dd>
+<dt><code>capture-output: boolean</code> (optional)</dt>
+<dd><p>bool flag to enable capture of
+stdout/stderr of running process. defaults to false.
+</p></dd>
+</dl>
+
+
+<p><b>Returns:</b>
+PID on success.
+</p>
+<p><b>Since:</b>
+2.5
+</p>
+</dd></dl>
+
+
+
+<dl>
+<dt><a name="index-GuestHostName"></a>Object: <strong>GuestHostName</strong></dt>
+<dd>
+
+
+<p><b>Members:</b>
+</p><dl compact="compact">
+<dt><code>host-name: string</code></dt>
+<dd><p>Fully qualified domain name of the guest OS
+</p></dd>
+</dl>
+
+
+<p><b>Since:</b>
+2.10
+</p>
+</dd></dl>
+
+
+
+<dl>
+<dt><a name="index-guest_002dget_002dhost_002dname"></a>Command: <em></em> <strong>guest-get-host-name</strong></dt>
+<dd>
+<p>Return a name for the machine.
+</p>
+<p>The returned name is not necessarily a fully-qualified domain name, or even
+present in DNS or some other name service at all. It need not even be unique
+on your local network or site, but usually it is.
+</p>
+
+<p><b>Returns:</b>
+the host name of the machine on success
+</p>
+<p><b>Since:</b>
+2.10
+</p>
+</dd></dl>
+
+
+
+<dl>
+<dt><a name="index-GuestUser"></a>Object: <strong>GuestUser</strong></dt>
+<dd>
+
+
+<p><b>Members:</b>
+</p><dl compact="compact">
+<dt><code>user: string</code></dt>
+<dd><p>Username
+</p></dd>
+<dt><code>domain: string</code> (optional)</dt>
+<dd><p>Logon domain (windows only)
+</p></dd>
+<dt><code>login-time: number</code></dt>
+<dd><p>Time of login of this user on the computer. If multiple
+instances of the user are logged in, the earliest login time is
+reported. The value is in fractional seconds since epoch time.
+</p></dd>
+</dl>
+
+
+<p><b>Since:</b>
+2.10
+</p>
+</dd></dl>
+
+
+
+<dl>
+<dt><a name="index-guest_002dget_002dusers"></a>Command: <em></em> <strong>guest-get-users</strong></dt>
+<dd>
+<p>Retrieves a list of currently active users on the VM.
+</p>
+
+<p><b>Returns:</b>
+A unique list of users.
+</p>
+<p><b>Since:</b>
+2.10
+</p>
+</dd></dl>
+
+
+
+<dl>
+<dt><a name="index-GuestTimezone"></a>Object: <strong>GuestTimezone</strong></dt>
+<dd>
+
+
+<p><b>Members:</b>
+</p><dl compact="compact">
+<dt><code>zone: string</code> (optional)</dt>
+<dd><p>Timezone name. These values may differ depending on guest/OS and
+should only be used for informational purposes.
+</p></dd>
+<dt><code>offset: int</code></dt>
+<dd><p>Offset to UTC in seconds, negative numbers for time zones west of
+GMT, positive numbers for east
+</p></dd>
+</dl>
+
+
+<p><b>Since:</b>
+2.10
+</p>
+</dd></dl>
+
+
+
+<dl>
+<dt><a name="index-guest_002dget_002dtimezone"></a>Command: <em></em> <strong>guest-get-timezone</strong></dt>
+<dd>
+<p>Retrieves the timezone information from the guest.
+</p>
+
+<p><b>Returns:</b>
+A GuestTimezone dictionary.
+</p>
+<p><b>Since:</b>
+2.10
+</p>
+</dd></dl>
+
+
+
+<dl>
+<dt><a name="index-GuestOSInfo"></a>Object: <strong>GuestOSInfo</strong></dt>
+<dd>
+
+
+<p><b>Members:</b>
+</p><dl compact="compact">
+<dt><code>kernel-release: string</code> (optional)</dt>
+<dd><ul>
+<li> POSIX: release field returned by uname(2)
+</li><li> Windows: version number of the OS
+</li></ul>
+
+</dd>
+<dt><code>kernel-version: string</code> (optional)</dt>
+<dd><ul>
+<li> POSIX: version field returned by uname(2)
+</li><li> Windows: build number of the OS
+</li></ul>
+
+</dd>
+<dt><code>machine: string</code> (optional)</dt>
+<dd><ul>
+<li> POSIX: machine field returned by uname(2)
+</li><li> Windows: one of x86, x86_64, arm, ia64
+</li></ul>
+
+</dd>
+<dt><code>id: string</code> (optional)</dt>
+<dd><ul>
+<li> POSIX: as defined by os-release(5)
+</li><li> Windows: contains string &quot;mswindows&quot;
+</li></ul>
+
+</dd>
+<dt><code>name: string</code> (optional)</dt>
+<dd><ul>
+<li> POSIX: as defined by os-release(5)
+</li><li> Windows: contains string &quot;Microsoft Windows&quot;
+</li></ul>
+
+</dd>
+<dt><code>pretty-name: string</code> (optional)</dt>
+<dd><ul>
+<li> POSIX: as defined by os-release(5)
+</li><li> Windows: product name, e.g. &quot;Microsoft Windows 10 Enterprise&quot;
+</li></ul>
+
+</dd>
+<dt><code>version: string</code> (optional)</dt>
+<dd><ul>
+<li> POSIX: as defined by os-release(5)
+</li><li> Windows: long version string, e.g. &quot;Microsoft Windows Server 2008&quot;
+</li></ul>
+
+</dd>
+<dt><code>version-id: string</code> (optional)</dt>
+<dd><ul>
+<li> POSIX: as defined by os-release(5)
+</li><li> Windows: short version identifier, e.g. &quot;7&quot; or &quot;20012r2&quot;
+</li></ul>
+
+</dd>
+<dt><code>variant: string</code> (optional)</dt>
+<dd><ul>
+<li> POSIX: as defined by os-release(5)
+</li><li> Windows: contains string &quot;server&quot; or &quot;client&quot;
+</li></ul>
+
+</dd>
+<dt><code>variant-id: string</code> (optional)</dt>
+<dd><ul>
+<li> POSIX: as defined by os-release(5)
+</li><li> Windows: contains string &quot;server&quot; or &quot;client&quot;
+</li></ul>
+
+</dd>
+</dl>
+
+
+<p><b>Notes:</b>
+On POSIX systems the fields <code>id</code>, <code>name</code>, <code>pretty-name</code>, <code>version</code>, <code>version-id</code>,
+<code>variant</code> and <code>variant-id</code> follow the definition specified in os-release(5).
+Refer to the manual page for exact description of the fields. Their values
+are taken from the os-release file. If the file is not present in the system,
+or the values are not present in the file, the fields are not included.
+</p>
+<p>On Windows the values are filled from information gathered from the system.
+</p>
+<p><b>Since:</b>
+2.10
+</p>
+</dd></dl>
+
+
+
+<dl>
+<dt><a name="index-guest_002dget_002dosinfo"></a>Command: <em></em> <strong>guest-get-osinfo</strong></dt>
+<dd>
+<p>Retrieve guest operating system information
+</p>
+
+<p><b>Returns:</b>
+<code>GuestOSInfo</code>
+</p>
+<p><b>Since:</b>
+2.10
+</p>
+</dd></dl>
+
+
+
+
+<hr>
+<a name="Commands-and-Events-Index"></a>
+<a name="Commands-and-Events-Index-1"></a>
+<h2 class="unnumbered">Commands and Events Index</h2>
+<table><tr><th valign="top">Jump to: &nbsp; </th><td><a class="summary-letter" href="#Commands-and-Events-Index_fn_letter-G"><b>G</b></a>
+ &nbsp; 
+</td></tr></table>
+<table class="index-fn" border="0">
+<tr><td></td><th align="left">Index Entry</th><td>&nbsp;</td><th align="left"> Section</th></tr>
+<tr><td colspan="4"> <hr></td></tr>
+<tr><th><a name="Commands-and-Events-Index_fn_letter-G">G</a></th><td></td><td></td></tr>
+<tr><td></td><td valign="top"><a href="#index-guest_002dexec"><code>guest-exec</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#API-Reference">API Reference</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-guest_002dexec_002dstatus"><code>guest-exec-status</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#API-Reference">API Reference</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-guest_002dfile_002dclose"><code>guest-file-close</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#API-Reference">API Reference</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-guest_002dfile_002dflush"><code>guest-file-flush</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#API-Reference">API Reference</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-guest_002dfile_002dopen"><code>guest-file-open</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#API-Reference">API Reference</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-guest_002dfile_002dread"><code>guest-file-read</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#API-Reference">API Reference</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-guest_002dfile_002dseek"><code>guest-file-seek</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#API-Reference">API Reference</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-guest_002dfile_002dwrite"><code>guest-file-write</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#API-Reference">API Reference</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-guest_002dfsfreeze_002dfreeze"><code>guest-fsfreeze-freeze</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#API-Reference">API Reference</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-guest_002dfsfreeze_002dfreeze_002dlist"><code>guest-fsfreeze-freeze-list</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#API-Reference">API Reference</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-guest_002dfsfreeze_002dstatus"><code>guest-fsfreeze-status</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#API-Reference">API Reference</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-guest_002dfsfreeze_002dthaw"><code>guest-fsfreeze-thaw</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#API-Reference">API Reference</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-guest_002dfstrim"><code>guest-fstrim</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#API-Reference">API Reference</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-guest_002dget_002dfsinfo"><code>guest-get-fsinfo</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#API-Reference">API Reference</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-guest_002dget_002dhost_002dname"><code>guest-get-host-name</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#API-Reference">API Reference</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-guest_002dget_002dmemory_002dblock_002dinfo"><code>guest-get-memory-block-info</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#API-Reference">API Reference</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-guest_002dget_002dmemory_002dblocks"><code>guest-get-memory-blocks</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#API-Reference">API Reference</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-guest_002dget_002dosinfo"><code>guest-get-osinfo</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#API-Reference">API Reference</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-guest_002dget_002dtime"><code>guest-get-time</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#API-Reference">API Reference</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-guest_002dget_002dtimezone"><code>guest-get-timezone</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#API-Reference">API Reference</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-guest_002dget_002dusers"><code>guest-get-users</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#API-Reference">API Reference</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-guest_002dget_002dvcpus"><code>guest-get-vcpus</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#API-Reference">API Reference</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-guest_002dinfo"><code>guest-info</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#API-Reference">API Reference</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-guest_002dnetwork_002dget_002dinterfaces"><code>guest-network-get-interfaces</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#API-Reference">API Reference</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-guest_002dping"><code>guest-ping</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#API-Reference">API Reference</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-guest_002dset_002dmemory_002dblocks"><code>guest-set-memory-blocks</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#API-Reference">API Reference</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-guest_002dset_002dtime"><code>guest-set-time</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#API-Reference">API Reference</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-guest_002dset_002duser_002dpassword"><code>guest-set-user-password</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#API-Reference">API Reference</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-guest_002dset_002dvcpus"><code>guest-set-vcpus</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#API-Reference">API Reference</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-guest_002dshutdown"><code>guest-shutdown</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#API-Reference">API Reference</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-guest_002dsuspend_002ddisk"><code>guest-suspend-disk</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#API-Reference">API Reference</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-guest_002dsuspend_002dhybrid"><code>guest-suspend-hybrid</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#API-Reference">API Reference</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-guest_002dsuspend_002dram"><code>guest-suspend-ram</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#API-Reference">API Reference</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-guest_002dsync"><code>guest-sync</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#API-Reference">API Reference</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-guest_002dsync_002ddelimited"><code>guest-sync-delimited</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#API-Reference">API Reference</a></td></tr>
+<tr><td colspan="4"> <hr></td></tr>
+</table>
+<table><tr><th valign="top">Jump to: &nbsp; </th><td><a class="summary-letter" href="#Commands-and-Events-Index_fn_letter-G"><b>G</b></a>
+ &nbsp; 
+</td></tr></table>
+
+<hr>
+<a name="Data-Types-Index"></a>
+<a name="Data-Types-Index-1"></a>
+<h2 class="unnumbered">Data Types Index</h2>
+<table><tr><th valign="top">Jump to: &nbsp; </th><td><a class="summary-letter" href="#Data-Types-Index_tp_letter-G"><b>G</b></a>
+ &nbsp; 
+<a class="summary-letter" href="#Data-Types-Index_tp_letter-Q"><b>Q</b></a>
+ &nbsp; 
+</td></tr></table>
+<table class="index-tp" border="0">
+<tr><td></td><th align="left">Index Entry</th><td>&nbsp;</td><th align="left"> Section</th></tr>
+<tr><td colspan="4"> <hr></td></tr>
+<tr><th><a name="Data-Types-Index_tp_letter-G">G</a></th><td></td><td></td></tr>
+<tr><td></td><td valign="top"><a href="#index-GuestAgentCommandInfo"><code>GuestAgentCommandInfo</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#API-Reference">API Reference</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-GuestAgentInfo"><code>GuestAgentInfo</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#API-Reference">API Reference</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-GuestDiskAddress"><code>GuestDiskAddress</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#API-Reference">API Reference</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-GuestDiskBusType"><code>GuestDiskBusType</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#API-Reference">API Reference</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-GuestExec"><code>GuestExec</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#API-Reference">API Reference</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-GuestExecStatus"><code>GuestExecStatus</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#API-Reference">API Reference</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-GuestFileRead"><code>GuestFileRead</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#API-Reference">API Reference</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-GuestFileSeek"><code>GuestFileSeek</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#API-Reference">API Reference</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-GuestFilesystemInfo"><code>GuestFilesystemInfo</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#API-Reference">API Reference</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-GuestFilesystemTrimResponse"><code>GuestFilesystemTrimResponse</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#API-Reference">API Reference</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-GuestFilesystemTrimResult"><code>GuestFilesystemTrimResult</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#API-Reference">API Reference</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-GuestFileWhence"><code>GuestFileWhence</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#API-Reference">API Reference</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-GuestFileWrite"><code>GuestFileWrite</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#API-Reference">API Reference</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-GuestFsfreezeStatus"><code>GuestFsfreezeStatus</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#API-Reference">API Reference</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-GuestHostName"><code>GuestHostName</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#API-Reference">API Reference</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-GuestIpAddress"><code>GuestIpAddress</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#API-Reference">API Reference</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-GuestIpAddressType"><code>GuestIpAddressType</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#API-Reference">API Reference</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-GuestLogicalProcessor"><code>GuestLogicalProcessor</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#API-Reference">API Reference</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-GuestMemoryBlock"><code>GuestMemoryBlock</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#API-Reference">API Reference</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-GuestMemoryBlockInfo"><code>GuestMemoryBlockInfo</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#API-Reference">API Reference</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-GuestMemoryBlockResponse"><code>GuestMemoryBlockResponse</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#API-Reference">API Reference</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-GuestMemoryBlockResponseType"><code>GuestMemoryBlockResponseType</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#API-Reference">API Reference</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-GuestNetworkInterface"><code>GuestNetworkInterface</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#API-Reference">API Reference</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-GuestOSInfo"><code>GuestOSInfo</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#API-Reference">API Reference</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-GuestPCIAddress"><code>GuestPCIAddress</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#API-Reference">API Reference</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-GuestTimezone"><code>GuestTimezone</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#API-Reference">API Reference</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-GuestUser"><code>GuestUser</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#API-Reference">API Reference</a></td></tr>
+<tr><td colspan="4"> <hr></td></tr>
+<tr><th><a name="Data-Types-Index_tp_letter-Q">Q</a></th><td></td><td></td></tr>
+<tr><td></td><td valign="top"><a href="#index-QGASeek"><code>QGASeek</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#API-Reference">API Reference</a></td></tr>
+<tr><td colspan="4"> <hr></td></tr>
+</table>
+<table><tr><th valign="top">Jump to: &nbsp; </th><td><a class="summary-letter" href="#Data-Types-Index_tp_letter-G"><b>G</b></a>
+ &nbsp; 
+<a class="summary-letter" href="#Data-Types-Index_tp_letter-Q"><b>Q</b></a>
+ &nbsp; 
+</td></tr></table>
+
+<hr>
+
+
+
+</body>
+</html>
