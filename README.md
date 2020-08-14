@@ -115,7 +115,7 @@ The [preprocessing script](./scripts/preprocess.py) takes the tested binary in x
 ~~~
 
 ### 2. Fuzzing
-We provide a fuzzing script's template with several input parameters, for example the fuzzer we want to run, the timeout in minutes and the predefined targets (e.g., extracted from the bug report). For the example above, we use the script [CVE-2018-20623.sh](./UAFBench/CVE-2018-20623.sh) and run UAFuzz as:
+We provide a fuzzing script's template with several input parameters, for example the fuzzer we want to run, the timeout in minutes and the predefined targets (e.g., extracted from the bug report). For the example above, we use the script [CVE-2018-20623.sh](https://github.com/strongcourage/uafbench/blob/master/CVE-2018-20623.sh) and run UAFuzz as:
 ~~~bash
 # Run UAFuzz with timeout 60 minutes
 $UAFBENCH_PATH/CVE-2018-20623.sh uafuzz 60 $UAFBENCH_PATH/valgrind/CVE-2018-20623.valgrind
