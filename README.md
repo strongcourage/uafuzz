@@ -24,13 +24,24 @@ Our tested environment is Ubuntu 16.04 64-bit.
 ~~~bash
 # Install Ocaml and prerequisite packages for BINSEC via OPAM
 sudo apt update
-sudo apt install ocaml ocaml-native-compilers camlp4-extra opam
+sudo apt update
+sudo apt install ocaml ocaml-native-compilers camlp4-extra opam emacs llvm-6.0-dev pkg-config protobuf-compiler libgmp-dev libzmq3-dev cmake valgrind
 opam init
 opam switch 4.05.0
+opam depext conf-m4.1
 opam install merlin ocp-indent caml-mode tuareg menhir ocamlgraph ocamlfind piqi zmq.5.0.0 zarith llvm.6.0.0
+eval `opam config env`
 
-# Install Python's packages
-sudo pip install networkx pydot
+# Install Python's packages (Python 2 for IDA's scripts)
+sudo python -m pip install networkx pydot
+sudo apt install graphviz
+
+# Install Graph Easy
+wget https://cpan.metacpan.org/authors/id/S/SH/SHLOMIF/Graph-Easy-0.76.tar.gz 
+tar xzf Graph-Easy-0.76.tar.gz
+cd Graph-Easy-0.76
+perl Makefile.PL; make test; sudo make install
+export GRAPH_EASY_PATH=/usr/local/bin/graph-easy
 
 # Checkout source code
 git clone https://github.com/strongcourage/uafuzz.git
