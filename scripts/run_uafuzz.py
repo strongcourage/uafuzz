@@ -12,12 +12,14 @@ import time
 ida_path = os.environ['IDA_PATH']
 uafuzz_path = os.environ['UAFUZZ_PATH']
 graph_easy_path = os.environ['GRAPH_EASY_PATH']
+uafbench_path = os.environ['UAFBENCH_PATH']
 ida_script_path = uafuzz_path + "/binsec/src/ida/ida.py"
 binsec_bin_path = uafuzz_path + "/binsec/src/binsec"
 afl_uafuzz_path = uafuzz_path + "/binsec/src/uafuzz/afl-2.52b"
 default_in_dir = "in"
 seed_input = "in"
 log_mode = "result" # debug
+no_ida = False
 
 
 # Remove IDA's crashing log files
@@ -29,7 +31,7 @@ def fix_ida():
                 os.remove("/tmp/ida/" + file)
 
 
-def run_binida(bin_file, out_dir):
+def run_binida(bin_file, out_dir, no_ida):
     fix_ida()
     # create an output dir
     if not os.path.exists(out_dir):
@@ -42,37 +44,46 @@ def run_binida(bin_file, out_dir):
     ida_file = tmp_file + ".ida"
     orig_ida_file = tmp_file + ".ida_orig"
     callgraph_file = out_dir + "/callgraph.dot"
+    exist_ida_file = uafbench_path + "/ida/" + bin_name + "/" + bin_name + ".ida"
+    exist_callgraph = uafbench_path + "/ida/" + bin_name + "/callgraph.dot"
 
     # copy binary to output dir
     copyfile(bin_file, tmp_file)
     os.chmod(tmp_file, 0o777)
     os.chdir(out_dir)
 
-    # run script to get *.idb
-    ida_cmd = ida_path + " -B \"-S" + ida_script_path + " -o=" + out_dir + "\" " + tmp_file
-    os.system(ida_cmd)
-    
-    # generate the original IDA CFG
-    parse_cmd = ida_path + " -A \"-S" + ida_script_path + " -o=" + out_dir + \
-                    " -cg=True -i=True\" " + idb_file
-    os.system(parse_cmd)
-    os.system("mv " + ida_file + " " + orig_ida_file)
-    
-    # generate modified IDA CFG (each block has at most 1 call instruction)
-    parse_cmd = ida_path + " -A \"-S" + ida_script_path + " -o=" + out_dir + " -cg=True\" " + idb_file
-    os.system(parse_cmd)
-    
-    # convert call graph into dot format
-    cg_cmd = graph_easy_path + " --input=callgraph.gdl --output=callgraph.dot 2> /dev/null"
-    os.system(cg_cmd)
-    
-    # run binida
-    binida_cmd = " -ida -isa x86 -quiet -ida-o-ida " + ida_file + " -ida-loglevel " + log_mode
+    if no_ida:
+        # copy intermediate files
+        os.system("cp " + exist_ida_file + " " + ida_file)
+        os.system("cp " + exist_ida_file + "_orig " + orig_ida_file)
+        os.system("cp " + exist_callgraph + " " + callgraph_file)
+        binida_cmd = " -ida -isa x86 -quiet -ida-o-ida " + ida_file + " -ida-loglevel " + log_mode
+    else:
+        # run script to get *.idb
+        ida_cmd = ida_path + " -B \"-S" + ida_script_path + " -o=" + out_dir + "\" " + tmp_file
+        os.system(ida_cmd)
+
+        # generate the original IDA CFG
+        parse_cmd = ida_path + " -A \"-S" + ida_script_path + " -o=" + out_dir + \
+                        " -cg=True -i=True\" " + idb_file
+        os.system(parse_cmd)
+        os.system("mv " + ida_file + " " + orig_ida_file)
+
+        # generate modified IDA CFG (each block has at most 1 call instruction)
+        parse_cmd = ida_path + " -A \"-S" + ida_script_path + " -o=" + out_dir + " -cg=True\" " + idb_file
+        os.system(parse_cmd)
+
+        # convert call graph into dot format
+        cg_cmd = graph_easy_path + " --input=callgraph.gdl --output=callgraph.dot 2> /dev/null"
+        os.system(cg_cmd)
+
+        # run binida
+        binida_cmd = " -ida -isa x86 -quiet -ida-cfg-dot -ida-o-ida " + ida_file + " -ida-loglevel " + log_mode
         
     return binida_cmd
 
 
-def main(bin_file, in_dir, out, mode, cmd, targets, fuzzer, timeout):
+def main(bin_file, in_dir, out, mode, cmd, targets, fuzzer, timeout, no_ida):
     # parse mode
     if mode == "fuzz":
         out_dir = os.path.join(bin_file + "_" + fuzzer + "_" + timeout, out)
@@ -99,7 +110,7 @@ def main(bin_file, in_dir, out, mode, cmd, targets, fuzzer, timeout):
         uafuzz_out_dir = out_dir
 
     # run binida
-    binida_cmd = run_binida(bin_file, out_dir)
+    binida_cmd = run_binida(bin_file, out_dir, no_ida)
 
     # run UAFuzz
     targets_cmd = " -uafuzz-T " + targets
@@ -129,6 +140,7 @@ if __name__ == '__main__':
     parser.add_argument('-T', '--targets', type=str, required=True, help="Fuzzing targets")
     parser.add_argument('-I', '--fuzzer', type=str, required=True, help="Fuzzer to run")
     parser.add_argument('-to', '--timeout', type=str, required=False, help="Timeout (m)")
+    parser.add_argument('--no_ida', default=False, action='store_true')
 
     args = parser.parse_args()
 
@@ -137,7 +149,7 @@ if __name__ == '__main__':
     if not args.timeout:
         args.timeout = "0"
     
-    main(args.bin_file, args.in_dir, args.out_dir, args.mode, args.cmd, args.targets, args.fuzzer, args.timeout)
+    main(args.bin_file, args.in_dir, args.out_dir, args.mode, args.cmd, args.targets, args.fuzzer, args.timeout, args.no_ida)
     
     end = time.time()
     print "Preprocessing time: " + str(end - start) + " (s)"

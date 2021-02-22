@@ -13,6 +13,7 @@ from pprint import pprint
 
 ida_path = os.environ.get('IDA_PATH')
 uafuzz_path = os.environ.get('UAFUZZ_PATH')
+uafbench_path = os.environ['UAFBENCH_PATH']
 ida_script_path = uafuzz_path + "/binsec/src/ida/ida.py"
 bin_file = out_dir = ""
 funcs = defaultdict(list)
@@ -50,6 +51,7 @@ def run_binida():
     # run script to get *.idb
     ida_cmd = ida_path + " -B \"-S" + ida_script_path + " -o=" + out_dir + "\" " + tmp_file
     os.system(ida_cmd)
+    print ida_cmd
     
     # generate modified IDA CFG (each block has at most 1 call instruction)
     parse_cmd = ida_path + " -A \"-S" + ida_script_path + " -o=" + out_dir + " -cg=True\" " + idb_file
@@ -282,8 +284,12 @@ def parse_valgrind(valgrind_file):
     ft.close()
 
 
-def main(valgrind_file):
-    ida_file = run_binida()
+def main(bin_file, valgrind_file, no_ida):
+    if no_ida:
+        bin_name = os.path.basename(bin_file)
+        ida_file = uafbench_path + "/ida/" + bin_name + "/" + bin_name + ".ida"
+    else:
+        ida_file = run_binida()
     parse_ida(ida_file)
     parse_valgrind(valgrind_file)
 
@@ -297,10 +303,11 @@ if __name__ == '__main__':
                             help="Full path of Valgrind's stack traces")
     parser.add_argument('-o', '--out_dir', type=str, required=False,
                             help="Full path of UAFuzz output directory")
+    parser.add_argument('--no_ida', default=False, action='store_true')
 
     args = parser.parse_args()
 
     bin_file = args.bin_file
     out_dir = args.out_dir
 
-    main(args.valgrind_file)
+    main(args.bin_file, args.valgrind_file, args.no_ida)
