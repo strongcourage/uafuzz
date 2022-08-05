@@ -14,7 +14,7 @@ Overall, UAFuzz has the similar workflow as directed fuzzers with our modificati
 More details in our [paper](./raid20-final286.pdf) at RAID'20 and our [talk](https://www.blackhat.com/us-20/briefings/schedule/#about-directed-fuzzing-and-use-after-free-how-to-find-complex--silent-bugs-20835) at Black Hat USA'20. Thanks also to Sébastien Bardin, Matthieu Lemerre, Prof. Roland Groz and especially Richard Bonichon ([@rbonichon](https://github.com/rbonichon)) for his help on Ocaml.
 
 ## Installation
-- [IDA Pro v6.9](https://www.hex-rays.com/products/ida/) (32-bit) and Python v2.7 (we aim to support more open-source binary disassemblers like Radare in the future).
+- [IDA Pro v6.9 and v7.6](https://www.hex-rays.com/products/ida/) (32-bit) and Python v2.7 (we aim to support more open-source binary disassemblers like Radare in the future).
 - [Graph-Easy v0.7.6](https://metacpan.org/pod/Graph::Easy) for converting IDA's call graph into dot format.
 - The profiling tool [Valgrind](https://valgrind.org/).
 - The binary analysis framework [BINSEC](https://github.com/binsec/binsec).
