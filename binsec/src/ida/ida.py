@@ -7,7 +7,10 @@ import sys
 import idautils
 import idaapi
 import idc
+import ida_auto
 import argparse
+import ida_nalt
+import ida_pro
 
 def hex_wo_L(addr):
     return hex(addr)[:-1]
@@ -32,7 +35,7 @@ class BinaryScanner(object):
         for (instruction, ret) in instructions:
             for xref in idautils.XrefsFrom(instruction, 0):
                 if xref.type == 17: # code_Near_Call
-                    callsite_function_name = idc.GetFunctionName(xref.to)
+                    callsite_function_name = idc.get_func_name(xref.to)
                     # TODO: handle indirect calls ?
                     if callsite_function_name is not None and len(callsite_function_name) > 0:
                         ct.append((instruction, xref.to, ret))
@@ -40,8 +43,8 @@ class BinaryScanner(object):
         return ct
 
     def _scan_block(self, block, fname):
-        current_bb_start = block.startEA
-        instructions = idautils.Heads(block.startEA, block.endEA)
+        current_bb_start = block.start_ea
+        instructions = idautils.Heads(block.start_ea, block.end_ea)
         last_instruction = None
         last_instruction_size = None
         call_instructions = []
@@ -49,12 +52,12 @@ class BinaryScanner(object):
 
         for i in instructions:
             last_instruction = i
-            last_instruction_size = idc.ItemSize(i)
-            mnem = idc.GetMnem(i)
+            last_instruction_size = idc.get_item_size(i)
+            mnem = idc.print_insn_mnem(i)
             is_call = mnem == "call"
             is_int = mnem == "int"
 
-            if (is_call or is_int) and i != block.endEA:
+            if (is_call or is_int) and i != block.end_ea:
                 if not ida_graph:
                     next_instruction = i + last_instruction_size
                     bb_size = next_instruction - current_bb_start
@@ -65,7 +68,7 @@ class BinaryScanner(object):
                     self._invoke_cbs(current_bb_start, i, bb_size, ct, [next_instruction], fname)
 
                     # start a new translation block
-                    current_bb_start = idc.NextHead(i, block.endEA + 1)
+                    current_bb_start = idc.next_head(i, block.end_ea + 1)
                 else:
                     next_instruction = i + last_instruction_size
                     call_instructions.append((i, next_instruction))
@@ -76,12 +79,12 @@ class BinaryScanner(object):
             # the call instruction probably doesn't return.
             return
 
-        if current_bb_start < block.endEA:
-            bb_size = block.endEA - current_bb_start
+        if current_bb_start < block.end_ea:
+            bb_size = block.end_ea - current_bb_start
             ct = []
             succs = []
             for succ_block in block.succs():
-                succs.append(succ_block.startEA)
+                succs.append(succ_block.start_ea)
 
             if not ida_graph and mnem == "call":
                 call_instructions = [(last_instruction, succs[0])]
@@ -95,8 +98,8 @@ class BinaryScanner(object):
     def scan(self):
         for fcn in idautils.Functions():
             # only interested in functions in .text or .plt segment
-            if not (idc.SegName(fcn) in ['extern']):
-                fname = idc.GetFunctionName(fcn)
+            if not (idc.get_segm_name(fcn) in ['extern']):
+                fname = idc.get_func_name(fcn)
                 f = idaapi.FlowChart(idaapi.get_func(fcn))
                 # print out to ida file
                 self._invoke_cbs_fcn(fcn, fname)
@@ -131,7 +134,7 @@ class Printer():
         # instruction: (addr;mnemonic;opcode;bb_addr;fname)
         for i in idautils.Heads(start, end+1):
             opcodes = []
-            for op in GetManyBytes(i, ItemSize(i)):
+            for op in get_bytes(i, get_item_size(i)):
                 if len(str(hex(ord(op)))) % 2 != 0:
                     opcodes.append('0' + '%X' % ord(op))
                 else:
@@ -173,16 +176,16 @@ if __name__ == "__main__":
         print output_dir, "is not a directory"
         idc.Exit(0)
 
-    basename = os.path.join(output_dir, idc.GetInputFile())
+    basename = os.path.join(output_dir, ida_nalt.get_root_filename())
     ida_file = os.path.join(output_dir, basename + ".ida")
     sys.stdout = sys.stderr = open(ida_file, "w")
 
     if args.call_graph:
         cg_file = os.path.join(output_dir, "callgraph.gdl")
-        idc.GenCallGdl(cg_file, 'Call Gdl', idc.CHART_GEN_GDL)
+        idc.gen_simple_call_chart(cg_file, 'Call Gdl', idc.CHART_GEN_GDL)
 
     # waits for IDA's auto-analysis to finish before continuing IDC code execution
-    idc.Wait()
+    ida_auto.auto_wait()
 
     printer = Printer()
     funcs_printer = FuncsPrinter(os.path.join(output_dir, basename + ".funcs"))
@@ -193,4 +196,4 @@ if __name__ == "__main__":
     scanner.scan()
 
     # exit IDA
-    idc.Exit(0)
+    ida_pro.qexit(0)
