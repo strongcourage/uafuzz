@@ -2427,7 +2427,7 @@ static u8 run_target(char** argv, u32 timeout) {
      must prevent any earlier operations from venturing into that
      territory. */
 
-  memset(trace_bits, 0, MAP_SIZE);
+  memset(trace_bits, 0, MAP_SIZE + DISTANCE_SIZE);
   // UAFuzz
   if (run_uafuzz) {
     memset(trace_bits + MAP_SIZE + DISTANCE_SIZE, 0, TRACE_TARGETS);
